@@ -1,7 +1,12 @@
 import Image from 'next/image';
-import { CloseOutline } from 'react-ionicons';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { CloseOutline, CartOutline, PricetagsOutline, ReceiptOutline, PersonOutline } from 'react-ionicons';
+
 
 function Sidebar({ show }) {
+    const router = useRouter();
+    const { id } = router.query;
 
     const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
@@ -9,7 +14,7 @@ function Sidebar({ show }) {
                 <div className="modal-body p-0">
                     <div className="profileBox pt-2 pb-2">
                         <div className="image-wrapper">
-                            <Image src="/images/profile/profile.png" width={36} height={36} alt="image" className="imaged  w36" />
+                            <Image src="/images/profile/profile.png" width={36} height={36} alt="image" className="imaged w36" />
                         </div>
                         <div className="in">
                             <strong>Sofie Taden</strong>
@@ -54,44 +59,52 @@ function Sidebar({ show }) {
                     </div>
                     <ul className="listview flush transparent no-line image-listview">
                         <li>
-                            <a href="order-checkout-my-order.html" className="item">
-                                <div className="icon-box bg-primary card-border">
-                                    <ion-icon name="cart-outline"></ion-icon>
-                                </div>
-                                <div className="in">
-                                    My Current Order
-                                </div>
-                            </a>
+                            <Link href={`/restaurant/${id}/menu`}>
+                                <a className="item">
+                                    <div className="icon-box bg-primary card-border">
+                                        <CartOutline color="#FFF" />
+                                    </div>
+                                    <div className="in">
+                                        My Current Order
+                                    </div>
+                                </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="order-menu.html" className="item">
-                                <div className="icon-box bg-primary card-border">
-                                    <ion-icon name="pricetags-outline"></ion-icon>
-                                </div>
-                                <div className="in">
-                                    Menu
-                                </div>
-                            </a>
+                            <Link href={`/restaurant/${id}/menu`}>
+                                <a className="item">
+                                    <div className="icon-box bg-primary card-border">
+                                        <PricetagsOutline color="#FFF" />
+                                    </div>
+                                    <div className="in">
+                                        Menu
+                                    </div>
+                                </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="order-receipts.html" className="item">
-                                <div className="icon-box bg-primary card-border">
-                                    <ion-icon name="receipt-outline"></ion-icon>
-                                </div>
-                                <div className="in">
-                                    Receipts
-                                </div>
-                            </a>
+                            <Link href="/orders">
+                                <a className="item">
+                                    <div className="icon-box bg-primary card-border">
+                                        <ReceiptOutline color="#FFF" />
+                                    </div>
+                                    <div className="in">
+                                        Receipts
+                                    </div>
+                                </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="order-my-profile.html" className="item">
-                                <div className="icon-box bg-primary card-border">
-                                    <ion-icon name="person-outline"></ion-icon>
-                                </div>
-                                <div className="in">
-                                    My Profile
-                                </div>
-                            </a>
+                            <Link href="/profile">
+                                <a className="item">
+                                    <div className="icon-box bg-primary card-border">
+                                        <PersonOutline color="#FFF" />
+                                    </div>
+                                    <div className="in">
+                                        My Profile
+                                    </div>
+                                </a>
+                            </Link>
                         </li>
                     </ul>
                     <div className="sidebar-preferred-lang mt-2">

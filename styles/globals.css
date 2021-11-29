@@ -711,6 +711,7 @@ a:hover, a:active, a:focus {
   -webkit-transition: all .5s ease;
   transition: all .5s ease;
   padding: 2px;
+  height: 46px;
 }
 
 .order-sidebar .sidebar-preferred-lang .wide-block ul li img {
@@ -1753,18 +1754,20 @@ a.badge-dark {
   background: rgba(220, 220, 233, 0.3);
 }
 
-.image-listview>li a.item:after {
-  content: "\f3d1";
-  font-family: "Ionicons";
-  font-size: 18px;
+.image-listview>li .item .in::after {
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  content: '';
   position: absolute;
+  width: 8px;
+  height: 8px;
   right: 16px;
   color: #A9ABAD;
   opacity: 0.6;
   line-height: 1em;
-  height: 18px;
-  top: 50%;
+  top: 55%;
   margin-top: -9px;
+  transform: rotate(-45deg)
 }
 
 .image-listview>li.active .item {
@@ -5604,12 +5607,13 @@ textarea,
   min-width: max-content;
 }
 
-.categories li a {
+.categories li span {
   font-size: 15px;
   color: #27173E;
+  cursor: pointer;
 }
 
-.categories li.category-active a {
+.categories li.category-active span {
   font-weight: 700;
   border-bottom: 1px solid #3b3a3a;
 }
@@ -9167,12 +9171,12 @@ body.dark-mode .categories {
   background-color: #030108;
 }
 
-body.dark-mode .categories li a {
+body.dark-mode .categories li span {
   color: #fff;
   font-weight: 400;
 }
 
-body.dark-mode .categories li.category-active a {
+body.dark-mode .categories li.category-active span {
   color: #fff;
   font-weight: 700;
   border-bottom: 1px solid #fff !important;

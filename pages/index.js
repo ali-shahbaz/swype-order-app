@@ -2,6 +2,7 @@ import styles from '../styles/Home.module.css'
 import { useEffect } from 'react';
 import Header from '../components/head';
 import Link from 'next/link';
+import { apiSettings } from '../configs/api-settings';
 
 export default function Home({ data }) {
   useEffect(() => {
@@ -11,11 +12,11 @@ export default function Home({ data }) {
     }
   }, [data]);
   return (
-    <div className={styles.container}>
+    <div>
       <Header title="Swype Order | Welcome"></Header>
       <Link href={`/restaurant/1`} >
         <a>Open Restaurant</a>
-      </Link>     
+      </Link>
     </div>
   )
 }
@@ -23,7 +24,7 @@ export default function Home({ data }) {
 // This gets called on every request
 export async function getServerSideProps({ params }) {
   // Fetch data from external API
-  const res = await fetch(`https://moreposapp-stage.azurewebsites.net/orderapp/getmenu/115`)
+  const res = await fetch(`${apiSettings.apiUrl}/orderapp/getmenu/115`)
   const data = await res.json()
   // Pass data to the page via props
   return { props: { data } }

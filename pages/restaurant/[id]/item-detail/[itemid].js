@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import useSessionStorage from '../../../../hooks/useSessionStorage';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import Header from '../../../../components/head';
 
 const ItemDetail = ({ props }) => {
     let state = useSessionStorage('init_data');
@@ -19,6 +20,7 @@ const ItemDetail = ({ props }) => {
         <Image src="/images/favicon.png" width={32} height={32} layout="fixed" alt="icon" className="loading-icon" />
     </div>
     return <>
+        <Header title={detail.name}></Header>
         <div className="section mt-2 order-item">
             <div className="row item-hero">
                 <div className="col-6 item-card-lg">

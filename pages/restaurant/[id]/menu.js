@@ -1,13 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useSessionStorage from '../../../hooks/useSessionStorage';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Header from '../../../components/head';
 const Menu = ({ props }) => {
     let state = useSessionStorage('init_data');
+    const tabRef = useRef(null);
     const router = useRouter();
     const { id } = router.query;
     const [menu, setMenu] = useState(null);
+
+    useEffect(() => {
+        setTimeout(() => {
+            if (tabRef && tabRef.current) {
+                tabRef.current.click();
+            }
+        }, 0);
+    }, [])
+
     const categoryClick = (event, categoryID) => {
         const filterMenuChildren = event.currentTarget.parentElement.children;
         for (let i = 0; i < filterMenuChildren.length; i++) {
@@ -17,10 +28,6 @@ const Menu = ({ props }) => {
         const products = state.quickProducts.filter(p => p.categoryid == categoryID);
         setMenu(products);
     }
-    useEffect(() => {
-        const s = state;
-        debugger
-    }, [state])
 
     if (!state) return <div id="loader">
         <Image src="/images/favicon.png" width={32} height={32} layout="fixed" alt="icon" className="loading-icon" />
@@ -28,11 +35,12 @@ const Menu = ({ props }) => {
     state = state.payload.data;
 
     return <>
+        <Header title="Menu"></Header>
         <ul id="menuCategory" className="categories pt-1 pb-1">
             {
-                state.quickKeyCategoryList.map(item => {
-                    return <li key={item.categoryID} onClick={(e) => categoryClick(e, item.categoryID)} className="single-category" data-target={item.name}>
-                        <a href="#">{item.name}</a>
+                state.quickKeyCategoryList.map((item, i) => {
+                    return <li key={item.categoryID} ref={el => i == 0 ? tabRef.current = el : null} onClick={(e) => categoryClick(e, item.categoryID)} className="single-category" data-target={item.name}>
+                        <span>{item.name}</span>
                     </li>
                 })
             }

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import useSessionStorage from '../../hooks/useSessionStorage';
 import { useRouter } from 'next/router';
 
-function Restaurant({ props }) {
+const Restaurant = (params) => {
     let state = useSessionStorage('init_data');
     const [orderUrl, setOrderUrl] = useState();
     const router = useRouter();

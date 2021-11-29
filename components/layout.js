@@ -1,8 +1,29 @@
+import { useRouter } from 'next/router';
 import { MenuOutline, ChevronBackOutline } from 'react-ionicons'
-import { useRouter } from 'next/router'
+
 
 function Layout({ props, children, name }) {
     const router = useRouter();
+    let title = '';
+    switch (name) {
+        case 'tables':
+            title = 'Select Your Section';
+            break;
+        case 'menu':
+            title = 'Menu';
+            break;
+        case 'itemdetail':
+            title = 'Item';
+            break;
+        case 'order':
+            title = 'My Orders';
+            break;
+        case 'profile':
+            title = 'My Profile';
+            break;
+        default:
+            break;
+    }
     const content = <>
         {name == 'restaurant' ? (<>
             <div className="appHeader order-welcome-header">
@@ -18,7 +39,7 @@ function Layout({ props, children, name }) {
                         <ChevronBackOutline />
                     </div>
                 </div>
-                <div className="pageTitle">{name}</div>
+                <div className="pageTitle">{title}</div>
             </div></>)}
         <div id="appCapsule" className={name == 'restaurant' ? 'pt-0' : ''}>
             {children}
