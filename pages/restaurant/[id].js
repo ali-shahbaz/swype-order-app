@@ -22,12 +22,16 @@ const Restaurant = (params) => {
     }
 
     useEffect(() => {
-        setOrderUrl(`/restaurant/${id}/tables`);
-    }, [id]);
+        if (state && state.quickTables.length == 0) {
+            setOrderUrl(`/restaurant/${id}/menu`);
+        } else {
+            setOrderUrl(`/restaurant/${id}/tables`);
+        }
+    }, [id, state]);
 
     const orderTypeChange = (event) => {
         const val = event.target.value.toLowerCase();
-        if (val === 'takeaway' || val === 'delivery') {
+        if (val === 'takeaway' || val === 'delivery' || state.quickTables.length == 0) {
             setOrderUrl(`/restaurant/${id}/menu`);
         } else {
             setOrderUrl(`/restaurant/${id}/tables`);

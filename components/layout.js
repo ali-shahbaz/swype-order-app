@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
-import { MenuOutline, ChevronBackOutline } from 'react-ionicons'
+import { MenuOutline, ChevronBackOutline, CartOutline } from 'react-ionicons'
+import Link from 'next/link';
 
 
 function Layout({ props, children, name }) {
@@ -40,6 +41,14 @@ function Layout({ props, children, name }) {
                     </div>
                 </div>
                 <div className="pageTitle">{title}</div>
+                <div className="right">
+                    <Link href="/checkout">
+                        <a className="headerButton">
+                            <CartOutline />
+                            <div className="badge badge-danger"></div>
+                        </a>
+                    </Link>
+                </div>
             </div></>)}
         <div id="appCapsule" className={name == 'restaurant' ? 'pt-0' : ''}>
             {children}

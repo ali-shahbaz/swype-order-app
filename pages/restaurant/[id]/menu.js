@@ -52,7 +52,7 @@ const Menu = ({ props }) => {
                         <Link href={`/restaurant/${id}/item-detail/${item.itemid}`}>
                             <a>
                                 <div className="card card-border">
-                                    <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={120} objectFit="cover" priority className="card-img-top" alt="image" />
+                                    <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={120} objectFit="cover" priority={true} className="card-img-top" alt="image" />
                                     <div className="card-body p-1">
                                         <div className="left">
                                             <h5 className="card-title">{item.name}</h5>

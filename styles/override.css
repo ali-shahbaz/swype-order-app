@@ -1,0 +1,16 @@
+.optional .single-modification {
+    margin-bottom: 0px !important;
+    border: none !important;
+}
+
+.optional .input-list .form-check .form-check-label {
+    min-height: 40px !important;
+}
+
+.optional .input-list .form-check .form-check-label:before, .optional .input-list .form-check .form-check-label:after {
+    top: 9px !important;
+}
+
+.optional .single-modification .form-check .form-check-label::after{
+    border-radius: 50% !important;
+}

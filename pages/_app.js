@@ -1,6 +1,7 @@
 import Layout from '../components/layout'
 import Sidebar from '../components/sidebar'
 import '../styles/globals.css'
+import '../styles/override.css'
 import '@splidejs/splide/dist/css/splide.min.css'
 import { useEffect } from "react";
 
