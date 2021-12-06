@@ -11,6 +11,10 @@
     top: 9px !important;
 }
 
-.optional .single-modification .form-check .form-check-label::after{
+.optional .single-modification .form-check .radio.form-check-label::after {
     border-radius: 50% !important;
+}
+
+.order-item .qnt-total {
+    margin-top: 10px;
 }

@@ -1,10 +1,16 @@
 import { useRouter } from 'next/router';
 import { MenuOutline, ChevronBackOutline, CartOutline } from 'react-ionicons'
 import Link from 'next/link';
+import { useRecoilValue } from 'recoil';
+import { cartState } from '../states/atoms';
+import useSessionStorage from '../hooks/useSessionStorage';
+import { useEffect } from 'react';
 
 
 function Layout({ props, children, name }) {
     const router = useRouter();
+    const cartCount = useRecoilValue(cartState);
+    const cartStorage = useSessionStorage('cart');
     let title = '';
     switch (name) {
         case 'tables':
@@ -25,6 +31,7 @@ function Layout({ props, children, name }) {
         default:
             break;
     }
+
     const content = <>
         {name == 'restaurant' ? (<>
             <div className="appHeader order-welcome-header">
@@ -45,7 +52,7 @@ function Layout({ props, children, name }) {
                     <Link href="/checkout">
                         <a className="headerButton">
                             <CartOutline />
-                            <div className="badge badge-danger"></div>
+                            <div className="badge badge-danger">{cartCount != 0 ? cartCount : cartStorage && cartStorage.length}</div>
                         </a>
                     </Link>
                 </div>

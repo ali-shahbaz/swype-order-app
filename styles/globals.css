@@ -9236,3 +9236,10 @@ body.dark-mode .order-item .instruction textarea {
 .cursor-pointer {
   cursor: pointer !important;
 }
+
+.order-item .remove-item {
+  cursor: pointer;
+  position: absolute;
+  right: 3px;
+  top: 1px;
+}
