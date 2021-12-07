@@ -13,7 +13,7 @@ const Tables = () => {
         <Image src="/images/favicon.png" width={32} height={32} layout="fixed" alt="icon" className="loading-icon" />
     </div>
     state = state.payload.data;
-    return <>
+    return <div className="order-receipts">
         <Header title="Select Your Section"></Header>
         <ul className="listview separate-list image-listview no-line no-arrow inset">
             {state.quickTables.map((item, index) => {
@@ -35,6 +35,6 @@ const Tables = () => {
                 </Link>
             </div>
         </div>
-    </>
+    </div>
 }
 export default Tables;

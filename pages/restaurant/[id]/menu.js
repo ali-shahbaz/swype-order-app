@@ -4,12 +4,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Header from '../../../components/head';
+import { useRecoilState } from 'recoil';
+import { menuTabState } from '../../../states/atoms';
 const Menu = ({ props }) => {
     let state = useSessionStorage('init_data');
     const tabRef = useRef(null);
     const router = useRouter();
     const { id } = router.query;
     const [menu, setMenu] = useState(null);
+    const [tab, setTab] = useRecoilState(menuTabState);
+
 
     useEffect(() => {
         setTimeout(() => {
@@ -17,9 +21,10 @@ const Menu = ({ props }) => {
                 tabRef.current.click();
             }
         }, 0);
-    }, [])
+    })
 
     const categoryClick = (event, categoryID) => {
+        setTab(event.currentTarget);
         const filterMenuChildren = event.currentTarget.parentElement.children;
         for (let i = 0; i < filterMenuChildren.length; i++) {
             filterMenuChildren[i].classList.remove('category-active');

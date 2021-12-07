@@ -16,6 +16,7 @@ const ItemDetail = ({ props }) => {
     const varificationEl = useRef();
     const router = useRouter();
     const { id, itemid } = router.query;
+    const cartName = `cart${id}`;
 
     useEffect(() => {
         if (data) {
@@ -76,13 +77,16 @@ const ItemDetail = ({ props }) => {
 
                 }
 
-                const modifier = {
-                    modifierId: parentId,
-                    modifierOptionId: id,
-                    name: modifierOption.name,
-                    price: modifierOption.price
+                if (e.target.checked) {
+                    const modifier = {
+                        modifierId: parentId,
+                        modifierOptionId: id,
+                        name: modifierOption.name,
+                        price: modifierOption.price
+                    }
+                    orderItemsState[index].selectedModifiers.push(modifier);
                 }
-                orderItemsState[index].selectedModifiers.push(modifier);
+
                 orderItemsState[index].total = orderItemsState[index].salesprice + orderItemsState[index].selectedModifiers.reduce((acc, obj) => { return acc + obj.price; }, 0);
                 setOrderItemsState(prev => prev = [...orderItemsState]);
             }
@@ -96,15 +100,15 @@ const ItemDetail = ({ props }) => {
     }
 
     const addToOrder = () => {
-        let cart = sessionStorage.getItem('cart');
+        let cart = sessionStorage.getItem(cartName);
         if (cart) {
             cart = [...JSON.parse(cart), ...orderItemsState];
-            sessionStorage.setItem('cart', JSON.stringify(cart));
+            sessionStorage.setItem(cartName, JSON.stringify(cart));
         } else {
-            sessionStorage.setItem('cart', JSON.stringify(orderItemsState));
+            sessionStorage.setItem(cartName, JSON.stringify(orderItemsState));
         }
 
-        const orderItemsCount = JSON.parse(sessionStorage.getItem('cart')).length;
+        const orderItemsCount = JSON.parse(sessionStorage.getItem(cartName)).length;
         setCart(orderItemsCount);
         router.back();
     }
@@ -118,7 +122,7 @@ const ItemDetail = ({ props }) => {
             <div className="row item-hero">
                 <div className="col-6 item-card-lg">
                     <div className="card card-border">
-                        <Image src={itemState.detailimageurl ? itemState.detailimageurl : '/images/food/wide1.jpg'} width={250} height={120} objectFit="cover" priority className="card-img-top" alt="image" />
+                        <Image src={itemState.detailimageurl ? itemState.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority className="card-img-top" alt="image" />
                         <div className="card-body p-1">
                             <div className="left">
                                 <h5 className="card-title">{itemState.name}</h5>

@@ -9,8 +9,9 @@ import { useEffect } from 'react';
 
 function Layout({ props, children, name }) {
     const router = useRouter();
+    const { id } = router.query;
     const cartCount = useRecoilValue(cartState);
-    const cartStorage = useSessionStorage('cart');
+    const cartStorage = useSessionStorage(`cart${id}`);
     let title = '';
     switch (name) {
         case 'tables':
@@ -49,14 +50,15 @@ function Layout({ props, children, name }) {
                 </div>
                 <div className="pageTitle">{title}</div>
                 <div className="right">
-                    <Link href="/checkout">
+                    <Link href={`/restaurant/${id}/checkout`}>
                         <a className="headerButton">
                             <CartOutline />
                             <div className="badge badge-danger">{cartCount != 0 ? cartCount : cartStorage && cartStorage.length}</div>
                         </a>
                     </Link>
                 </div>
-            </div></>)}
+            </div></>)
+        }
         <div id="appCapsule" className={name == 'restaurant' ? 'pt-0' : ''}>
             {children}
         </div>
