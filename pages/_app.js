@@ -5,6 +5,8 @@ import '../styles/override.css'
 import '@splidejs/splide/dist/css/splide.min.css'
 import { useEffect } from "react";
 import { RecoilRoot } from 'recoil';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
@@ -14,6 +16,7 @@ function MyApp({ Component, pageProps }) {
     <Layout name={Component.name.toLowerCase()}>
       <Component {...pageProps} />
       <Sidebar />
+      <ToastContainer hideProgressBar={true} autoClose={3000} position="top-center" />
     </Layout>
   </RecoilRoot>
 }

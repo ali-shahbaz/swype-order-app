@@ -1,6 +1,40 @@
+import { useState } from 'react';
 import IntlTelInput from 'react-intl-tel-input';
 import 'react-intl-tel-input/dist/main.css';
+import { loginUser } from '../../services/user-service';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
+
+
 const Login = () => {
+    const [number, setNumber] = useState(null);
+    const router = useRouter();
+    const singin = () => {
+        if (number) {
+            loginUser(JSON.stringify(number))
+                .then(data => {
+                    if (data.status == 1) {
+                        debugger
+                        sessionStorage.setItem('user_number', JSON.stringify(number))
+                        router.push('/user/login-verify');
+                    } else {
+                        toast.error(data.error);
+                    }
+                });
+        } else {
+            toast.error("Phone number is not valid");
+        }
+
+    }
+
+    const changeHandler = (isValid, value, selectedCountryData, fullNumber, extension) => {
+        if (isValid) {
+            setNumber({
+                MobileNumber: fullNumber
+            });
+        }
+    }
+
     return <div className="section">
         <div className="card card-border mt-2">
             <div className="card-body">
@@ -8,8 +42,8 @@ const Login = () => {
                     <div className="form-group flag-mbl-input basic">
                         <div className="input-wrapper">
                             <label className="label" htmlFor="phone">Mobile</label>
-                            <IntlTelInput
-                               fieldName="phone" preferredCountries={['us','gb']}
+                            <IntlTelInput onPhoneNumberChange={changeHandler}
+                                fieldName="phone" preferredCountries={['pk', 'gb']}
                             />
                         </div>
                     </div>
@@ -18,7 +52,7 @@ const Login = () => {
         </div>
 
         <div className="mt-4">
-            <a href="order-my-profile-login-sms.html" className="btn btn-primary btn-shadow btn-lg btn-block mt-2">{`Let's go`}</a>
+            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={singin}>{`Let's go`}</button>
         </div>
     </div>
 }

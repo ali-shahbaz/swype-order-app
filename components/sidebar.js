@@ -2,11 +2,32 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { CloseOutline, CartOutline, PricetagsOutline, ReceiptOutline, PersonOutline } from 'react-ionicons';
+import { useEffect, useRef, useState } from 'react';
+import useSessionStorage from '../hooks/useSessionStorage';
 
 
 function Sidebar({ show }) {
     const router = useRouter();
+    const loggedInUser = useSessionStorage('logged_in_user');
     const { id } = router.query;
+    const closeRef = useRef(null);
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+
+    useEffect(() => {
+        const handleRouteChange = (url, { shallow }) => {
+            closeRef.current.click();
+        }
+        router.events.on('routeChangeStart', handleRouteChange);
+        if (loggedInUser) {
+            setIsUserLoggedIn(true);
+        }
+    }, [loggedInUser, router.events])
+
+    const logout = () => {
+        sessionStorage.removeItem('logged_in_user');
+        setIsUserLoggedIn(false);
+    }
 
     const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
@@ -14,12 +35,12 @@ function Sidebar({ show }) {
                 <div className="modal-body p-0">
                     <div className="profileBox pt-2 pb-2">
                         <div className="image-wrapper">
-                            <Image src="/images/profile/profile.png" width={36} height={36} alt="image" className="imaged w36" />
+                            <Image src="/images/profile/profile.png" width={36} height={36} layout="fixed" alt="image" className="imaged w36" />
                         </div>
                         <div className="in">
                             <strong>Sofie Taden</strong>
                         </div>
-                        <a href="#" className="btn btn-link btn-icon sidebar-close" data-bs-dismiss="modal">
+                        <a href="#" ref={closeRef} className="btn btn-link btn-icon sidebar-close" data-bs-dismiss="modal">
                             <CloseOutline />
                         </a>
                     </div>
@@ -95,7 +116,7 @@ function Sidebar({ show }) {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/profile">
+                            <Link href="/user/profile">
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <PersonOutline color="#FFF" />
@@ -146,7 +167,11 @@ function Sidebar({ show }) {
                         </li>
                     </ul>
                     <div className="section log-out-btn mt-3">
-                        <a href="#" className="btn bg-primary btn-shadow btn-lg">Log Out</a>
+                        {isUserLoggedIn ? (<button className="btn bg-primary btn-shadow btn-lg" onClick={logout}>Logout</button>) :
+                            <Link href="/user/login">
+                                <a className="btn bg-primary btn-shadow btn-lg">Login</a>
+                            </Link>
+                        }
                     </div>
                 </div>
             </div>

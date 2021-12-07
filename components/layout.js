@@ -12,6 +12,45 @@ function Layout({ props, children, name }) {
     const { id } = router.query;
     const cartCount = useRecoilValue(cartState);
     const cartStorage = useSessionStorage(`cart${id}`);
+    useEffect(() => {
+
+        // clear
+        const clearInput = document.querySelectorAll(".clear-input");
+        clearInput.forEach(function (el) {
+            el.addEventListener("click", function () {
+                const parent = this.parentElement;
+                const input = parent.querySelector(".form-control");
+                input.focus();
+                input.value = "";
+                parent.classList.remove("not-empty");
+            });
+        });
+
+        // active
+        const formControl = document.querySelectorAll(".form-group .form-control");
+        formControl.forEach(function (el) {
+            // active
+            el.addEventListener("focus", () => {
+                var parent = el.parentElement;
+                parent.classList.add("active");
+            });
+            el.addEventListener("blur", () => {
+                var parent = el.parentElement;
+                parent.classList.remove("active");
+            });
+            // empty check
+            el.addEventListener("keyup", log);
+            function log(e) {
+                var inputCheck = this.value.length;
+                if (inputCheck > 0) {
+                    this.parentElement.classList.add("not-empty");
+                } else {
+                    this.parentElement.classList.remove("not-empty");
+                }
+            }
+        });
+    });
+
     let title = '';
     switch (name) {
         case 'tables':
