@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { CloseOutline, CartOutline, PricetagsOutline, ReceiptOutline, PersonOutline } from 'react-ionicons';
 import { useEffect, useRef, useState } from 'react';
 import useSessionStorage from '../hooks/useSessionStorage';
+import { userLoggedInState } from '../states/atoms';
+import { useRecoilValue } from 'recoil';
 
 
 function Sidebar({ show }) {
@@ -12,17 +14,22 @@ function Sidebar({ show }) {
     const { id } = router.query;
     const closeRef = useRef(null);
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-
+    const loggedIn = useRecoilValue(userLoggedInState);
+    const [profileUrl, setProfileUrl] = useState('/user/profile');
 
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {
-            closeRef.current.click();
+            if (closeRef && closeRef.current)
+                closeRef.current.click();
         }
         router.events.on('routeChangeStart', handleRouteChange);
-        if (loggedInUser) {
+        if (loggedInUser || loggedIn) {
+            setProfileUrl('/user/profile');
             setIsUserLoggedIn(true);
+        } else {
+            setProfileUrl('/user/login');
         }
-    }, [loggedInUser, router.events])
+    }, [loggedIn, loggedInUser, router.events])
 
     const logout = () => {
         sessionStorage.removeItem('logged_in_user');
@@ -34,12 +41,19 @@ function Sidebar({ show }) {
             <div className="modal-content">
                 <div className="modal-body p-0">
                     <div className="profileBox pt-2 pb-2">
-                        <div className="image-wrapper">
-                            <Image src="/images/profile/profile.png" width={36} height={36} layout="fixed" alt="image" className="imaged w36" />
-                        </div>
-                        <div className="in">
-                            <strong>Sofie Taden</strong>
-                        </div>
+                        <Link href={profileUrl}>
+                            <a className="user-info">
+                                {
+                                    loggedInUser && loggedInUser.name ? <>
+                                        <div className="image-wrapper">
+                                            <Image src="/images/profile/profile.png" width={36} height={36} layout="fixed" alt="image" className="imaged w36" />
+                                        </div>
+                                        <div className="in">
+                                            <strong>Sofie Taden</strong>
+                                        </div> </> : <h2 className="mb-0">Set Up Your Profile</h2>
+                                }
+                            </a>
+                        </Link>
                         <a href="#" ref={closeRef} className="btn btn-link btn-icon sidebar-close" data-bs-dismiss="modal">
                             <CloseOutline />
                         </a>

@@ -9,11 +9,15 @@ import { useEffect } from 'react';
 
 function Layout({ props, children, name }) {
     const router = useRouter();
-    const { id } = router.query;
+    let { id } = router.query;
+    const data = useSessionStorage('init_data')
     const cartCount = useRecoilValue(cartState);
+    
+    if (!id && data) {
+        id = data.payload.data.id;
+    }
     const cartStorage = useSessionStorage(`cart${id}`);
     useEffect(() => {
-
         // clear
         const clearInput = document.querySelectorAll(".clear-input");
         clearInput.forEach(function (el) {

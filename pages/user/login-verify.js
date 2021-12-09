@@ -3,16 +3,28 @@ import useSessionStorage from "../../hooks/useSessionStorage";
 import { loginVerify } from "../../services/user-service";
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import router, { useRouter } from 'next/router';
+import { useRecoilState } from "recoil";
+import { userLoggedInState } from "../../states/atoms";
 
 const LoginVerify = () => {
     const userPhoneNumber = useSessionStorage('user_number');
     const [number, setNumber] = useState(null);
+    const { id } = router.query;
+    const cartStorage = useSessionStorage(`cart${id}`);
+    const [isUserLoggedIn, setIsUserLoggedIn] = useRecoilState(userLoggedInState);
 
     const verifyBySMS = () => {
         loginVerify(JSON.stringify(number))
             .then(data => {
                 if (data.status == 1) {
                     sessionStorage.setItem('logged_in_user', JSON.stringify(data.payload));
+                    setIsUserLoggedIn(true);
+                    if (cartStorage && cartStorage.length > 0) {
+                        router.push(`/restaurant/${id}/checkout`);
+                    } else {
+                        router.push(`/restaurant/${id}`);
+                    }
                 } else {
                     toast.error(data.message);
                 }

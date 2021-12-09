@@ -10,7 +10,7 @@ const Login = () => {
     const [number, setNumber] = useState(null);
     const router = useRouter();
     const singin = () => {
-        if (number) {
+        if (number.isValid) {
             loginUser(JSON.stringify(number))
                 .then(data => {
                     if (data.status == 1) {
@@ -28,11 +28,10 @@ const Login = () => {
     }
 
     const changeHandler = (isValid, value, selectedCountryData, fullNumber, extension) => {
-        if (isValid) {
-            setNumber({
-                MobileNumber: fullNumber
-            });
-        }
+        setNumber({
+            MobileNumber: fullNumber,
+            isValid
+        });
     }
 
     return <div className="section">

@@ -43,13 +43,13 @@ const ItemDetail = ({ props }) => {
         setOrderItemsState(items);
     }
 
-    const changeHandler = (e, index, id, parentId, type) => {
+    const changeHandler = (e, itemIndex, id, parentId, type) => {
         if (id && type == 'variation') {
             const variation = itemState.variations.find(p => p.itemvariationid == id);
             if (variation) {
                 if (e.target.checked) {
-                    orderItemsState[index].variationName = variation.name;
-                    orderItemsState[index].total = orderItemsState[index].salesprice + variation.salesprice;
+                    orderItemsState[itemIndex].variationName = variation.name;
+                    orderItemsState[itemIndex].total = orderItemsState[itemIndex].salesprice + variation.salesprice;
 
                     [...varificationEl.current.getElementsByTagName("input")].forEach(element => {
                         if (element.name != e.target.name) {
@@ -58,8 +58,8 @@ const ItemDetail = ({ props }) => {
                     });
 
                 } else {
-                    orderItemsState[index].variationName = '';
-                    orderItemsState[index].total = orderItemsState[index].salesprice;
+                    orderItemsState[itemIndex].variationName = '';
+                    orderItemsState[itemIndex].total = orderItemsState[itemIndex].salesprice;
                 }
 
                 setOrderItemsState(prev => prev = [...orderItemsState]);
@@ -70,9 +70,9 @@ const ItemDetail = ({ props }) => {
             if (quickModifier) {
                 const modifierOption = quickModifier.modifierOptions.find(p => p.modifierOptionId == id);
                 if (quickModifier.selectionAllowed == 1 || !e.target.checked) {
-                    const idx = orderItemsState[index].selectedModifiers && orderItemsState[index].selectedModifiers.findIndex(p => p.modifierId == parentId);
+                    const idx = orderItemsState[itemIndex].selectedModifiers && orderItemsState[itemIndex].selectedModifiers.findIndex(p => p.modifierId == parentId);
                     if (idx >= 0) {
-                        orderItemsState[index].selectedModifiers = orderItemsState[index].selectedModifiers.filter((p, i) => i != idx);
+                        orderItemsState[itemIndex].selectedModifiers = orderItemsState[itemIndex].selectedModifiers.filter((p, i) => i != idx);
                     }
 
                 }
@@ -84,17 +84,23 @@ const ItemDetail = ({ props }) => {
                         name: modifierOption.name,
                         price: modifierOption.price
                     }
-                    orderItemsState[index].selectedModifiers.push(modifier);
+                    orderItemsState[itemIndex].selectedModifiers.push(modifier);
                 }
 
-                orderItemsState[index].total = orderItemsState[index].salesprice + orderItemsState[index].selectedModifiers.reduce((acc, obj) => { return acc + obj.price; }, 0);
+                orderItemsState[itemIndex].total = orderItemsState[itemIndex].salesprice + orderItemsState[itemIndex].selectedModifiers.reduce((acc, obj) => { return acc + obj.price; }, 0);
                 setOrderItemsState(prev => prev = [...orderItemsState]);
+
+                // now unlock next panel
+                const nextSibling = e.target.closest('.accordion-item').nextSibling;
+                if (nextSibling.classList.contains('accordion-item')) {
+                    nextSibling.getElementsByTagName('button')[0].disabled = false;
+                }
             }
 
         }
 
         if (!id) {
-            orderItemsState[index].instructions = e.target.value;
+            orderItemsState[itemIndex].instructions = e.target.value;
         }
 
     }
@@ -139,12 +145,12 @@ const ItemDetail = ({ props }) => {
                 </div>
             </div>
             <div id="addItemContainer">
-                {orderItemsState.map((item, i) => {
-                    return <div key={i.toString()} className="card card-border mt-2">
+                {orderItemsState.map((item, itemIndex) => {
+                    return <div key={itemIndex.toString()} className="card card-border mt-2">
                         <div className="card-body">
                             <div className="options">
                                 {
-                                    (i != 0) && <div onClick={() => removeAnotherItem(i)} className="remove-item"><CloseCircle /></div>
+                                    (itemIndex != 0) && <div onClick={() => removeAnotherItem(itemIndex)} className="remove-item"><CloseCircle /></div>
                                 }
                             </div>
                             <div className="modification-item-name">
@@ -157,8 +163,8 @@ const ItemDetail = ({ props }) => {
                                         return <div key={variation.itemvariationid} className="single-modification">
                                             <div className="card-title mb-0">{variation.salesprice}</div>
                                             <div className="form-check">
-                                                <input type="checkbox" className="form-check-input" name={`${variation.itemvariationid}-${i}`} onChange={(e) => changeHandler(e, i, variation.itemvariationid, -1, 'variation')} id={`id${variation.itemvariationid}${i}`} />
-                                                <label className="form-check-label" htmlFor={`id${variation.itemvariationid}${i}`}>{item.name} {variation.name}</label>
+                                                <input type="checkbox" className="form-check-input" name={`${variation.itemvariationid}-${itemIndex}`} onChange={(e) => changeHandler(e, itemIndex, variation.itemvariationid, -1, 'variation')} id={`id${variation.itemvariationid}${itemIndex}`} />
+                                                <label className="form-check-label" htmlFor={`id${variation.itemvariationid}${itemIndex}`}>{item.name} {variation.name}</label>
                                             </div>
                                         </div>
                                     })
@@ -169,9 +175,9 @@ const ItemDetail = ({ props }) => {
                                     item.modifiers.map((modifier, index) => {
                                         const quickModifier = data.payload.data.quickModifiers.find(p => p.modifierId == modifier.modifierId);
                                         if (quickModifier) {
-                                            return <div key={index} className="accordion-item">
+                                            return <div key={index} data-optional={quickModifier.isOptional} className="accordion-item">
                                                 <h2 className="accordion-header" id={`modifier${modifier.itemModifierId}`}>
-                                                    <button className={"accordion-button" + (index != 0 ? ' collapsed' : '')} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${modifier.itemModifierId}`} aria-expanded={index == 0 ? 'true' : 'false'} aria-controls={`modifier${modifier.itemModifierId}`}>
+                                                    <button id={`headerBtn${index}`} className={"accordion-button" + (index != 0 ? ' collapsed' : '')} disabled={index == 0 ? false : true} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${modifier.itemModifierId}`} aria-expanded={index == 0 ? 'true' : 'false'} aria-controls={`modifier${modifier.itemModifierId}`}>
                                                         {quickModifier.displayName}
                                                     </button>
                                                 </h2>
@@ -183,8 +189,8 @@ const ItemDetail = ({ props }) => {
                                                                     return <div key={modifierOption.modifierOptionId} className="single-modification">
                                                                         <div className="card-title mb-0">{modifierOption.price != 0 && modifierOption.price}</div>
                                                                         <div className="form-check">
-                                                                            <input type="radio" className="form-check-input" onChange={(e) => changeHandler(e, i, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${i}modifier-${quickModifier.modifierId}`} id={`${i}modifierid-${modifierOption.modifierOptionId}`} />
-                                                                            <label className="radio form-check-label" htmlFor={`${i}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
+                                                                            <input type="radio" className="form-check-input" onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
+                                                                            <label className="radio form-check-label" htmlFor={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
                                                                         </div>
                                                                     </div>
                                                                 }) :
@@ -192,8 +198,8 @@ const ItemDetail = ({ props }) => {
                                                                     return <div key={modifierOption.modifierOptionId} className="single-modification">
                                                                         <div className="card-title mb-0">{modifierOption.price != 0 && modifierOption.price}</div>
                                                                         <div className="form-check">
-                                                                            <input type="checkbox" className="form-check-input" onChange={(e) => changeHandler(e, i, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${i}modifier-${quickModifier.modifierId}`} id={`${i}modifierid-${modifierOption.modifierOptionId}`} />
-                                                                            <label className="form-check-label" htmlFor={`${i}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
+                                                                            <input type="checkbox" className="form-check-input" onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
+                                                                            <label className="form-check-label" htmlFor={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
                                                                         </div>
                                                                     </div>
                                                                 })
@@ -214,8 +220,8 @@ const ItemDetail = ({ props }) => {
                                 </div>
                             </div>
                             <div className="instruction mt-3">
-                                <textarea name={`instructions-${i}`} id={`instructions${i}`} rows="2"
-                                    placeholder="Add an instruction to this item" onChange={(e) => changeHandler(e, i)} className="w-100 p-1"></textarea>
+                                <textarea name={`instructions-${itemIndex}`} id={`instructions${itemIndex}`} rows="2"
+                                    placeholder="Add an instruction to this item" onChange={(e) => changeHandler(e, itemIndex)} className="w-100 p-1"></textarea>
                             </div>
                         </div>
                     </div>
@@ -235,7 +241,7 @@ const ItemDetail = ({ props }) => {
         </div>
 
         <div className="section mt-4">
-            <button className="btn btn-primary btn-shadow btn-lg btn-block" onClick={() => addToOrder()}>Add to Order</button>
+            <button disabled className="btn btn-primary btn-shadow btn-lg btn-block" onClick={() => addToOrder()}>Add to Order</button>
         </div>
     </>
 }

@@ -9,3 +9,8 @@ export const menuTabState = atom({
     key: 'menuTab',
     default: null
 });
+
+export const userLoggedInState = atom({
+    key: 'userLoggedIn',
+    default: false
+});

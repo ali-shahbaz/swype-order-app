@@ -21,7 +21,7 @@ const Menu = ({ props }) => {
                 tabRef.current.click();
             }
         }, 0);
-    })
+    }, [tabRef])
 
     const categoryClick = (event, categoryID) => {
         setTab(event.currentTarget);

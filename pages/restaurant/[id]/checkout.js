@@ -6,6 +6,15 @@ const Checkout = () => {
     const router = useRouter();
     const { id } = router.query;
     const cart = useSessionStorage(`cart${id}`);
+    const loggedInUser = useSessionStorage('logged_in_user');
+
+    const payNow = () => {
+        if (loggedInUser) {
+
+        } else {
+            router.push('/user/login')
+        }
+    }
 
     return <div className="order-checkout">
         <div className="section">
@@ -34,8 +43,7 @@ const Checkout = () => {
         </div>
 
         <div className="section mt-4">
-            <a href="order-my-profile-2.html" className="btn btn-primary btn-shadow btn-lg btn-block">Invite a Friend to Your Order</a>
-            <a href="#" className="btn btn-primary btn-shadow btn-lg btn-block mt-2">Pay Now</a>
+            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={payNow}>Pay Now</button>
         </div>
     </div>
 }

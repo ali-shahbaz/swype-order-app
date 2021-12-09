@@ -7,8 +7,9 @@ import { useEffect } from "react";
 import { RecoilRoot } from 'recoil';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { appWithTranslation } from 'next-i18next';
 
-function MyApp({ Component, pageProps }) {
+const MyApp = ({ Component, pageProps }) => {
   useEffect(() => {
     import('bootstrap/dist/js/bootstrap.bundle');
   }, []);
@@ -21,4 +22,4 @@ function MyApp({ Component, pageProps }) {
   </RecoilRoot>
 }
 
-export default MyApp
+export default appWithTranslation(MyApp)

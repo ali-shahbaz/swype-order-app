@@ -9244,3 +9244,12 @@ body.dark-mode .order-item .instruction textarea {
   right: 3px;
   top: 1px;
 }
+
+.profileBox a.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.profileBox a.user-info:hover h2 {
+  color: #1DCC70 !important;
+}

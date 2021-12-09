@@ -5,12 +5,16 @@ import { Splide, SplideSlide } from '@splidejs/react-splide';
 import Link from 'next/link';
 import useSessionStorage from '../../hooks/useSessionStorage';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Restaurant = (params) => {
     let state = useSessionStorage('init_data');
     const [orderUrl, setOrderUrl] = useState();
     const router = useRouter();
     const { id } = router.query;
+    const { t } = useTranslation();
+
     let offers;
     if (state) {
         state = state.payload.data;
@@ -23,19 +27,23 @@ const Restaurant = (params) => {
 
     useEffect(() => {
         if (state && state.quickTables.length == 0) {
-            setOrderUrl(`/restaurant/${id}/menu`);
+            setOrderUrl(`/restaurant/${id}/menu?type=1`);
         } else {
-            setOrderUrl(`/restaurant/${id}/tables`);
+            setOrderUrl(`/restaurant/${id}/tables?type=3`);
         }
     }, [id, state]);
 
     const orderTypeChange = (event) => {
         const val = event.target.value.toLowerCase();
-        if (val === 'takeaway' || val === 'delivery' || state.quickTables.length == 0) {
-            setOrderUrl(`/restaurant/${id}/menu`);
+        if (val == 1 || val == 2 || state.quickTables.length == 0) {
+            setOrderUrl(`/restaurant/${id}/menu?type=${val}`);
         } else {
-            setOrderUrl(`/restaurant/${id}/tables`);
+            setOrderUrl(`/restaurant/${id}/tables?type=${val}`);
         }
+    }
+
+    const changeLanguage = (lngCode) => {
+        router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
     }
 
     if (!state) return <>Loading..</>
@@ -61,12 +69,12 @@ const Restaurant = (params) => {
                     <h3>Select preferred language</h3>
                     <ul id="langFlag" className="lang-flag my-2">
                         {state.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
-                            return <li key={item.languagecode} className="single-flag">
+                            return <li key={item.languagecode} title={item.languagecode} onClick={() => changeLanguage(item.languagecode)} className="single-flag">
                                 <Image src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} alt="en" />
                             </li>
                         })}
                     </ul>
-                    <p id="langNameShow">English (American)</p>
+                    <p id="langNameShow">English (American) {t('welcome')}</p>
                 </div>
             </div>
         </div>
@@ -74,13 +82,13 @@ const Restaurant = (params) => {
         <div className="wide-block border-0">
             <div className="options content-center">
                 <div className="btn-group" role="group" onChange={(e) => orderTypeChange(e)}>
-                    <input type="radio" className="btn-check" value="DineIn" name="btnRadioOrderType" id="DineIn" defaultChecked />
+                    <input type="radio" className="btn-check" value="3" name="btnRadioOrderType" id="DineIn" defaultChecked />
                     <label className="btn btn-outline-primary" htmlFor="DineIn">Dine In</label>
 
-                    <input type="radio" className="btn-check" value="TakeAway" name="btnRadioOrderType" id="TakeAway" />
+                    <input type="radio" className="btn-check" value="1" name="btnRadioOrderType" id="TakeAway" />
                     <label className="btn btn-outline-primary" htmlFor="TakeAway">Take Away</label>
 
-                    <input type="radio" className="btn-check" value="Delivery" name="btnRadioOrderType" id="Delivery" />
+                    <input type="radio" className="btn-check" value="2" name="btnRadioOrderType" id="Delivery" />
                     <label className="btn btn-outline-primary" htmlFor="Delivery">Delivery</label>
                 </div>
             </div>
@@ -153,10 +161,16 @@ const Restaurant = (params) => {
                 <a className="btn btn-primary btn-shadow btn-lg btn-block">Start Your Order</a>
             </Link>
         </div>
-    </div>
+    </div >
 
     return content;
 }
+
+export const getServerSideProps = async ({ locale }) => ({
+    props: {
+        ...await serverSideTranslations(locale),
+    },
+})
 
 export default Restaurant;
 
