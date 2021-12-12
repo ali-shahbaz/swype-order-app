@@ -3,13 +3,14 @@ import useSessionStorage from "../../hooks/useSessionStorage";
 import { loginVerify } from "../../services/user-service";
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { useRecoilState } from "recoil";
 import { userLoggedInState } from "../../states/atoms";
 
 const LoginVerify = () => {
     const userPhoneNumber = useSessionStorage('user_number');
     const [number, setNumber] = useState(null);
+    const router = useRouter();
     const { id } = router.query;
     const cartStorage = useSessionStorage(`cart${id}`);
     const [isUserLoggedIn, setIsUserLoggedIn] = useRecoilState(userLoggedInState);
