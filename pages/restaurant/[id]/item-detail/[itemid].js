@@ -3,10 +3,10 @@ import useSessionStorage from '../../../../hooks/useSessionStorage';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Header from '../../../../components/head';
-import AddToOrder from '../../../../helpers/cart-helper';
 import { AddCircle, CloseCircle, Restaurant } from "react-ionicons";
 import { useRecoilState } from 'recoil';
 import { cartState } from '../../../../states/atoms';
+import { toast } from 'react-toastify';
 
 const ItemDetail = ({ props }) => {
     let data = useSessionStorage('init_data');
@@ -106,15 +106,33 @@ const ItemDetail = ({ props }) => {
     }
 
     const addToOrder = () => {
-        let cart = sessionStorage.getItem(cartName);
-        if (cart) {
-            cart = [...JSON.parse(cart), ...orderItemsState];
-            sessionStorage.setItem(cartName, JSON.stringify(cart));
-        } else {
-            sessionStorage.setItem(cartName, JSON.stringify(orderItemsState));
+        for (let i = 0; i < orderItemsState.length; i++) {
+            const element = orderItemsState[i];
+            if (element.modifiers.length > 0) {
+                const requiredModifiers = data.payload.data.quickModifiers.filter(p => p.isOptional == 0 && element.modifiers.some(m => m.modifierId == p.modifierId));
+                if (element.selectedModifiers && element.selectedModifiers.length > 0) {
+                    const selectedRequiredModifiers = requiredModifiers.filter(p => element.selectedModifiers.some(m => m.modifierId == p.modifierId));
+                    if (selectedRequiredModifiers.length < requiredModifiers.length) {
+                        toast.error('Some of the required modifiers are not selected');
+                        return;
+                    }
+
+                } else {
+                    toast.error('Some of the required modifiers are not selected');
+                    return;
+                }
+
+            }
         }
 
-        const orderItemsCount = JSON.parse(sessionStorage.getItem(cartName)).length;
+        let cart = sessionStorage.getItem(cartName);
+        if (cart) {
+            const saleDetails = [...JSON.parse(cart).saleDetails, ...orderItemsState];
+            cart = { ...JSON.parse(cart), ...{ saleDetails } };
+            sessionStorage.setItem(cartName, JSON.stringify(cart));
+        }
+
+        const orderItemsCount = JSON.parse(sessionStorage.getItem(cartName)).saleDetails.length;
         setCart(orderItemsCount);
         router.back();
     }
@@ -241,7 +259,7 @@ const ItemDetail = ({ props }) => {
         </div>
 
         <div className="section mt-4">
-            <button disabled className="btn btn-primary btn-shadow btn-lg btn-block" onClick={() => addToOrder()}>Add to Order</button>
+            <button className="btn btn-primary btn-shadow btn-lg btn-block" onClick={() => addToOrder()}>Add to Order</button>
         </div>
     </>
 }

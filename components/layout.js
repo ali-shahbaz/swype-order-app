@@ -96,7 +96,7 @@ function Layout({ props, children, name }) {
                     <Link href={`/restaurant/${id}/checkout`}>
                         <a className="headerButton">
                             <CartOutline />
-                            <div className="badge badge-danger">{cartCount != 0 ? cartCount : cartStorage && cartStorage.length}</div>
+                            <div className="badge badge-danger">{cartCount != 0 ? cartCount : cartStorage && cartStorage.saleDetails.length}</div>
                         </a>
                     </Link>
                 </div>

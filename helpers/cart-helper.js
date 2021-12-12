@@ -1,26 +1,38 @@
-import useSessionStorage from "../hooks/useSessionStorage";
+const SetCartWithOrderType = (companyId, orderType) => {
+    debugger
+    const cartName = `cart${companyId}`;
+    orderType = parseInt(orderType);
 
-const AddToOrder = (params) => {
-    let state = useSessionStorage('init_data');
-    let cart = useSessionStorage('cart');
-
-    if (state) {
-        state = state.payload.data;
-        if (cart) {
-            cart = JSON.parse(cart);
-            cart.items.push(params);
-        } else {
-            const product = state.quickProducts.find(p => p.itemid == params.itemid);
-            const addToCart = {
-                totalAmount: product.salesprice,
-                items: [
-                    params
-                ]
-            }
-
-            localStorage.setItem('cart', JSON.stringify(addToCart));
+    let cart = sessionStorage.getItem(cartName);
+    if (cart) {
+        cart = { ...JSON.parse(cart), ...{ onlineOrderType: orderType } };
+        sessionStorage.setItem(cartName, JSON.stringify(cart));
+    } else {
+        const orderObj = {
+            status: 1,
+            saleDetails: [],
+            label: 'Online Sales',
+            isSplitCheck: false,
+            equitySplitCount: 0,
+            parkSplitSale: null,
+            netTotal: 0,
+            taxAmount: 0,
+            tableId: 0,
+            tableName: null,
+            amount: 0,
+            grandTotal: 0,
+            discount: 0,
+            discountAmount: 0,
+            tipAmount: 0,
+            salePayments: [{
+                paymentMethodId: 0,
+                paymentTypeId: 0,
+                amount: 0
+            }],
+            onlineOrderType: orderType
         }
+        sessionStorage.setItem(cartName, JSON.stringify(orderObj));
     }
 
 }
-export default AddToOrder;
+export default SetCartWithOrderType;

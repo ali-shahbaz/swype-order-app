@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Header from '../../components/head';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import Link from 'next/link';
 import useSessionStorage from '../../hooks/useSessionStorage';
@@ -14,6 +14,42 @@ const Restaurant = (params) => {
     const router = useRouter();
     const { id } = router.query;
     const { t } = useTranslation();
+    const cartName = `cart${id}`;
+
+    const startWithOrderType = useCallback((orderType) => {
+        orderType = parseInt(orderType);
+        let cart = sessionStorage.getItem(cartName);
+        if (cart) {
+            cart = { ...JSON.parse(cart), ...{ onlineOrderType: orderType } };
+            sessionStorage.setItem(cartName, JSON.stringify(cart));
+        } else {
+            const orderObj = {
+                status: 1,
+                saleDetails: [],
+                label: 'Online Sales',
+                isSplitCheck: false,
+                equitySplitCount: 0,
+                parkSplitSale: null,
+                netTotal: 0,
+                taxAmount: 0,
+                tableId: 0,
+                tableName: null,
+                amount: 0,
+                grandTotal: 0,
+                discount: 0,
+                discountAmount: 0,
+                tipAmount: 0,
+                salePayments: [{
+                    paymentMethodId: 0,
+                    paymentTypeId: 0,
+                    amount: 0
+                }],
+                onlineOrderType: orderType
+            }
+            sessionStorage.setItem(cartName, JSON.stringify(orderObj));
+        }
+    }, [cartName]);
+
 
     let offers;
     if (state) {
@@ -26,25 +62,25 @@ const Restaurant = (params) => {
     }
 
     useEffect(() => {
-        if (state && state.quickTables.length == 0) {
-            setOrderUrl(`/restaurant/${id}/menu?type=1`);
-        } else {
-            setOrderUrl(`/restaurant/${id}/tables?type=3`);
-        }
-    }, [id, state]);
+        startWithOrderType(1);
+        setOrderUrl(`/restaurant/${id}/menu`);
+    }, [id, startWithOrderType]);
 
     const orderTypeChange = (event) => {
         const val = event.target.value.toLowerCase();
+        startWithOrderType(val);
         if (val == 1 || val == 2 || state.quickTables.length == 0) {
-            setOrderUrl(`/restaurant/${id}/menu?type=${val}`);
+            setOrderUrl(`/restaurant/${id}/menu`);
         } else {
-            setOrderUrl(`/restaurant/${id}/tables?type=${val}`);
+            setOrderUrl(`/restaurant/${id}/tables`);
         }
     }
 
     const changeLanguage = (lngCode) => {
         router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
     }
+
+
 
     if (!state) return <>Loading..</>
     const content = <div id="appCapsule" className="pt-0">
@@ -82,11 +118,11 @@ const Restaurant = (params) => {
         <div className="wide-block border-0">
             <div className="options content-center">
                 <div className="btn-group" role="group" onChange={(e) => orderTypeChange(e)}>
-                    <input type="radio" className="btn-check" value="3" name="btnRadioOrderType" id="DineIn" defaultChecked />
-                    <label className="btn btn-outline-primary" htmlFor="DineIn">Dine In</label>
-
-                    <input type="radio" className="btn-check" value="1" name="btnRadioOrderType" id="TakeAway" />
+                    <input type="radio" className="btn-check" value="1" name="btnRadioOrderType" id="TakeAway" defaultChecked />
                     <label className="btn btn-outline-primary" htmlFor="TakeAway">Take Away</label>
+
+                    <input type="radio" className="btn-check" value="3" name="btnRadioOrderType" id="DineIn" />
+                    <label className="btn btn-outline-primary" htmlFor="DineIn">Dine In</label>
 
                     <input type="radio" className="btn-check" value="2" name="btnRadioOrderType" id="Delivery" />
                     <label className="btn btn-outline-primary" htmlFor="Delivery">Delivery</label>
