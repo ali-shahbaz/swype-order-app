@@ -54,7 +54,7 @@ const Menu = ({ props }) => {
             {
                 (menu && menu.map(item => {
                     return <div key={item.itemid} className="col-6 menu-card item-card section mt-2 filter-active" data-item={item.categoryname}>
-                        <Link href={`/restaurant/${id}/item-detail/${item.itemid}?type=${type}${table ? `&table=${table}` : ''}`}>
+                        <Link href={`/restaurant/${id}/item-detail/${item.itemid}`}>
                             <a>
                                 <div className="card card-border">
                                     <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={120} objectFit="cover" priority={true} className="card-img-top" alt="image" />

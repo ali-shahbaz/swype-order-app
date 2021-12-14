@@ -1,5 +1,5 @@
 import Head from 'next/head'
-const Header = ({title}) => {
+const Header = ({title, children}) => {
     return <Head>
         <title>{title}</title>
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
@@ -13,6 +13,7 @@ const Header = ({title}) => {
             content="bootstrap, wallet, banking, fintech mobile template, cordova, phonegap, mobile, html, responsive" />
         <link rel="icon" type="image/png" href="/images/favicon.png" sizes="32x32" />
         <link rel="apple-touch-icon" sizes="180x180" href="/images/icon/192x192.png" />
+        {children}
     </Head>
 }
 

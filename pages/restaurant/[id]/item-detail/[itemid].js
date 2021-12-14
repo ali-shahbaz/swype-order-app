@@ -92,7 +92,7 @@ const ItemDetail = ({ props }) => {
 
                 // now unlock next panel
                 const nextSibling = e.target.closest('.accordion-item').nextSibling;
-                if (nextSibling.classList.contains('accordion-item')) {
+                if (nextSibling && nextSibling.classList.contains('accordion-item')) {
                     nextSibling.getElementsByTagName('button')[0].disabled = false;
                 }
             }

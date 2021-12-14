@@ -10,6 +10,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Restaurant = (params) => {
     let state = useSessionStorage('init_data');
+    const userLoggedIn = useSessionStorage('logged_in_user');
     const [orderUrl, setOrderUrl] = useState();
     const router = useRouter();
     const { id } = router.query;
@@ -23,6 +24,8 @@ const Restaurant = (params) => {
             cart = { ...JSON.parse(cart), ...{ onlineOrderType: orderType } };
             sessionStorage.setItem(cartName, JSON.stringify(cart));
         } else {
+            const userNumber = userLoggedIn ? userLoggedIn.MobileNumber : '';
+            const userFullName = userLoggedIn ? userLoggedIn.Name : '';
             const orderObj = {
                 status: 1,
                 saleDetails: [],
@@ -44,11 +47,14 @@ const Restaurant = (params) => {
                     paymentTypeId: 0,
                     amount: 0
                 }],
-                onlineOrderType: orderType
+                onlineOrderType: orderType,
+                verifyfullname: userFullName,
+                verifymobile: userNumber
+
             }
             sessionStorage.setItem(cartName, JSON.stringify(orderObj));
         }
-    }, [cartName]);
+    }, [cartName, userLoggedIn]);
 
 
     let offers;
@@ -69,10 +75,12 @@ const Restaurant = (params) => {
     const orderTypeChange = (event) => {
         const val = event.target.value.toLowerCase();
         startWithOrderType(val);
-        if (val == 1 || val == 2 || state.quickTables.length == 0) {
+        if (val == 1 || (state.quickTables.length == 0 && val != 2)) {
             setOrderUrl(`/restaurant/${id}/menu`);
-        } else {
+        } else if (val == 3) {
             setOrderUrl(`/restaurant/${id}/tables`);
+        } else {
+            setOrderUrl(`/restaurant/${id}/confirm-address`);
         }
     }
 
@@ -202,11 +210,13 @@ const Restaurant = (params) => {
     return content;
 }
 
-export const getServerSideProps = async ({ locale }) => ({
-    props: {
-        ...await serverSideTranslations(locale),
-    },
-})
+export async function getServerSideProps({ locale }) {
+    return {
+        props: {
+            ...await serverSideTranslations(locale)
+        }
+    }
+}
 
 export default Restaurant;
 

@@ -9,23 +9,32 @@ import { userLoggedInState } from "../../states/atoms";
 
 const LoginVerify = () => {
     const userPhoneNumber = useSessionStorage('user_number');
+    const companyData = useSessionStorage('init_data');
     const [number, setNumber] = useState(null);
     const router = useRouter();
-    const { id } = router.query;
-    const cartStorage = useSessionStorage(`cart${id}`);
     const [isUserLoggedIn, setIsUserLoggedIn] = useRecoilState(userLoggedInState);
 
     const verifyBySMS = () => {
         loginVerify(JSON.stringify(number))
             .then(data => {
                 if (data.status == 1) {
-                    sessionStorage.setItem('logged_in_user', JSON.stringify(data.payload));
+                    sessionStorage.setItem('logged_in_user', JSON.stringify({ ...data.payload, ...userPhoneNumber }));
                     setIsUserLoggedIn(true);
-                    if (cartStorage && cartStorage.length > 0) {
-                        router.push(`/restaurant/${id}/checkout`);
-                    } else {
-                        router.push(`/restaurant/${id}`);
+                    const id = companyData.payload.data.id;
+                    const cartStorage = sessionStorage.getItem(`cart${id}`) ? JSON.parse(sessionStorage.getItem(`cart${id}`)) : null;
+                    if (cartStorage) {
+                        sessionStorage.removeItem('user_number');
+                        cartStorage = { ...cartStorage, ...{ verifymobile: userPhoneNumber.MobileNumber } };
+                        sessionStorage.setItem(`cart${id}`, JSON.stringify(cartStorage));
+
+                        if (cartStorage.saleDetails.length > 0) {
+                            router.push(`/restaurant/${id}/checkout`);
+                        } else {
+                            router.push(`/restaurant/${id}`);
+                        }
+
                     }
+
                 } else {
                     toast.error(data.message);
                 }

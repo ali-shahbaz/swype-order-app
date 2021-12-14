@@ -12,7 +12,7 @@ function Layout({ props, children, name }) {
     let { id } = router.query;
     const data = useSessionStorage('init_data')
     const cartCount = useRecoilValue(cartState);
-    
+
     if (!id && data) {
         id = data.payload.data.id;
     }
@@ -54,7 +54,6 @@ function Layout({ props, children, name }) {
             }
         });
     });
-
     let title = '';
     switch (name) {
         case 'tables':
@@ -71,6 +70,9 @@ function Layout({ props, children, name }) {
             break;
         case 'profile':
             title = 'My Profile';
+            break;
+        case 'confirmaddress':
+            title = 'Confirm Your Address';
             break;
         default:
             break;

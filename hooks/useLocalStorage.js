@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 
-const useSessionStorage = (name) => {
+const useLocalStorage = (name) => {
   const [value, setValue] = useState(null);
 
   useEffect(() => {
-    const value = sessionStorage.getItem(name);
+    const value = localStorage.getItem(name);
     const data = !!value ? JSON.parse(value) : undefined;
     setValue(data)
   }, [name])
@@ -12,4 +12,4 @@ const useSessionStorage = (name) => {
   return value
 }
 
-export default useSessionStorage
+export default useLocalStorage

@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 const Login = () => {
     const [number, setNumber] = useState(null);
     const router = useRouter();
-    const singin = () => {
+    const singin = (event) => {
         if (number.isValid) {
             loginUser(JSON.stringify(number))
                 .then(data => {
@@ -51,7 +51,7 @@ const Login = () => {
         </div>
 
         <div className="mt-4">
-            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={singin}>{`Let's go`}</button>
+            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => singin(e)}>{`Let's go`}</button>
         </div>
     </div>
 }

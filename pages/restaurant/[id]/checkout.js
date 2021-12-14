@@ -9,15 +9,27 @@ const Checkout = () => {
     const cart = useSessionStorage(`cart${id}`);
     const loggedInUser = useSessionStorage('logged_in_user');
 
-    useEffect(() => {
-        if (cart) {
-            // cart = {...cart, }
-        }
-    }, [cart]);
-
     const payNow = () => {
         if (loggedInUser) {
+            if (cart) {
+                const taxAmount = cart.saleDetails.reduce((a, b) => {
+                    return a + b.taxamount + (b.variationName ? b.variations.find(p => p.name == b.variationName).taxamount : 0)
+                }, 0).toFixed(2);
 
+                const netTotal = cart.saleDetails.reduce((a, b) => {
+                    return a + b.retailprice + (b.variationName ? b.variations.find(p => p.name == b.variationName).retailprice : 0)
+                        + (b.selectedModifiers.length > 0 ? b.selectedModifiers.reduce((x, y) => { return x + y.price }, 0) : 0)
+                }, 0).toFixed(2);
+
+                const grandTotal = cart.saleDetails.reduce((a, b) => {
+                    return a + b.total
+                }, 0).toFixed(2);
+
+                const newCart = {...cart, ...{netTotal, taxAmount, grandTotal, amount: grandTotal}}
+                debugger
+            } else {
+
+            }
         } else {
             router.push('/user/login')
         }
@@ -44,7 +56,7 @@ const Checkout = () => {
                 </div>
                 <div className="total-amount">
                     <h4>Total Amount</h4>
-                    <h4>{cart && cart.saleDetails.reduce((a, b) => { return a + b.total }, 0)}</h4>
+                    <h4>{cart && cart.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h4>
                 </div>
             </div>
         </div>
