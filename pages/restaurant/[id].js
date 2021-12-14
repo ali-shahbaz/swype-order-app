@@ -5,7 +5,7 @@ import { Splide, SplideSlide } from '@splidejs/react-splide';
 import Link from 'next/link';
 import useSessionStorage from '../../hooks/useSessionStorage';
 import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
+import { useTranslation, i18n } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 const Restaurant = (params) => {
@@ -13,7 +13,9 @@ const Restaurant = (params) => {
     const userLoggedIn = useSessionStorage('logged_in_user');
     const [orderUrl, setOrderUrl] = useState();
     const router = useRouter();
-    const { id } = router.query;
+    const { query, locale } = router;
+    const { id } = query;
+    const [translation, setTranslation] = useState({});
     const { t } = useTranslation();
     const cartName = `cart${id}`;
 
@@ -213,7 +215,7 @@ const Restaurant = (params) => {
 export async function getServerSideProps({ locale }) {
     return {
         props: {
-            ...await serverSideTranslations(locale)
+            ...await serverSideTranslations(locale, ['common'])
         }
     }
 }

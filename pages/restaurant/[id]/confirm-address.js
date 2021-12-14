@@ -29,7 +29,17 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
     useEffect(() => {
         setTimeout(() => {
             new google.maps.Map(mapDivRef.current, options);
+
+            const autoCompleteOptions = {
+                fields: ["address_components", "geometry", "icon", "name"],
+                strictBounds: false,
+                types: ["establishment"],
+            };
+            const autocomplete = new google.maps.places.Autocomplete(autoCompleteRef.current, autoCompleteOptions);
+
         }, 1000);
+
+
     })
 
     return <>
@@ -44,7 +54,6 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
                     <form>
                         <div className="form-group basic">
                             <div className="input-wrapper">
-                                <label className="label" htmlFor="enterCode">Enter your address</label>
                                 <input type="text" className="form-control" ref={autoCompleteRef} id="enterCode" />
                                 <i className="clear-input">
                                     <CloseCircle />
