@@ -137,9 +137,7 @@ const ItemDetail = ({ props }) => {
         router.back();
     }
 
-    if (!data || !itemState || !orderItemsState) return <div id="loader">
-        <Image src="/images/favicon.png" width={32} height={32} layout="fixed" alt="icon" className="loading-icon" />
-    </div>
+    if (!data || !itemState || !orderItemsState) return <></>
     return <>
         <Header title={itemState.name}></Header>
         <div className="section mt-2 order-item">

@@ -31,9 +31,7 @@ const Tables = () => {
         }
     }
 
-    if (!state) return <div id="loader">
-        <Image src="/images/favicon.png" width={32} height={32} layout="fixed" alt="icon" className="loading-icon" />
-    </div>
+    if (!state) return <></>
     state = state.payload.data;
     return <div className="order-receipts">
         <Header title="Select Your Section"></Header>

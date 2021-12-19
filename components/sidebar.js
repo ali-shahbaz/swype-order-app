@@ -16,6 +16,8 @@ function Sidebar({ show }) {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const loggedIn = useRecoilValue(userLoggedInState);
     const [profileUrl, setProfileUrl] = useState('/user/profile');
+    const darkModeName = `dark-mode-${id}`;
+    const [isDarkModeOn, setIsDarkModeOn] = useState(false);
 
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {
@@ -29,11 +31,31 @@ function Sidebar({ show }) {
         } else {
             setProfileUrl('/user/login');
         }
-    }, [loggedIn, loggedInUser, router.events])
+
+        // set for dark mode
+        if (!darkModeName in localStorage) {
+            localStorage.setItem(darkModeName, false);
+        } else {
+            setDarkMode(JSON.parse(localStorage.getItem(darkModeName)));
+        }
+
+    }, [darkModeName, loggedIn, loggedInUser, router.events])
 
     const logout = () => {
         sessionStorage.removeItem('logged_in_user');
         setIsUserLoggedIn(false);
+    }
+
+    const changeDarkMode = (event) => {
+        localStorage.setItem(darkModeName, event.target.checked);
+        setDarkMode(event.target.checked);
+    }
+
+    const setDarkMode = (isDarkMode) => {
+        setIsDarkModeOn(isDarkMode);
+        const pageBody = document.querySelector("body");
+        pageBody.classList.remove('dark-mode');
+        if (isDarkMode) pageBody.classList.add('dark-mode')
     }
 
     const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" tabIndex="-1" role="dialog">
@@ -169,7 +191,7 @@ function Sidebar({ show }) {
                             <div className="item">
                                 <div className="in">
                                     <div className="form-check form-switch me-2">
-                                        <input className="form-check-input dark-mode-switch" type="checkbox"
+                                        <input checked={isDarkModeOn ? true : false} onChange={(e) => changeDarkMode(e)} className="form-check-input dark-mode-switch" type="checkbox"
                                             id="darkmodeSwitch" />
                                         <label className="form-check-label" htmlFor="darkmodeSwitch"></label>
                                     </div>

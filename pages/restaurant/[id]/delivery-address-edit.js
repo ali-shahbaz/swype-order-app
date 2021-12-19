@@ -2,13 +2,7 @@ import useLocalStorage from "../../../hooks/useLocalStorage";
 
 const DeliveryAddressEdit = () => {
     const location = useLocalStorage('location');
-    if (!location) {
-        return <div id="loader">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/loading-icon.png" alt="icon" className="loading-icon" />
-        </div>
-    }
-
+    if (!location)  return <></>
     return <>
         <div className="section mt-2">
             <div className="card card-border">

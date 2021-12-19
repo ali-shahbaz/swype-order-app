@@ -712,7 +712,10 @@ a:hover, a:active, a:focus {
   -webkit-transition: all .5s ease;
   transition: all .5s ease;
   padding: 2px;
-  height: 46px;
+}
+
+.order-sidebar .sidebar-preferred-lang .wide-block ul li>span {
+  vertical-align: top;
 }
 
 .order-sidebar .sidebar-preferred-lang .wide-block ul li img {
@@ -7106,6 +7109,10 @@ textarea,
   padding: 2px;
 }
 
+.preferred-lang .wide-block ul li>span {
+  vertical-align: top;
+}
+
 .preferred-lang .wide-block ul li img {
   height: 40px;
   width: 40px;
@@ -9253,19 +9260,23 @@ body.dark-mode .order-item .instruction textarea {
 .profileBox a.user-info:hover h2 {
   color: #1DCC70 !important;
 }
+
 #map {
   position: relative;
 }
 
 #map:after {
-    width: 64px;
-    height: 64px;
-    display: block;
-    content: ' ';
-    position: absolute;
-    top: 50%; left: 50%;
-    margin: -65px 0 0 -33px;
-    background: url('../public/images/location-pin.png');
-    background-size: 64px 64px; /* Since I used the HiDPI marker version this compensates for the 2x size */
-    pointer-events: none; /* This disables clicks on the marker. Not fully supported by all major browsers, though */
+  width: 64px;
+  height: 64px;
+  display: block;
+  content: ' ';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -65px 0 0 -33px;
+  background: url('../public/images/location-pin.png');
+  background-size: 64px 64px;
+  /* Since I used the HiDPI marker version this compensates for the 2x size */
+  pointer-events: none;
+  /* This disables clicks on the marker. Not fully supported by all major browsers, though */
 }

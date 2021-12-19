@@ -15,7 +15,6 @@ const Restaurant = (params) => {
     const router = useRouter();
     const { query, locale } = router;
     const { id } = query;
-    const [translation, setTranslation] = useState({});
     const { t } = useTranslation();
     const cartName = `cart${id}`;
 
@@ -72,6 +71,7 @@ const Restaurant = (params) => {
     useEffect(() => {
         startWithOrderType(1);
         setOrderUrl(`/restaurant/${id}/menu`);
+
     }, [id, startWithOrderType]);
 
     const orderTypeChange = (event) => {
@@ -90,9 +90,7 @@ const Restaurant = (params) => {
         router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
     }
 
-
-
-    if (!state) return <>Loading..</>
+    if (!state) return <></>
     const content = <div id="appCapsule" className="pt-0">
         <Header title={state.welcomePageVM.header}></Header>
         <div className="section full welcome-cover">
@@ -115,8 +113,8 @@ const Restaurant = (params) => {
                     <h3>Select preferred language</h3>
                     <ul id="langFlag" className="lang-flag my-2">
                         {state.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
-                            return <li key={item.languagecode} title={item.languagecode} onClick={() => changeLanguage(item.languagecode)} className="single-flag">
-                                <Image src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} alt="en" />
+                            return <li key={item.languagecode} title={item.languagecode} onClick={() => changeLanguage(item.languagecode)} className={locale == item.languagecode ? 'single-flag flag-active' : 'single-flag'}>
+                                <Image src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} objectFit='' alt={item.languagecode} />
                             </li>
                         })}
                     </ul>

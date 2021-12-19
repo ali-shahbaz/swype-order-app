@@ -36,7 +36,6 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
     }
 
     useEffect(() => {
-        debugger
         if (localStorage.getItem('location')) {
             const location = JSON.parse(localStorage.getItem('location'));
             options.center.lat = location.latitude;
