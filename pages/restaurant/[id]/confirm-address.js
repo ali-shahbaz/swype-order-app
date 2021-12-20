@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { useRouter } from "next/router";
 import { CreateOutline } from "react-ionicons";
+import { apiSettings } from "../../../configs/api-settings";
 
 const ConfirmAddress = ({ width, height, lat, lng, zoom,
     zoomControl, scaleControl, fullscreenControl, disableDefaultUI }) => {
@@ -58,29 +59,31 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
     });
 
     const initMap = () => {
-        getAddress(options.center)
-        const map = new google.maps.Map(mapDivRef.current, options);
-        const autoCompleteOptions = {
-            fields: ["address_components", "geometry", "icon", "name"],
-            strictBounds: false,
-            types: ["establishment"],
-        };
-        const autocomplete = new google.maps.places.Autocomplete(autoCompleteRef.current, autoCompleteOptions);
-        autocomplete.addListener('place_changed', (e) => {
-            const place = autocomplete.getPlace();
-            const lat = place.geometry.location.lat();
-            const lng = place.geometry.location.lng();
-            map.setCenter({ lat, lng });
-            getAddress({ lat, lng });
-        });
-        map.addListener('dragend', () => {
-            const center = map.getCenter();
-            const latlng = {
-                lat: center.lat(),
-                lng: center.lng()
+        setTimeout(() => {
+            getAddress(options.center)
+            const map = new google.maps.Map(mapDivRef.current, options);
+            const autoCompleteOptions = {
+                fields: ["address_components", "geometry", "icon", "name"],
+                strictBounds: false,
+                types: ["establishment"],
             };
-            getAddress(latlng);
-        });
+            const autocomplete = new google.maps.places.Autocomplete(autoCompleteRef.current, autoCompleteOptions);
+            autocomplete.addListener('place_changed', (e) => {
+                const place = autocomplete.getPlace();
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+                map.setCenter({ lat, lng });
+                getAddress({ lat, lng });
+            });
+            map.addListener('dragend', () => {
+                const center = map.getCenter();
+                const latlng = {
+                    lat: center.lat(),
+                    lng: center.lng()
+                };
+                getAddress(latlng);
+            });
+        }, 100);
 
         // const marker = new google.maps.Marker({
         //     position: options.center,
@@ -127,8 +130,10 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
     }
 
     return <>
+        <script async
+            src={`https://maps.googleapis.com/maps/api/js?key=${apiSettings.mapApiKey}&libraries=places`}>
+        </script>
         <Header title={'Cofirm Delivery Address'}>
-
         </Header>
         <div className="section mt-2">
             <div className="card card-border mt-2">

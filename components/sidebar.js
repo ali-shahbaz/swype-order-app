@@ -68,10 +68,10 @@ function Sidebar({ show }) {
                                 {
                                     loggedInUser && loggedInUser.name ? <>
                                         <div className="image-wrapper">
-                                            <Image src="/images/profile/profile.png" width={36} height={36} layout="fixed" alt="image" className="imaged w36" />
+                                            <Image src={loggedInUser.imageUrl ? loggedInUser.imageUrl : '/images/profile/profile.png'} width={36} height={36} objectFit='cover' alt="image" className="imaged w36" />
                                         </div>
                                         <div className="in">
-                                            <strong>Sofie Taden</strong>
+                                            <strong>{loggedInUser.name}</strong>
                                         </div> </> : <h2 className="mb-0">Set Up Your Profile</h2>
                                 }
                             </a>

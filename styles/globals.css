@@ -1747,6 +1747,8 @@ a.badge-dark {
   -ms-flex-pack: justify;
   justify-content: space-between;
   width: 100%;
+  margin-left: 16px;
+  margin-right: 32px;
 }
 
 .image-listview>li a.item {
@@ -9279,4 +9281,23 @@ body.dark-mode .order-item .instruction textarea {
   /* Since I used the HiDPI marker version this compensates for the 2x size */
   pointer-events: none;
   /* This disables clicks on the marker. Not fully supported by all major browsers, though */
+}
+
+label.uploader {
+  color: #4a6dce;
+  background-color: white;
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 5px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+label.uploader input[type="file"] {
+  display: none;
 }

@@ -14,7 +14,6 @@ const Login = () => {
             loginUser(JSON.stringify(number))
                 .then(data => {
                     if (data.status == 1) {
-                        debugger
                         sessionStorage.setItem('user_number', JSON.stringify(number))
                         router.push('/user/login-verify');
                     } else {
