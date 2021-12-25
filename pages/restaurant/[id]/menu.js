@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import useSessionStorage from '../../../hooks/useSessionStorage';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Header from '../../../components/head';
 import { useRecoilState } from 'recoil';
 import { menuTabState } from '../../../states/atoms';
+import useLocalStorage from '../../../hooks/useLocalStorage';
 const Menu = ({ props }) => {
-    let state = useSessionStorage('init_data');
+    let restaurantData = useLocalStorage('init_data');
     const tabRef = useRef(null);
     const router = useRouter();
-    const { id, type, table } = router.query;
+    const { id } = router.query;
     const [menu, setMenu] = useState(null);
     const [tab, setTab] = useRecoilState(menuTabState);
 
@@ -30,17 +30,16 @@ const Menu = ({ props }) => {
             filterMenuChildren[i].classList.remove('category-active');
         }
         event.currentTarget.classList.add('category-active');
-        const products = state.quickProducts.filter(p => p.categoryid == categoryID);
+        const products = restaurantData.quickProducts.filter(p => p.categoryid == categoryID);
         setMenu(products);
     }
 
-    if (!state) return <></>
-    state = state.payload.data;
+    if (!restaurantData) return <></>
     return <>
         <Header title="Menu"></Header>
         <ul id="menuCategory" className="categories pt-1 pb-1">
             {
-                state.quickKeyCategoryList.map((item, i) => {
+                restaurantData.quickKeyCategoryList.map((item, i) => {
                     return <li key={item.categoryID} ref={el => i == 0 ? tabRef.current = el : null} onClick={(e) => categoryClick(e, item.categoryID)} className="single-category" data-target={item.name}>
                         <span>{item.name}</span>
                     </li>

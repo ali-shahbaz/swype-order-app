@@ -2,7 +2,7 @@ import Header from '../../components/head';
 import Image from 'next/image'
 import useSessionStorage from '../../hooks/useSessionStorage';
 import { useEffect, useState } from 'react';
-import { getUserProfile, updateProfile, uploadUserImage } from '../../services/user-service';
+import { GetUserProfile, UpdateProfile, UploadUserImage } from '../../services/user-service';
 import { CloseCircle } from 'react-ionicons';
 import { toast } from 'react-toastify';
 
@@ -13,7 +13,7 @@ const Profile = () => {
     useEffect(() => {
         if (loggedInUser) {
             // setUserDetail(loggedInUser);
-            getUserProfile(loggedInUser.token).then(data => {
+            GetUserProfile(loggedInUser.token).then(data => {
                 if (data.status == 1) {
                     loggedInUser.email = data.payload.user.email;
                     loggedInUser.imageUrl = data.payload.user.imageUrl;
@@ -35,7 +35,7 @@ const Profile = () => {
             const formData = new FormData();
             formData.append('file', event.target.files[0]);
 
-            uploadUserImage(formData, loggedInUser.token).then(data => {
+            UploadUserImage(formData, loggedInUser.token).then(data => {
                 if (data.status == 1) {
                     loggedInUser.imageUrl = data.payload.image.url;
                     setUserDetail(prev => prev = { ...prev, ...{ imageUrl: data.payload.image.url } });
@@ -55,8 +55,7 @@ const Profile = () => {
             Name: userDetail.name,
             MobileNumber: userDetail.MobileNumber
         }
-        debugger
-        updateProfile(JSON.stringify(params), loggedInUser.token).then(response => {
+        UpdateProfile(JSON.stringify(params), loggedInUser.token).then(response => {
             if (response.status == 1) {
                 toast.success('Profile updated successfully');
             } else {

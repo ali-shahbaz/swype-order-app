@@ -5,16 +5,18 @@ import { Splide, SplideSlide } from '@splidejs/react-splide';
 import Link from 'next/link';
 import useSessionStorage from '../../hooks/useSessionStorage';
 import { useRouter } from 'next/router';
-import { useTranslation, i18n } from 'next-i18next';
+import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { GetRestaurantData } from '../../services/restaurant-service';
 
-const Restaurant = (params) => {
-    let state = useSessionStorage('init_data');
+const Restaurant = () => {
+    const [restaurantData, setRestaurantData] = useState(null); // useLocalStorage('init_data');
+    const [offers, setOffers] = useState([]);
     const userLoggedIn = useSessionStorage('logged_in_user');
-    const [orderUrl, setOrderUrl] = useState();
     const router = useRouter();
     const { query, locale } = router;
     const { id } = query;
+    const [orderUrl, setOrderUrl] = useState(`/restaurant/${id}/menu`);
     const { t } = useTranslation();
     const cartName = `cart${id}`;
 
@@ -25,8 +27,8 @@ const Restaurant = (params) => {
             cart = { ...JSON.parse(cart), ...{ onlineOrderType: orderType } };
             sessionStorage.setItem(cartName, JSON.stringify(cart));
         } else {
-            const userNumber = userLoggedIn ? userLoggedIn.MobileNumber : '';
-            const userFullName = userLoggedIn ? userLoggedIn.Name : '';
+            const userNumber = userLoggedIn ? userLoggedIn.user.mobileNumber : '';
+            const userFullName = userLoggedIn ? userLoggedIn.user.name : '';
             const orderObj = {
                 status: 1,
                 saleDetails: [],
@@ -57,27 +59,44 @@ const Restaurant = (params) => {
         }
     }, [cartName, userLoggedIn]);
 
+    useEffect(() => {
+        startWithOrderType(1);
+        // setOrderUrl(`/restaurant/${id}/menu`);
 
-    let offers;
-    if (state) {
-        state = state.payload.data;
-        offers = state.welcomePageVM.todaySpecials.map((value, index) => {
-            const product = state.quickProducts.find(p => p.itemid == value.itemId);
+        const storageData = window.localStorage.getItem('init_data');
+        if (!storageData || JSON.parse(storageData).id != id) {
+            GetRestaurantData(id).then(data => {
+                if (data.status == 1) {
+                    localStorage.setItem('init_data', JSON.stringify(data.payload.data));
+                    setRestaurantData(data.payload.data);
+                    setOffersData(data.payload.data);
+
+                }
+
+            });
+        } else {
+            const value = localStorage.getItem('init_data');
+            const data = !!value ? JSON.parse(value) : undefined;
+            setRestaurantData(data);
+            setOffersData(data);
+
+        }
+
+    }, [id, startWithOrderType]);
+
+    const setOffersData = (data) => {
+        const offers = data.welcomePageVM.todaySpecials.map((value, index) => {
+            const product = data.quickProducts.find(p => p.itemid == value.itemId);
             product.salesprice = value.price;
             return product;
         });
+        setOffers(offers);
     }
-
-    useEffect(() => {
-        startWithOrderType(1);
-        setOrderUrl(`/restaurant/${id}/menu`);
-
-    }, [id, startWithOrderType]);
 
     const orderTypeChange = (event) => {
         const val = event.target.value.toLowerCase();
         startWithOrderType(val);
-        if (val == 1 || (state.quickTables.length == 0 && val != 2)) {
+        if (val == 1 || (restaurantData.quickTables.length == 0 && val != 2)) {
             setOrderUrl(`/restaurant/${id}/menu`);
         } else if (val == 3) {
             setOrderUrl(`/restaurant/${id}/tables`);
@@ -90,20 +109,20 @@ const Restaurant = (params) => {
         router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
     }
 
-    if (!state) return <></>
+    if (!restaurantData) return <></>
     const content = <div id="appCapsule" className="pt-0">
-        <Header title={state.welcomePageVM.header}></Header>
+        <Header title={restaurantData.welcomePageVM.header}></Header>
         <div className="section full welcome-cover">
         </div>
         <div className="section full welcome-section">
             <div className="wide-block py-2">
                 <div className="under-logo">
-                    <Image src={state.logo} width={124} height={104} alt="under logo" />
+                    <Image src={restaurantData.logo} width={124} height={104} alt="under logo" />
                 </div>
                 <div className="welcome-txt mt-2">
-                    <h2>{state.welcomePageVM.header}</h2>
-                    {(state.welcomePageVM.message ?
-                        <h4>{state.welcomePageVM.message}</h4> : <></>)}
+                    <h2>{restaurantData.welcomePageVM.header}</h2>
+                    {(restaurantData.welcomePageVM.message ?
+                        <h4>{restaurantData.welcomePageVM.message}</h4> : <></>)}
                 </div>
             </div>
         </div>
@@ -112,7 +131,7 @@ const Restaurant = (params) => {
                 <div className="wide-block py-2">
                     <h3>Select preferred language</h3>
                     <ul id="langFlag" className="lang-flag my-2">
-                        {state.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
+                        {restaurantData.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
                             return <li key={item.languagecode} title={item.languagecode} onClick={() => changeLanguage(item.languagecode)} className={locale == item.languagecode ? 'single-flag flag-active' : 'single-flag'}>
                                 <Image src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} objectFit='' alt={item.languagecode} />
                             </li>

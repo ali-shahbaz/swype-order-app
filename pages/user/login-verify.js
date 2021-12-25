@@ -1,30 +1,43 @@
 import { CloseCircle } from "react-ionicons";
 import useSessionStorage from "../../hooks/useSessionStorage";
-import { loginVerify } from "../../services/user-service";
+import { VerifyLogin } from "../../services/user-service";
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import { useRecoilState } from "recoil";
 import { userLoggedInState } from "../../states/atoms";
+import React, { useRef } from 'react';
+import LoadingBar from 'react-top-loading-bar';
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 const LoginVerify = () => {
     const userPhoneNumber = useSessionStorage('user_number');
-    const companyData = useSessionStorage('init_data');
+    const companyData = useLocalStorage('init_data');
     const [number, setNumber] = useState(null);
     const router = useRouter();
+    const ref = useRef(null);
     const [isUserLoggedIn, setIsUserLoggedIn] = useRecoilState(userLoggedInState);
 
-    const verifyBySMS = () => {
-        loginVerify(JSON.stringify(number))
+    const verifyBySMS = (event) => {
+        event.target.disabled = true;
+        ref.current.continuousStart();
+
+        VerifyLogin(JSON.stringify(number))
             .then(data => {
+                event.target.disabled = false;
+                ref.current.complete();
+
                 if (data.status == 1) {
                     sessionStorage.setItem('logged_in_user', JSON.stringify({ ...data.payload, ...userPhoneNumber }));
                     setIsUserLoggedIn(true);
-                    const id = companyData.payload.data.id;
+                    const id = companyData.id;
                     const cartStorage = sessionStorage.getItem(`cart${id}`) ? JSON.parse(sessionStorage.getItem(`cart${id}`)) : null;
                     if (cartStorage) {
                         sessionStorage.removeItem('user_number');
-                        cartStorage = { ...cartStorage, ...{ verifymobile: userPhoneNumber.MobileNumber } };
+                        cartStorage = { ...cartStorage, ...{ 
+                            verifymobile: userPhoneNumber.MobileNumber,
+                            verifyfullname: data.payload.user.name 
+                        } };
                         sessionStorage.setItem(`cart${id}`, JSON.stringify(cartStorage));
 
                         if (cartStorage.saleDetails.length > 0) {
@@ -49,6 +62,7 @@ const LoginVerify = () => {
     }
 
     return <div className="section mt-2">
+        <LoadingBar color='#3b3a3a' ref={ref} />
         <div className="card card-border mt-2">
             <div className="card-body">
                 <form>
@@ -67,7 +81,7 @@ const LoginVerify = () => {
         </div>
 
         <div className="mt-4">
-            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={verifyBySMS}>Verify</button>
+            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => verifyBySMS(e)}>Verify</button>
         </div>
 
     </div>

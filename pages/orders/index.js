@@ -1,7 +1,7 @@
 import Header from '../../components/head';
 import Image from 'next/image';
 import useSessionStorage from '../../hooks/useSessionStorage';
-import { getUserReceipts } from '../../services/user-service';
+import { GetUserReceipts } from '../../services/user-service';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 const Orders = () => {
@@ -10,7 +10,7 @@ const Orders = () => {
 
     useEffect(() => {
         if (loggedInUser) {
-            getUserReceipts(loggedInUser.token).then(data => {
+            GetUserReceipts(loggedInUser.token).then(data => {
                 if (data.status == 1) {
                     setReceipts(data.payload.receipts);
                 } else {

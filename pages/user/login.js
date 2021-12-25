@@ -1,24 +1,34 @@
 import { useState } from 'react';
 import IntlTelInput from 'react-intl-tel-input';
 import 'react-intl-tel-input/dist/main.css';
-import { loginUser } from '../../services/user-service';
+import { LoginUser } from '../../services/user-service';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
+import React, { useRef } from 'react';
+import LoadingBar from 'react-top-loading-bar';
 
 
 const Login = () => {
     const [number, setNumber] = useState(null);
     const router = useRouter();
+    const ref = useRef(null);
+
     const singin = (event) => {
-        if (number.isValid) {
-            loginUser(JSON.stringify(number))
+        if (number && number.isValid) {
+            event.target.disabled = true;
+            ref.current.continuousStart();
+            
+            LoginUser(JSON.stringify(number))
                 .then(data => {
+                    event.target.disabled = false;
+                    ref.current.complete();
                     if (data.status == 1) {
-                        sessionStorage.setItem('user_number', JSON.stringify(number))
+                        sessionStorage.setItem('user_number', JSON.stringify(number));
                         router.push('/user/login-verify');
                     } else {
-                        toast.error(data.error);
+                        ref.current.complete();
                     }
+                    
                 });
         } else {
             toast.error("Phone number is not valid");
@@ -34,6 +44,7 @@ const Login = () => {
     }
 
     return <div className="section">
+        <LoadingBar color='#3b3a3a' ref={ref} />
         <div className="card card-border mt-2">
             <div className="card-body">
                 <form>

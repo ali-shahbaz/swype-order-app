@@ -5,6 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { cartState } from '../states/atoms';
 import useSessionStorage from '../hooks/useSessionStorage';
 import { useEffect } from 'react';
+import { apiSettings } from '../configs/api-settings';
 
 
 function Layout({ props, children, name }) {
@@ -105,6 +106,9 @@ function Layout({ props, children, name }) {
             </div></>)
         }
         <div id="appCapsule" className={name == 'restaurant' ? 'pt-0' : ''}>
+            <script async
+                src={`https://maps.googleapis.com/maps/api/js?key=${apiSettings.mapApiKey}&libraries=places`}>
+            </script>
             {children}
         </div>
     </>

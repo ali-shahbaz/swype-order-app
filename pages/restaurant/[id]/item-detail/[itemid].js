@@ -1,15 +1,15 @@
 import { useEffect, useState, useRef, Dispatcher } from 'react'
-import useSessionStorage from '../../../../hooks/useSessionStorage';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Header from '../../../../components/head';
-import { AddCircle, CloseCircle, Restaurant } from "react-ionicons";
+import { AddCircle, CloseCircle } from "react-ionicons";
 import { useRecoilState } from 'recoil';
 import { cartState } from '../../../../states/atoms';
 import { toast } from 'react-toastify';
+import useLocalStorage from '../../../../hooks/useLocalStorage';
 
 const ItemDetail = ({ props }) => {
-    let data = useSessionStorage('init_data');
+    let companyData = useLocalStorage('init_data');
     const [itemState, setItemState] = useState(null); // state to set detail of order item
     const [orderItemsState, setOrderItemsState] = useState([]); // state to handle multiple items
     const [cart, setCart] = useRecoilState(cartState);
@@ -19,8 +19,8 @@ const ItemDetail = ({ props }) => {
     const cartName = `cart${id}`;
 
     useEffect(() => {
-        if (data) {
-            setItemState(data.payload.data.quickProducts.find(p => p.itemid == itemid));
+        if (companyData) {
+            setItemState(companyData.quickProducts.find(p => p.itemid == itemid));
             if (itemState) {
                 setOrderItemsState([]);
                 const itemDetail = JSON.parse(JSON.stringify(itemState));
@@ -29,7 +29,7 @@ const ItemDetail = ({ props }) => {
                 setOrderItemsState(orderItems => [...orderItems, itemDetail]);
             }
         }
-    }, [data, itemState, itemid]);
+    }, [companyData, itemState, itemid]);
 
     const addAnotherItem = () => {
         const itemDetail = JSON.parse(JSON.stringify(itemState));
@@ -66,7 +66,7 @@ const ItemDetail = ({ props }) => {
             }
 
         } else if (id && parentId >= 0 && type == 'modifier') {
-            const quickModifier = data.payload.data.quickModifiers.find(p => p.modifierId == parentId);
+            const quickModifier = companyData.quickModifiers.find(p => p.modifierId == parentId);
             if (quickModifier) {
                 const modifierOption = quickModifier.modifierOptions.find(p => p.modifierOptionId == id);
                 if (quickModifier.selectionAllowed == 1 || !e.target.checked) {
@@ -109,7 +109,7 @@ const ItemDetail = ({ props }) => {
         for (let i = 0; i < orderItemsState.length; i++) {
             const element = orderItemsState[i];
             if (element.modifiers.length > 0) {
-                const requiredModifiers = data.payload.data.quickModifiers.filter(p => p.isOptional == 0 && element.modifiers.some(m => m.modifierId == p.modifierId));
+                const requiredModifiers = companyData.quickModifiers.filter(p => p.isOptional == 0 && element.modifiers.some(m => m.modifierId == p.modifierId));
                 if (element.selectedModifiers && element.selectedModifiers.length > 0) {
                     const selectedRequiredModifiers = requiredModifiers.filter(p => element.selectedModifiers.some(m => m.modifierId == p.modifierId));
                     if (selectedRequiredModifiers.length < requiredModifiers.length) {
@@ -137,7 +137,7 @@ const ItemDetail = ({ props }) => {
         router.back();
     }
 
-    if (!data || !itemState || !orderItemsState) return <></>
+    if (!companyData || !itemState || !orderItemsState) return <></>
     return <>
         <Header title={itemState.name}></Header>
         <div className="section mt-2 order-item">
@@ -189,7 +189,7 @@ const ItemDetail = ({ props }) => {
                             {item.modifiers.length > 0 && <div className="accordion" id="modifiers">
                                 {
                                     item.modifiers.map((modifier, index) => {
-                                        const quickModifier = data.payload.data.quickModifiers.find(p => p.modifierId == modifier.modifierId);
+                                        const quickModifier = companyData.quickModifiers.find(p => p.modifierId == modifier.modifierId);
                                         if (quickModifier) {
                                             return <div key={index} data-optional={quickModifier.isOptional} className="accordion-item">
                                                 <h2 className="accordion-header" id={`modifier${modifier.itemModifierId}`}>

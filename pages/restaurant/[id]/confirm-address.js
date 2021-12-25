@@ -14,7 +14,7 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
     const mapDivRef = useRef();
     const autoCompleteRef = useRef();
     const router = useRouter();
-    // const [address, setAddress] = useState({});
+    const [address, setAddress] = useState({});
     const { id } = router.query;
     const options = {
         center: { lat, lng },
@@ -83,7 +83,8 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
                 };
                 getAddress(latlng);
             });
-        }, 100);
+        }, 500);
+
 
         // const marker = new google.maps.Marker({
         //     position: options.center,
@@ -127,12 +128,10 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
                 localStorage.setItem('location', JSON.stringify(location))
             }
         }).catch((e) => console.log("Geocoder failed due to: " + e));
+
     }
 
     return <>
-        <script async
-            src={`https://maps.googleapis.com/maps/api/js?key=${apiSettings.mapApiKey}&libraries=places`}>
-        </script>
         <Header title={'Cofirm Delivery Address'}>
         </Header>
         <div className="section mt-2">
@@ -148,8 +147,8 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
                             </div>
                             <div>
                                 <span>
-                                    {/* {address.formattedAddress}, {address.city} <br />
-                                    {address.country} */}
+                                    {address.formattedAddress}, {address.city} <br />
+                                    {address.country}
                                 </span>
                                 <CreateOutline />
                             </div>
@@ -159,7 +158,7 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
             </div>
             <div className="section mt-2" style={{ width, height }} ref={mapDivRef} id="map"></div>
             <div className="section mt-4">
-                <Link href={`/restaurant/${id}/delivery-address-edit`}>
+                <Link href={`/restaurant/${id}/menu`}>
                     <a className="btn btn-primary btn-shadow btn-lg btn-block">Confirm</a>
                 </Link>
             </div>

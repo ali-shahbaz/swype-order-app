@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { apiSettings } from '../configs/api-settings';
 const Header = ({ title, children }) => {
     return <Head>
-        <title>{title}</title>
+        <title>{title} - Swype Order App</title>
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport"
             content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />

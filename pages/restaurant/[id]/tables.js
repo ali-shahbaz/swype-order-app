@@ -1,19 +1,13 @@
-import useSessionStorage from '../../../hooks/useSessionStorage';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Header from '../../../components/head';
-import { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import useLocalStorage from '../../../hooks/useLocalStorage';
 
 const Tables = () => {
-    let state = useSessionStorage('init_data');
+    let restaurantData = useLocalStorage('init_data');
     const router = useRouter();
-    const { id, type } = router.query;
+    const { id } = router.query;
     const cartName = `cart${id}`;
-
-    useEffect(() => {
-    });
 
     const setCartTable = (tableId, tableName) => {
         let cart = sessionStorage.getItem(cartName);
@@ -31,12 +25,11 @@ const Tables = () => {
         }
     }
 
-    if (!state) return <></>
-    state = state.payload.data;
+    if (!restaurantData) return <></>
     return <div className="order-receipts">
         <Header title="Select Your Section"></Header>
         <ul className="listview separate-list image-listview no-line no-arrow inset">
-            {state.quickTables.map((item, index) => {
+            {restaurantData.quickTables.map((item, index) => {
                 return <li key={item.tableId} onClick={() => setCartTable(item.tableId, item.name)} className="items-card card card-border">
                     <Link href={`/restaurant/${id}/menu`}>
                         <a className="item">

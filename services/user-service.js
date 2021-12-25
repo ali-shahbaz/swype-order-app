@@ -1,6 +1,6 @@
 import { apiSettings } from "../configs/api-settings";
 
-export const loginUser = (params) => {
+export const LoginUser = (params) => {
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -10,7 +10,7 @@ export const loginUser = (params) => {
         .then(response => response.json())
 }
 
-export const loginVerify = (params) => {
+export const VerifyLogin = (params) => {
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -20,7 +20,7 @@ export const loginVerify = (params) => {
         .then(response => response.json())
 }
 
-export const getUserProfile = (token) => {
+export const GetUserProfile = (token) => {
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -32,7 +32,7 @@ export const getUserProfile = (token) => {
         .then(response => response.json())
 }
 
-export const uploadUserImage = (formData, token) => {
+export const UploadUserImage = (formData, token) => {
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -44,7 +44,7 @@ export const uploadUserImage = (formData, token) => {
         .then(response => response.json())
 }
 
-export const updateProfile = (params, token) => {
+export const UpdateProfile = (params, token) => {
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': token },
@@ -54,7 +54,7 @@ export const updateProfile = (params, token) => {
         .then(response => response.json())
 }
 
-export const getUserReceipts = (token) => {
+export const GetUserReceipts = (token) => {
     const requestOptions = {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', 'Authorization': token }
