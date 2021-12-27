@@ -3,21 +3,23 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { CloseOutline, CartOutline, PricetagsOutline, ReceiptOutline, PersonOutline } from 'react-ionicons';
 import { useEffect, useRef, useState } from 'react';
-import useSessionStorage from '../hooks/useSessionStorage';
 import { userLoggedInState } from '../states/atoms';
 import { useRecoilValue } from 'recoil';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 
-function Sidebar({ show }) {
+function Sidebar({ restaurantdata }) {
     const router = useRouter();
-    const loggedInUser = useSessionStorage('logged_in_user');
-    const { id } = router.query;
+    const { query, locale } = router;
+    const { id } = query;
+    const loggedInUser = useLocalStorage('logged_in_user');
     const closeRef = useRef(null);
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const loggedIn = useRecoilValue(userLoggedInState);
     const [profileUrl, setProfileUrl] = useState('/user/profile');
     const darkModeName = `dark-mode-${id}`;
     const [isDarkModeOn, setIsDarkModeOn] = useState(false);
+    const [selectedLanguage, setSelectedLanguage] = useState('');
 
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {
@@ -39,7 +41,12 @@ function Sidebar({ show }) {
             setDarkMode(JSON.parse(localStorage.getItem(darkModeName)));
         }
 
-    }, [darkModeName, loggedIn, loggedInUser, router.events])
+        if (restaurantdata) {
+            const lng = restaurantdata.welcomePageVM.profileLanguagesVM.languages.find(p => p.languagecode == locale);
+            setSelectedLanguage(lng.name);
+        }
+
+    }, [darkModeName, locale, loggedIn, loggedInUser, restaurantdata, router.events])
 
     const logout = () => {
         sessionStorage.removeItem('logged_in_user');
@@ -58,6 +65,10 @@ function Sidebar({ show }) {
         if (isDarkMode) pageBody.classList.add('dark-mode')
     }
 
+    const changeLanguage = (lngCode) => {
+        router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
+    }
+
     const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
             <div className="modal-content">
@@ -66,12 +77,12 @@ function Sidebar({ show }) {
                         <Link href={profileUrl}>
                             <a className="user-info">
                                 {
-                                    loggedInUser && loggedInUser.name ? <>
+                                    loggedInUser && loggedInUser.user.name ? <>
                                         <div className="image-wrapper">
-                                            <Image src={loggedInUser.imageUrl ? loggedInUser.imageUrl : '/images/profile/profile.png'} width={36} height={36} objectFit='cover' alt="image" className="imaged w36" />
+                                            <Image src={loggedInUser.user.imageUrl ? loggedInUser.user.imageUrl : '/images/profile/profile.png'} width={36} height={36} objectFit='cover' alt="image" className="imaged w36" />
                                         </div>
                                         <div className="in">
-                                            <strong>{loggedInUser.name}</strong>
+                                            <strong>{loggedInUser.user.name}</strong>
                                         </div> </> : <h2 className="mb-0">Set Up Your Profile</h2>
                                 }
                             </a>
@@ -169,20 +180,13 @@ function Sidebar({ show }) {
                             <div className="wide-block py-2">
                                 <h4>Select preferred language</h4>
                                 <ul id="sidebarLangFlag" className="sidebar-lang-flag my-2">
-                                    <li className="sidebar-single-flag sidebar-flag-active">
-                                        <Image src="/images/flag/english.jpg" height={40} width={40} alt="us" />
-                                    </li>
-                                    <li className="sidebar-single-flag">
-                                        <Image src="/images/flag/russian.jpg" height={40} width={40} alt="france" />
-                                    </li>
-                                    <li className="sidebar-single-flag">
-                                        <Image src="/images/flag/danish.jpg" height={40} width={40} alt="danish" />
-                                    </li>
-                                    <li className="sidebar-single-flag">
-                                        <Image src="/images/flag/spanish.jpg" height={40} width={40} alt="spanish" />
-                                    </li>
+                                    {restaurantdata && restaurantdata.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
+                                        return <li key={item.languagecode} title={item.languagecode} onClick={() => changeLanguage(item.languagecode)} className={locale == item.languagecode ? 'sidebar-single-flag sidebar-flag-active' : 'sidebar-single-flag'}>
+                                            <Image src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} objectFit='' alt={item.languagecode} />
+                                        </li>
+                                    })}
                                 </ul>
-                                <p id="sidebarLangNameShow">English (American)</p>
+                                <p id="sidebarLangNameShow">{selectedLanguage}</p>
                             </div>
                         </div>
                     </div>

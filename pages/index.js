@@ -5,17 +5,16 @@ import { apiSettings } from '../configs/api-settings';
 import Image from 'next/image';
 
 export default function Home({ data }) {
-  useEffect(() => {
-    if (window) {
-      // window.sessionStorage.setItem('init_data', JSON.stringify(data));
-      // set props data to session storage or local storage  
-    }
-  }, [data]);
-
   return <>
-    <Header title="Swype Order | Restaurants"></Header>
+    <Header title="Restaurants">
+      <style>
+        {` #hamburgerMenu {
+          display: none;
+        }`}
+      </style>
+    </Header>
     <div className="section">
-      <ul className="row checkout-item">
+      <ul className="row">
         {
           data.payload.restaurants.map(item => {
             return <div key={item.companyId} className="col-4 mt-2">

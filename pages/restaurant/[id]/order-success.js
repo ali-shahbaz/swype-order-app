@@ -33,7 +33,7 @@ const OrderSuccess = () => {
             <h3>You can follow it, by going to your profile page. </h3>
         </div>
         <div className="section next-button mt-4">
-            <Link href={`/restaurant/${id}`}>
+            <Link href={`/restaurant/${id}?sidebar=1`}>
                 <a className="btn btn-primary btn-shadow btn-lg btn-block">Next</a>
             </Link>
         </div>

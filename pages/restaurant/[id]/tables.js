@@ -3,8 +3,7 @@ import { useRouter } from 'next/router';
 import Header from '../../../components/head';
 import useLocalStorage from '../../../hooks/useLocalStorage';
 
-const Tables = () => {
-    let restaurantData = useLocalStorage('init_data');
+const Tables = ({restaurantdata}) => {
     const router = useRouter();
     const { id } = router.query;
     const cartName = `cart${id}`;
@@ -25,11 +24,11 @@ const Tables = () => {
         }
     }
 
-    if (!restaurantData) return <></>
+    if (!restaurantdata) return <></>
     return <div className="order-receipts">
         <Header title="Select Your Section"></Header>
         <ul className="listview separate-list image-listview no-line no-arrow inset">
-            {restaurantData.quickTables.map((item, index) => {
+            {restaurantdata.quickTables.map((item, index) => {
                 return <li key={item.tableId} onClick={() => setCartTable(item.tableId, item.name)} className="items-card card card-border">
                     <Link href={`/restaurant/${id}/menu`}>
                         <a className="item">

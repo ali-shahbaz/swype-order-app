@@ -139,18 +139,20 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
                 <div className="card-body">
                     <form>
                         <div className="form-group basic">
-                            <div className="input-wrapper">
+                            <div className="input-wrapper not-empty">
                                 <input type="text" className="form-control" ref={autoCompleteRef} id="enterCode" />
                                 <i className="clear-input">
                                     <CloseCircle />
                                 </i>
                             </div>
                             <div>
-                                <span>
+                                <Link href={`/restaurant/${id}/delivery-address-edit`}>
+                                    <a><CreateOutline /></a>
+                                </Link>
+                                {/* <span>
                                     {address.formattedAddress}, {address.city} <br />
                                     {address.country}
-                                </span>
-                                <CreateOutline />
+                                </span> */}
                             </div>
                         </div>
                     </form>

@@ -1,15 +1,13 @@
-import { useEffect, useState, useRef, Dispatcher } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Header from '../../../../components/head';
-import { AddCircle, CloseCircle } from "react-ionicons";
+import { AddCircle, CloseCircleOutline } from "react-ionicons";
 import { useRecoilState } from 'recoil';
 import { cartState } from '../../../../states/atoms';
 import { toast } from 'react-toastify';
-import useLocalStorage from '../../../../hooks/useLocalStorage';
 
-const ItemDetail = ({ props }) => {
-    let companyData = useLocalStorage('init_data');
+const ItemDetail = ({ restaurantdata }) => {
     const [itemState, setItemState] = useState(null); // state to set detail of order item
     const [orderItemsState, setOrderItemsState] = useState([]); // state to handle multiple items
     const [cart, setCart] = useRecoilState(cartState);
@@ -19,8 +17,8 @@ const ItemDetail = ({ props }) => {
     const cartName = `cart${id}`;
 
     useEffect(() => {
-        if (companyData) {
-            setItemState(companyData.quickProducts.find(p => p.itemid == itemid));
+        if (restaurantdata) {
+            setItemState(restaurantdata.quickProducts.find(p => p.itemid == itemid));
             if (itemState) {
                 setOrderItemsState([]);
                 const itemDetail = JSON.parse(JSON.stringify(itemState));
@@ -29,7 +27,7 @@ const ItemDetail = ({ props }) => {
                 setOrderItemsState(orderItems => [...orderItems, itemDetail]);
             }
         }
-    }, [companyData, itemState, itemid]);
+    }, [restaurantdata, itemState, itemid]);
 
     const addAnotherItem = () => {
         const itemDetail = JSON.parse(JSON.stringify(itemState));
@@ -66,7 +64,7 @@ const ItemDetail = ({ props }) => {
             }
 
         } else if (id && parentId >= 0 && type == 'modifier') {
-            const quickModifier = companyData.quickModifiers.find(p => p.modifierId == parentId);
+            const quickModifier = restaurantdata.quickModifiers.find(p => p.modifierId == parentId);
             if (quickModifier) {
                 const modifierOption = quickModifier.modifierOptions.find(p => p.modifierOptionId == id);
                 if (quickModifier.selectionAllowed == 1 || !e.target.checked) {
@@ -109,7 +107,7 @@ const ItemDetail = ({ props }) => {
         for (let i = 0; i < orderItemsState.length; i++) {
             const element = orderItemsState[i];
             if (element.modifiers.length > 0) {
-                const requiredModifiers = companyData.quickModifiers.filter(p => p.isOptional == 0 && element.modifiers.some(m => m.modifierId == p.modifierId));
+                const requiredModifiers = restaurantdata.quickModifiers.filter(p => p.isOptional == 0 && element.modifiers.some(m => m.modifierId == p.modifierId));
                 if (element.selectedModifiers && element.selectedModifiers.length > 0) {
                     const selectedRequiredModifiers = requiredModifiers.filter(p => element.selectedModifiers.some(m => m.modifierId == p.modifierId));
                     if (selectedRequiredModifiers.length < requiredModifiers.length) {
@@ -134,30 +132,31 @@ const ItemDetail = ({ props }) => {
 
         const orderItemsCount = JSON.parse(sessionStorage.getItem(cartName)).saleDetails.length;
         setCart(orderItemsCount);
-        router.back();
+        router.push(`/restaurant/${id}/menu`);
     }
 
-    if (!companyData || !itemState || !orderItemsState) return <></>
+    if (!restaurantdata || !itemState || !orderItemsState) return <></>
     return <>
         <Header title={itemState.name}></Header>
         <div className="section mt-2 order-item">
             <div className="row item-hero">
                 <div className="col-6 item-card-lg">
                     <div className="card card-border">
-                        <Image src={itemState.detailimageurl ? itemState.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority className="card-img-top" alt="image" />
-                        <div className="card-body p-1">
-                            <div className="left">
-                                <h5 className="card-title">{itemState.name}</h5>
-                                <h6 className="card-text">{itemState.description}</h6>
-                            </div>
-                            <div className="right">
-                                <h3>{itemState.salesprice}</h3>
-                            </div>
-                        </div>
+                        <Image src={itemState.detailimageurl ? itemState.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority className="card-img" alt="image" />
                     </div>
                 </div>
                 <div className="col-6">
-                    <p>{itemState.description}</p>
+                    <div className="item-title">
+                        <div className="left">
+                            <h4>{itemState.name}</h4>
+                        </div>
+                        <div className="right">
+                            <h3>{itemState.salesprice.toFixed(2)}</h3>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 className="card-text">{itemState.description}</h5>
+                    </div>
                 </div>
             </div>
             <div id="addItemContainer">
@@ -166,7 +165,7 @@ const ItemDetail = ({ props }) => {
                         <div className="card-body">
                             <div className="options">
                                 {
-                                    (itemIndex != 0) && <div onClick={() => removeAnotherItem(itemIndex)} className="remove-item"><CloseCircle /></div>
+                                    (itemIndex != 0) && <div onClick={() => removeAnotherItem(itemIndex)} className="remove-item"><CloseCircleOutline /></div>
                                 }
                             </div>
                             <div className="modification-item-name">
@@ -177,7 +176,7 @@ const ItemDetail = ({ props }) => {
                                 {
                                     item.variations.map(variation => {
                                         return <div key={variation.itemvariationid} className="single-modification">
-                                            <div className="card-title mb-0">{variation.salesprice}</div>
+                                            <div className="card-title mb-0">+{variation.salesprice.toFixed(2)}</div>
                                             <div className="form-check">
                                                 <input type="checkbox" className="form-check-input" name={`${variation.itemvariationid}-${itemIndex}`} onChange={(e) => changeHandler(e, itemIndex, variation.itemvariationid, -1, 'variation')} id={`id${variation.itemvariationid}${itemIndex}`} />
                                                 <label className="form-check-label" htmlFor={`id${variation.itemvariationid}${itemIndex}`}>{item.name} {variation.name}</label>
@@ -189,7 +188,7 @@ const ItemDetail = ({ props }) => {
                             {item.modifiers.length > 0 && <div className="accordion" id="modifiers">
                                 {
                                     item.modifiers.map((modifier, index) => {
-                                        const quickModifier = companyData.quickModifiers.find(p => p.modifierId == modifier.modifierId);
+                                        const quickModifier = restaurantdata.quickModifiers.find(p => p.modifierId == modifier.modifierId);
                                         if (quickModifier) {
                                             return <div key={index} data-optional={quickModifier.isOptional} className="accordion-item">
                                                 <h2 className="accordion-header" id={`modifier${modifier.itemModifierId}`}>
@@ -203,7 +202,7 @@ const ItemDetail = ({ props }) => {
                                                             (quickModifier.selectionAllowed === 1 ?
                                                                 quickModifier.modifierOptions.map(modifierOption => {
                                                                     return <div key={modifierOption.modifierOptionId} className="single-modification">
-                                                                        <div className="card-title mb-0">{modifierOption.price != 0 && modifierOption.price}</div>
+                                                                        <div className="card-title mb-0">{modifierOption.price != 0 && `+${modifierOption.price.toFixed(2)}`}</div>
                                                                         <div className="form-check">
                                                                             <input type="radio" className="form-check-input" onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
                                                                             <label className="radio form-check-label" htmlFor={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
@@ -212,7 +211,7 @@ const ItemDetail = ({ props }) => {
                                                                 }) :
                                                                 quickModifier.modifierOptions.map(modifierOption => {
                                                                     return <div key={modifierOption.modifierOptionId} className="single-modification">
-                                                                        <div className="card-title mb-0">{modifierOption.price != 0 && modifierOption.price}</div>
+                                                                        <div className="card-title mb-0">{modifierOption.price != 0 && `+${modifierOption.price.toFixed(2)}`}</div>
                                                                         <div className="form-check">
                                                                             <input type="checkbox" className="form-check-input" onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
                                                                             <label className="form-check-label" htmlFor={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
@@ -232,7 +231,7 @@ const ItemDetail = ({ props }) => {
                             <div className="qnt-total input-list w-100">
                                 <h2 className="m-0">Total</h2>
                                 <div className="total-amount">
-                                    <h2 className="m-0">{item.total}</h2>
+                                    <h2 className="m-0">{item.total.toFixed(2)}</h2>
                                 </div>
                             </div>
                             <div className="instruction mt-3">

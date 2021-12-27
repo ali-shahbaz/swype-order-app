@@ -8,11 +8,9 @@ import { useRecoilState } from "recoil";
 import { userLoggedInState } from "../../states/atoms";
 import React, { useRef } from 'react';
 import LoadingBar from 'react-top-loading-bar';
-import useLocalStorage from "../../hooks/useLocalStorage";
 
-const LoginVerify = () => {
+const LoginVerify = ({restaurantdata}) => {
     const userPhoneNumber = useSessionStorage('user_number');
-    const companyData = useLocalStorage('init_data');
     const [number, setNumber] = useState(null);
     const router = useRouter();
     const ref = useRef(null);
@@ -28,9 +26,9 @@ const LoginVerify = () => {
                 ref.current.complete();
 
                 if (data.status == 1) {
-                    sessionStorage.setItem('logged_in_user', JSON.stringify({ ...data.payload, ...userPhoneNumber }));
+                    localStorage.setItem('logged_in_user', JSON.stringify({ ...data.payload, ...userPhoneNumber }));
                     setIsUserLoggedIn(true);
-                    const id = companyData.id;
+                    const id = restaurantdata.id;
                     const cartStorage = sessionStorage.getItem(`cart${id}`) ? JSON.parse(sessionStorage.getItem(`cart${id}`)) : null;
                     if (cartStorage) {
                         sessionStorage.removeItem('user_number');

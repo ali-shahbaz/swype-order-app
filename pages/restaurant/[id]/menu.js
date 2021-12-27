@@ -60,7 +60,7 @@ const Menu = ({ props }) => {
                                             <h6 className="card-text">{item.description}</h6>
                                         </div>
                                         <div className="right">
-                                            <h3>{item.salesprice}</h3>
+                                            <h3>{item.salesprice.toFixed(2)}</h3>
                                         </div>
                                     </div>
                                 </div>

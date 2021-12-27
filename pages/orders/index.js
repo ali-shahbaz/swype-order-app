@@ -46,10 +46,6 @@ const Orders = () => {
                     })
                 }
             </ul>
-            <div className="section mt-4">
-                <a href="#" className="btn btn-primary btn-shadow btn-lg btn-block">Export</a>
-            </div>
-
         </div>
     </>
 }

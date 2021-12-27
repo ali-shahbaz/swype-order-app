@@ -7,10 +7,9 @@ import useSessionStorage from '../../hooks/useSessionStorage';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { GetRestaurantData } from '../../services/restaurant-service';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
-const Restaurant = () => {
-    const [restaurantData, setRestaurantData] = useState(null); // useLocalStorage('init_data');
+const Restaurant = ({ restaurantdata }) => {
     const [offers, setOffers] = useState([]);
     const userLoggedIn = useSessionStorage('logged_in_user');
     const router = useRouter();
@@ -19,6 +18,7 @@ const Restaurant = () => {
     const [orderUrl, setOrderUrl] = useState(`/restaurant/${id}/menu`);
     const { t } = useTranslation();
     const cartName = `cart${id}`;
+    const [selectedLanguage, setSelectedLanguage] = useState('');
 
     const startWithOrderType = useCallback((orderType) => {
         orderType = parseInt(orderType);
@@ -61,28 +61,13 @@ const Restaurant = () => {
 
     useEffect(() => {
         startWithOrderType(1);
-        // setOrderUrl(`/restaurant/${id}/menu`);
-
-        const storageData = window.localStorage.getItem('init_data');
-        if (!storageData || JSON.parse(storageData).id != id) {
-            GetRestaurantData(id).then(data => {
-                if (data.status == 1) {
-                    localStorage.setItem('init_data', JSON.stringify(data.payload.data));
-                    setRestaurantData(data.payload.data);
-                    setOffersData(data.payload.data);
-
-                }
-
-            });
-        } else {
-            const value = localStorage.getItem('init_data');
-            const data = !!value ? JSON.parse(value) : undefined;
-            setRestaurantData(data);
-            setOffersData(data);
-
+        if (restaurantdata) {
+            const lng = restaurantdata.welcomePageVM.profileLanguagesVM.languages.find(p=> p.languagecode == locale);
+            setSelectedLanguage(lng.name);
+            setOffersData(restaurantdata);
         }
 
-    }, [id, startWithOrderType]);
+    }, [locale, id, restaurantdata, startWithOrderType]);
 
     const setOffersData = (data) => {
         const offers = data.welcomePageVM.todaySpecials.map((value, index) => {
@@ -96,7 +81,7 @@ const Restaurant = () => {
     const orderTypeChange = (event) => {
         const val = event.target.value.toLowerCase();
         startWithOrderType(val);
-        if (val == 1 || (restaurantData.quickTables.length == 0 && val != 2)) {
+        if (val == 1 || (restaurantdata.quickTables.length == 0 && val != 2)) {
             setOrderUrl(`/restaurant/${id}/menu`);
         } else if (val == 3) {
             setOrderUrl(`/restaurant/${id}/tables`);
@@ -109,20 +94,20 @@ const Restaurant = () => {
         router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
     }
 
-    if (!restaurantData) return <></>
+    if (!restaurantdata) return <></>
     const content = <div id="appCapsule" className="pt-0">
-        <Header title={restaurantData.welcomePageVM.header}></Header>
+        <Header title={restaurantdata.welcomePageVM.header}></Header>
         <div className="section full welcome-cover">
         </div>
         <div className="section full welcome-section">
             <div className="wide-block py-2">
                 <div className="under-logo">
-                    <Image src={restaurantData.logo} width={124} height={104} alt="under logo" />
+                    <Image src={restaurantdata.logo} width={124} height={104} alt="under logo" />
                 </div>
                 <div className="welcome-txt mt-2">
-                    <h2>{restaurantData.welcomePageVM.header}</h2>
-                    {(restaurantData.welcomePageVM.message ?
-                        <h4>{restaurantData.welcomePageVM.message}</h4> : <></>)}
+                    <h2>{restaurantdata.welcomePageVM.header}</h2>
+                    {(restaurantdata.welcomePageVM.message ?
+                        <h4>{restaurantdata.welcomePageVM.message}</h4> : <></>)}
                 </div>
             </div>
         </div>
@@ -131,13 +116,13 @@ const Restaurant = () => {
                 <div className="wide-block py-2">
                     <h3>Select preferred language</h3>
                     <ul id="langFlag" className="lang-flag my-2">
-                        {restaurantData.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
+                        {restaurantdata.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
                             return <li key={item.languagecode} title={item.languagecode} onClick={() => changeLanguage(item.languagecode)} className={locale == item.languagecode ? 'single-flag flag-active' : 'single-flag'}>
                                 <Image src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} objectFit='' alt={item.languagecode} />
                             </li>
                         })}
                     </ul>
-                    <p id="langNameShow">English (American) {t('welcome')}</p>
+                    <p id="langNameShow">{selectedLanguage}</p>
                 </div>
             </div>
         </div>
@@ -182,14 +167,14 @@ const Restaurant = () => {
                         <div className="card card-border">
                             <Link href={`/restaurant/${id}/item-detail/${item.itemid}`}>
                                 <a>
-                                    <Image src={item.detailimageurl} width={300} height={150} layout="responsive" className="card-Image-top" alt={item.name} />
+                                    <Image src={item.detailimageurl} width={300} height={150} layout="responsive" className="card-img-top" alt={item.name} />
                                     <div className="card-body">
                                         <div className="card-text">
                                             <div>
                                                 <h5>{item.name}</h5>
                                                 <h6>{item.description}</h6>
                                             </div>
-                                            <h3>{item.salesprice}</h3>
+                                            <h3>{item.salesprice.toFixed(2)}</h3>
                                         </div>
                                     </div>
                                 </a>

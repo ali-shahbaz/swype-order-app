@@ -19,6 +19,6 @@ export const PlaceOrder = (data, restaurantId, orderType) => {
         },
         body: data
     };
-    return fetch(`${apiSettings.apiUrl}orderapp/NewSale?id=${restaurantId}&ordertype=${orderType}`, requestOptions)
+    return fetch(`${apiSettings.apiUrl}orderapp/NewSale2?id=${restaurantId}&ordertype=${orderType}`, requestOptions)
         .then(response => response.json())
 }

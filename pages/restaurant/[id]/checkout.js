@@ -2,11 +2,12 @@ import Image from 'next/image';
 import useSessionStorage from '../../../hooks/useSessionStorage';
 import { useRouter } from 'next/router';
 import { PlaceOrder } from '../../../services/restaurant-service';
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import LoadingBar from 'react-top-loading-bar';
 import { toast } from 'react-toastify';
 import Header from '../../../components/head';
 import { loadStripe } from '@stripe/stripe-js';
+import { CloseCircleOutline } from 'react-ionicons';
 
 const Checkout = () => {
     const router = useRouter();
@@ -14,6 +15,9 @@ const Checkout = () => {
     const cart = useSessionStorage(`cart${id}`);
     const loggedInUser = useSessionStorage('logged_in_user');
     const ref = useRef(null);
+    const [saleItems, setSaleItems] = useState([]);
+    const [cartData, setCartData] = useState(null);
+    const cartName = `cart${id}`;
 
     const payNow = (event) => {
         if (loggedInUser) {
@@ -81,16 +85,44 @@ const Checkout = () => {
         }
     }, [status]);
 
+    useEffect(() => {
+        if (cart) {
+            const newCart = [];
+            for (let i = 0; i < cart.saleDetails.length; i++) {
+                const items = cart.saleDetails.filter(p => p.itemid == cart.saleDetails[i].itemid);
+                if (newCart.findIndex(p => p.itemid == cart.saleDetails[i].itemid) < 0) {
+                    items[0].count = items.length;
+                    newCart.push(items[0]);
+                }
+            }
+            setSaleItems(newCart);
+            setCartData(cart);
+        }
+    }, [cart]);
+
+    const removeItem = (itemId) => {
+        setSaleItems(items => items = items.filter(p => p.itemid != itemId));
+
+        let myCart = sessionStorage.getItem(cartName);
+        if (myCart) {
+            const saleDetails = cart.saleDetails.filter(p => p.itemid != itemId);
+            myCart = { ...JSON.parse(myCart), ...{ saleDetails } };
+            sessionStorage.setItem(cartName, JSON.stringify(myCart));
+            setCartData(myCart);
+        }
+    }
+
     return <div className="order-checkout">
         <LoadingBar color='#3b3a3a' ref={ref} />
         <Header title="Checkout"></Header>
         <div className="section">
             <div className="row checkout-item">
-                {cart && cart.saleDetails.map((item, i) => {
-                    return <div key={i} className="col-4 mt-2">
+                {saleItems.map((item, i) => {
+                    return <div key={i} className="col-4 mt-2 cart-item">
+                        <div onClick={() => removeItem(item.itemid)} className="remove-cart-item"><CloseCircleOutline /></div>
                         <div className="card item-card card-border p-0">
                             <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority={true} className="card-img-top" alt="image" />
-                            <h4>{item.name}</h4>
+                            <h4>{item.count} - {item.name}</h4>
                         </div>
                     </div>
                 })}
@@ -100,11 +132,11 @@ const Checkout = () => {
             <div className="border-bottom">
                 <div className="total-item">
                     <h4>Total Items</h4>
-                    <h4>{cart && cart.saleDetails.length}</h4>
+                    <h4>{cartData && cartData.saleDetails.length}</h4>
                 </div>
                 <div className="total-amount">
                     <h4>Total Amount</h4>
-                    <h4>{cart && cart.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h4>
+                    <h4>{cartData && cartData.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h4>
                 </div>
             </div>
         </div>

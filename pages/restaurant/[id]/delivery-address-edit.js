@@ -1,8 +1,13 @@
 import useLocalStorage from "../../../hooks/useLocalStorage";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 const DeliveryAddressEdit = () => {
     const location = useLocalStorage('location');
-    if (!location)  return <></>
+    const router = useRouter();
+    const { id } = router.query;
+
+    if (!location) return <></>
     return <>
         <div className="section mt-2">
             <div className="card card-border">
@@ -51,7 +56,11 @@ const DeliveryAddressEdit = () => {
         </div>
 
         <div className="section mt-4">
-            <a href="order-delivery-confirmed-address.html" className="btn btn-primary btn-shadow btn-lg btn-block mt-2">Confirm</a>
+            <div className="section mt-4">
+                <Link href={`/restaurant/${id}/menu`}>
+                    <a className="btn btn-primary btn-shadow btn-lg btn-block mt-2">Confirm</a>
+                </Link>
+            </div>
         </div>
     </>
 }
