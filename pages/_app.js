@@ -27,7 +27,7 @@ const MyApp = ({ Component, pageProps }) => {
     };
   }, []);
   return <RecoilRoot>
-    <Layout props={Component.defaultProps} name={Component.name.toLowerCase()}>
+    <Layout props={Component.defaultProps}>
       {!loading ? (
         <Component {...pageProps} />
       ) : (
