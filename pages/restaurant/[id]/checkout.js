@@ -119,7 +119,7 @@ const Checkout = () => {
             <div className="row checkout-item">
                 {saleItems.map((item, i) => {
                     return <div key={i} className="col-4 mt-2 cart-item">
-                        <div onClick={() => removeItem(item.itemid)} className="remove-cart-item"><CloseCircleOutline className="switchSVGColor" /></div>
+                        <div onClick={() => removeItem(item.itemid)} className="remove-cart-item"><CloseCircleOutline className="" /></div>
                         <div className="count-cart-item">{item.count}</div>
                         <div className="card item-card card-border p-0">
                             <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority={true} className="card-img-top" alt="image" />

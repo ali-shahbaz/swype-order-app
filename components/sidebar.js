@@ -17,6 +17,7 @@ function Sidebar({ restaurantdata }) {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const loggedIn = useRecoilValue(userLoggedInState);
     const [profileUrl, setProfileUrl] = useState('/user/profile');
+    const [ordersUrl, setOrdersUrl] = useState('/orders');
     const darkModeName = `dark-mode-${id}`;
     const [isDarkModeOn, setIsDarkModeOn] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState('');
@@ -29,9 +30,11 @@ function Sidebar({ restaurantdata }) {
         router.events.on('routeChangeStart', handleRouteChange);
         if (loggedInUser || loggedIn) {
             setProfileUrl('/user/profile');
+            setOrdersUrl('/orders');
             setIsUserLoggedIn(true);
         } else {
             setProfileUrl('/user/login');
+            setOrdersUrl('/user/login')
         }
 
         // set for dark mode
@@ -127,7 +130,7 @@ function Sidebar({ restaurantdata }) {
                     </div>
                     <ul className="listview flush transparent no-line image-listview">
                         <li>
-                            <Link href={`/restaurant/${id}/menu`}>
+                        <Link href={`/restaurant/${id}/menu`}>
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <CartOutline color="#FFF" />
@@ -139,7 +142,7 @@ function Sidebar({ restaurantdata }) {
                             </Link>
                         </li>
                         <li>
-                            <Link href={`/restaurant/${id}/menu`}>
+                        <Link href={`/restaurant/${id}/menu`}>
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <PricetagsOutline color="#FFF" />
@@ -151,7 +154,7 @@ function Sidebar({ restaurantdata }) {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/orders">
+                            <Link  href={ordersUrl}>
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <ReceiptOutline color="#FFF" />
@@ -163,7 +166,7 @@ function Sidebar({ restaurantdata }) {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/user/profile">
+                            <Link href={profileUrl}>
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <PersonOutline color="#FFF" />
@@ -192,7 +195,7 @@ function Sidebar({ restaurantdata }) {
                     </div>
                     <ul className="listview darkmode-switcher image-listview text inset no-line mt-2">
                         <li>
-                            <div className="item darkMode">
+                            <div className="item">
                                 <div className="in">
                                     <div className="form-check form-switch me-2">
                                         <input checked={isDarkModeOn ? true : false} onChange={(e) => changeDarkMode(e)} className="form-check-input dark-mode-switch" type="checkbox"

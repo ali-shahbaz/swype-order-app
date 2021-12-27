@@ -44,8 +44,10 @@
 {
     position: absolute;
     right: 15px;
+    min-width: 20px;
+    min-height: 20px;
     z-index: 1;
-    top: 5px;
+    top: 4px;
     background-color: #fff;
     display: inline-block;
     padding: 0.35em 0.65em;
@@ -62,6 +64,12 @@
 body.dark-mode .switchSVGColor svg{
     color: #fff !important;
 }
+
+.remove-cart-item svg{
+    background-color: white;
+    border-radius: 50%;
+}
+
 .btn-group .btn.myDeliveryButton{
     margin-left: -1px !important;
 }
@@ -70,10 +78,14 @@ body.dark-mode .switchSVGColor svg{
     border: 1px solid gray;
     border-radius: 10px;
 }
-.image-listview>li .item.darkMode{
+.image-listview.darkmode-switcher>li .item{
     padding-left: 5px;
 }
-.image-listview>li .item.darkMode .in::after
+.image-listview.darkmode-switcher>li .item .in::after
 {
     display: none;
+}
+.image-listview.darkmode-switcher>li .item .in
+{
+    margin-left: 0px;
 }
