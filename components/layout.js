@@ -9,7 +9,7 @@ import { apiSettings } from '../configs/api-settings';
 import { GetRestaurantData } from '../services/restaurant-service';
 
 
-function Layout({ props, children }) {
+function Layout({ props = {}, children }) {
     const router = useRouter();
     let { id, sidebar } = router.query;
     const cartCount = useRecoilValue(cartState);
@@ -77,7 +77,7 @@ function Layout({ props, children }) {
         }
 
 
-    }, [id, props, sidebar]);
+    }, [id, sidebar]);
 
     return <>
         {props.name == 'Restaurant' ? (<>
