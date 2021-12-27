@@ -62,7 +62,7 @@ const Restaurant = ({ restaurantdata }) => {
     useEffect(() => {
         startWithOrderType(1);
         if (restaurantdata) {
-            const lng = restaurantdata.welcomePageVM.profileLanguagesVM.languages.find(p=> p.languagecode == locale);
+            const lng = restaurantdata.welcomePageVM.profileLanguagesVM.languages.find(p => p.languagecode == locale);
             setSelectedLanguage(lng.name);
             setOffersData(restaurantdata);
         }
@@ -220,6 +220,13 @@ export async function getServerSideProps({ locale }) {
             ...await serverSideTranslations(locale, ['common'])
         }
     }
+}
+
+Restaurant.defaultProps = {
+    name: 'Restaurant',
+    title: '',
+    showBack: false,
+    showCart: false
 }
 
 export default Restaurant;

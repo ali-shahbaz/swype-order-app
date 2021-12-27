@@ -50,4 +50,11 @@ const Orders = () => {
     </>
 }
 
+Orders.defaultProps = {
+    name: 'Orders',
+    title: 'Reciepts',
+    showBack: false,
+    showCart: false
+}
+
 export default Orders;

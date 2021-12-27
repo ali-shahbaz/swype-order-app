@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useRecoilState } from "recoil";
+import Header from "../../../components/head";
 import { cartState } from "../../../states/atoms";
 
 const OrderSuccess = () => {
@@ -14,11 +15,12 @@ const OrderSuccess = () => {
     useEffect(() => {
         if (orderid && window) {
             sessionStorage.removeItem(cartName);
-            setCart(0);        
+            setCart(0);
         }
     })
 
     return <>
+        <Header title="Order Confirmed"></Header>
         <div className="section confirmed-heading my-3">
             <div className="section-heading">
                 <Image src="/images/paid.png" width={87} height={80} alt="" />
@@ -38,6 +40,13 @@ const OrderSuccess = () => {
             </Link>
         </div>
     </>
+}
+
+OrderSuccess.defaultProps = {
+    name: 'OrderSuccess',
+    title: '',
+    showBack: false,
+    showCart: false
 }
 
 export default OrderSuccess;

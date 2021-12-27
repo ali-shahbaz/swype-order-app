@@ -200,6 +200,10 @@ ConfirmAddress.defaultProps = {
     onDragStart: () => { },
     onDragEnd: () => { },
     showMyLocationButton: false,
+    name: 'ConfirmAddress',
+    title: 'Confirm Your Address',
+    showBack: true,
+    showCart: false
 }
 
 export default ConfirmAddress;

@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import React, { useRef } from 'react';
 import LoadingBar from 'react-top-loading-bar';
+import Header from '../../components/head';
 
 
 const Login = () => {
@@ -44,6 +45,7 @@ const Login = () => {
     }
 
     return <div className="section">
+        <Header title="Login"></Header>
         <LoadingBar color='#3b3a3a' ref={ref} />
         <div className="card card-border mt-2">
             <div className="card-body">
@@ -64,6 +66,13 @@ const Login = () => {
             <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => singin(e)}>{`Let's go`}</button>
         </div>
     </div>
+}
+
+Login.defaultProps = {
+    name: 'Login',
+    title: 'Login',
+    showBack: false,
+    showCart: false
 }
 
 export default Login;

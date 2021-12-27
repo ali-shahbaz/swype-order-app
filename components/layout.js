@@ -9,22 +9,14 @@ import { apiSettings } from '../configs/api-settings';
 import { GetRestaurantData } from '../services/restaurant-service';
 
 
-function Layout({ props, children, name }) {
+function Layout({ props, children }) {
     const router = useRouter();
     let { id, sidebar } = router.query;
-    // const data = useSessionStorage('init_data')
     const cartCount = useRecoilValue(cartState);
-    const [title, setTitle] = useState('');
-    const [showCart, setShowCart] = useState(false);
-    const [showBack, setShowBack] = useState(false);
     const [data, setData] = useState(null);
     let restData = useRef(null);
     const sidebarBtnRef = useRef(null);
 
-
-    // if (!id && data) {
-    //     id = data.payload.data.id;
-    // }
     const cartStorage = useSessionStorage(`cart${id}`);
     useEffect(() => {
         // clear
@@ -63,66 +55,6 @@ function Layout({ props, children, name }) {
             }
         });
 
-        console.log('component name: ' + name);
-        switch (name) {
-            case 'tables':
-                setTitle('Select Your Section');
-                setShowBack(true);
-                break;
-            case 'menu':
-                setTitle('Menu');
-                setShowBack(true);
-                setShowCart(true);
-                break;
-            case 'itemdetail':
-                setTitle('Item');
-                setShowBack(true);
-                setShowCart(true);
-                break;
-            case 'order':
-                setTitle('My Orders');
-                break;
-            case 'profile':
-                setTitle('My Profile');
-                break;
-            case 'confirmaddress':
-                setTitle('Confirm Your Address');
-                setShowBack(true);
-                setShowCart(false);
-                break;
-            case 'deliveryaddressedit':
-                setTitle('Edit');
-                setShowBack(true);
-                setShowCart(false);
-                break;
-            case 'home':
-                setTitle('Restaurants');
-                break;
-            case 'login':
-                setTitle('Login');
-                break;
-            case 'loginverify':
-                setTitle('SMS');
-                setShowBack(true);
-                break;
-            case 'checkout':
-                setTitle('Checkout');
-                setShowBack(true);
-                setShowCart(false);
-                break;
-            case 'ordersuccess':
-                setTitle('Confirmed');
-                break;
-            case 'orders':
-                setTitle('Reciepts');
-                break;
-            case 'orderdetail':
-                setTitle('Your Order');
-                break;
-            default:
-                break;
-        }
-
         const storageData = window.localStorage.getItem('init_data');
         if (!storageData || (id && JSON.parse(storageData).id != id)) {
             GetRestaurantData(id).then(data => {
@@ -145,10 +77,10 @@ function Layout({ props, children, name }) {
         }
 
 
-    }, [id, name, sidebar]);
+    }, [id, props, sidebar]);
 
     return <>
-        {name == 'restaurant' ? (<>
+        {props.name == 'Restaurant' ? (<>
             <div className="appHeader order-welcome-header">
                 <div className="left">
                     <a href="#" ref={sidebarBtnRef} className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
@@ -159,16 +91,16 @@ function Layout({ props, children, name }) {
             (<div className="appHeader">
 
                 <div className="left">
-                    {showBack ? <div onClick={() => router.back()} className="headerButton">
+                    {props.showBack ? <div onClick={() => router.back()} className="headerButton">
                         <ChevronBackOutline />
                     </div> : <a href="#" id='hamburgerMenu' className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
                         <MenuOutline class="md hydrated" />
                     </a>}
                 </div>
 
-                <div className="pageTitle">{title}</div>
+                <div className="pageTitle">{props.title}</div>
                 {
-                    showCart && <div className="right">
+                    props.showCart && <div className="right">
                         <Link href={`/restaurant/${id}/checkout`}>
                             <a className="headerButton">
                                 <CartOutline />
@@ -179,7 +111,7 @@ function Layout({ props, children, name }) {
                 }
             </div>)
         }
-        <div id="appCapsule" className={name == 'restaurant' ? 'pt-0' : ''}>
+        <div id="appCapsule" className={props.name == 'Restaurant' ? 'pt-0' : ''}>
             <script async
                 src={`https://maps.googleapis.com/maps/api/js?key=${apiSettings.mapApiKey}&libraries=places`}>
             </script>

@@ -260,4 +260,12 @@ const ItemDetail = ({ restaurantdata }) => {
         </div>
     </>
 }
+
+ItemDetail.defaultProps = {
+    name: 'ItemDetail',
+    title: 'Item',
+    showBack: true,
+    showCart: true
+}
+
 export default ItemDetail;

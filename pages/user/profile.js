@@ -123,4 +123,11 @@ const Profile = () => {
     </>
 }
 
+Profile.defaultProps = {
+    name: 'Profile',
+    title: 'My Profile',
+    showBack: true,
+    showCart: false
+}
+
 export default Profile;

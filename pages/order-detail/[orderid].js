@@ -1,5 +1,17 @@
+import Header from "../../components/head";
+
 const OrderDetail = () => {
-    return <span>Ordre Detail</span>
+    return <>
+        <Header title="Order Detail"></Header>
+        <span>Ordre Detail</span>
+    </>
+}
+
+OrderDetail.defaultProps = {
+    name: 'OrderDetail',
+    title: 'Your Order',
+    showBack: false,
+    showCart: false
 }
 
 export default OrderDetail;

@@ -1,8 +1,14 @@
-import { useEffect } from 'react';
 import Header from '../components/head';
 import Link from 'next/link';
 import { apiSettings } from '../configs/api-settings';
 import Image from 'next/image';
+
+Home.defaultProps = {
+  name: 'Home',
+  title: 'Restaurants',
+  showBack: false,
+  showCart: false
+}
 
 export default function Home({ data }) {
   return <>

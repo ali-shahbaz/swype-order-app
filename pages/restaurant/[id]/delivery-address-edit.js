@@ -1,6 +1,7 @@
 import useLocalStorage from "../../../hooks/useLocalStorage";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Header from "../../../components/head";
 
 const DeliveryAddressEdit = () => {
     const location = useLocalStorage('location');
@@ -9,6 +10,7 @@ const DeliveryAddressEdit = () => {
 
     if (!location) return <></>
     return <>
+        <Header title="Edit Delivery Address"></Header>
         <div className="section mt-2">
             <div className="card card-border">
                 <div className="card-body">
@@ -64,4 +66,12 @@ const DeliveryAddressEdit = () => {
         </div>
     </>
 }
+
+DeliveryAddressEdit.defaultProps = {
+    name: 'DeliveryAddressEdit',
+    title: 'Edit',
+    showBack: true,
+    showCart: false
+}
+
 export default DeliveryAddressEdit;

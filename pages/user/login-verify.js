@@ -8,8 +8,9 @@ import { useRecoilState } from "recoil";
 import { userLoggedInState } from "../../states/atoms";
 import React, { useRef } from 'react';
 import LoadingBar from 'react-top-loading-bar';
+import Header from "../../components/head";
 
-const LoginVerify = ({restaurantdata}) => {
+const LoginVerify = ({ restaurantdata }) => {
     const userPhoneNumber = useSessionStorage('user_number');
     const [number, setNumber] = useState(null);
     const router = useRouter();
@@ -32,10 +33,12 @@ const LoginVerify = ({restaurantdata}) => {
                     const cartStorage = sessionStorage.getItem(`cart${id}`) ? JSON.parse(sessionStorage.getItem(`cart${id}`)) : null;
                     if (cartStorage) {
                         sessionStorage.removeItem('user_number');
-                        cartStorage = { ...cartStorage, ...{ 
-                            verifymobile: userPhoneNumber.MobileNumber,
-                            verifyfullname: data.payload.user.name 
-                        } };
+                        cartStorage = {
+                            ...cartStorage, ...{
+                                verifymobile: userPhoneNumber.MobileNumber,
+                                verifyfullname: data.payload.user.name
+                            }
+                        };
                         sessionStorage.setItem(`cart${id}`, JSON.stringify(cartStorage));
 
                         if (cartStorage.saleDetails.length > 0) {
@@ -60,6 +63,7 @@ const LoginVerify = ({restaurantdata}) => {
     }
 
     return <div className="section mt-2">
+        <Header title="Verify Login"></Header>
         <LoadingBar color='#3b3a3a' ref={ref} />
         <div className="card card-border mt-2">
             <div className="card-body">
@@ -83,6 +87,13 @@ const LoginVerify = ({restaurantdata}) => {
         </div>
 
     </div>
+}
+
+LoginVerify.defaultProps = {
+    name: 'LoginVerify',
+    title: 'SMS',
+    showBack: true,
+    showCart: false
 }
 
 export default LoginVerify;

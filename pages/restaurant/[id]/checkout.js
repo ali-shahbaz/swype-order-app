@@ -147,4 +147,11 @@ const Checkout = () => {
     </div>
 }
 
+Checkout.defaultProps = {
+    name: 'Checkout',
+    title: 'Checkout',
+    showBack: true,
+    showCart: false
+}
+
 export default Checkout;

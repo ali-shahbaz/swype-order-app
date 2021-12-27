@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Header from '../../../components/head';
-import useLocalStorage from '../../../hooks/useLocalStorage';
 
 const Tables = ({restaurantdata}) => {
     const router = useRouter();
@@ -49,4 +48,12 @@ const Tables = ({restaurantdata}) => {
         </div>
     </div>
 }
+
+Tables.defaultProps = {
+    name: 'Tables',
+    title: 'Select Your Section',
+    showBack: true,
+    showCart: false
+}
+
 export default Tables;
