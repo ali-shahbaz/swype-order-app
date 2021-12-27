@@ -1,13 +1,13 @@
 import Header from '../../components/head';
 import Image from 'next/image'
-import useSessionStorage from '../../hooks/useSessionStorage';
+import useLocalStorage from '../../hooks/useLocalStorage';
 import { useEffect, useState } from 'react';
 import { GetUserProfile, UpdateProfile, UploadUserImage } from '../../services/user-service';
 import { CloseCircle } from 'react-ionicons';
 import { toast } from 'react-toastify';
 
 const Profile = () => {
-    const loggedInUser = useSessionStorage('logged_in_user');
+    const loggedInUser = useLocalStorage('logged_in_user');
     const [userDetail, setUserDetail] = useState(null);
 
     useEffect(() => {
@@ -20,7 +20,7 @@ const Profile = () => {
                     loggedInUser.name = data.payload.user.name;
 
                     setUserDetail(loggedInUser);
-                    sessionStorage.setItem('logged_in_user', JSON.stringify(loggedInUser));
+                    localStorage.setItem('logged_in_user', JSON.stringify(loggedInUser));
                 } else {
                     toast.error(data.error);
                 }
@@ -39,7 +39,7 @@ const Profile = () => {
                 if (data.status == 1) {
                     loggedInUser.imageUrl = data.payload.image.url;
                     setUserDetail(prev => prev = { ...prev, ...{ imageUrl: data.payload.image.url } });
-                    sessionStorage.setItem('logged_in_user', JSON.stringify(loggedInUser));
+                    localStorage .setItem('logged_in_user', JSON.stringify(loggedInUser));
                     toast.success('Image uploaded, click Save button for save changes.');
                 } else {
                     toast.error(data.message ? data.message : data.error);
@@ -126,7 +126,7 @@ const Profile = () => {
 Profile.defaultProps = {
     name: 'Profile',
     title: 'My Profile',
-    showBack: true,
+    showBack: false,
     showCart: false
 }
 

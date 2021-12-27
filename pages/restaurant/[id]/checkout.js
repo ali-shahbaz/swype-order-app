@@ -8,12 +8,13 @@ import { toast } from 'react-toastify';
 import Header from '../../../components/head';
 import { loadStripe } from '@stripe/stripe-js';
 import { CloseCircleOutline } from 'react-ionicons';
+import useLocalStorage from '../../../hooks/useLocalStorage';
 
 const Checkout = () => {
     const router = useRouter();
     const { id, status } = router.query;
     const cart = useSessionStorage(`cart${id}`);
-    const loggedInUser = useSessionStorage('logged_in_user');
+    const loggedInUser = useLocalStorage('logged_in_user');
     const ref = useRef(null);
     const [saleItems, setSaleItems] = useState([]);
     const [cartData, setCartData] = useState(null);

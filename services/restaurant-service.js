@@ -22,3 +22,15 @@ export const PlaceOrder = (data, restaurantId, orderType) => {
     return fetch(`${apiSettings.apiUrl}orderapp/NewSale2?id=${restaurantId}&ordertype=${orderType}`, requestOptions)
         .then(response => response.json())
 }
+
+export const GetOrderDetail = (token, orderId) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        }
+    };
+    return fetch(`${apiSettings.apiUrl}orderapp/GetOrderDetail/${orderId}`, requestOptions)
+        .then(response => response.json())
+}
