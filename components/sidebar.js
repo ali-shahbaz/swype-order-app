@@ -17,7 +17,6 @@ function Sidebar({ restaurantdata }) {
     const loggedIn = useRecoilValue(userLoggedInState);
     const [profileUrl, setProfileUrl] = useState('/user/profile');
     const [ordersUrl, setOrdersUrl] = useState('/orders');
-    const darkModeName = `dark-mode-${id}`;
     const [isDarkModeOn, setIsDarkModeOn] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState('');
     const [restaurantId, setRestaurantId] = useState();
