@@ -63,16 +63,16 @@ const OrderDetail = () => {
         <div className="section full mt-2 px-3">
             <form action="#">
                 <div className="form-check mt-1">
-                    <input type="checkbox" onClick={(e) => { e.preventDefault() }} className="form-check-input" id="orderConfirmed" defaultChecked={orderDetail.order.orderStatusDone.indexOf('OrderConfirmed') >= 0} />
+                    <input type="checkbox" onClick={(e) => { e.preventDefault() }} className="form-check-input" id="orderConfirmed" defaultChecked={orderDetail && orderDetail.order.orderStatusDone.indexOf('OrderConfirmed') >= 0} />
                     <label className="form-check-label" htmlFor="orderConfirmed">Order Confirmed</label>
                 </div>
                 <div className="form-check mt-1">
-                    <input type="checkbox" onClick={(e) => { e.preventDefault() }} className="form-check-input" id="preparingOrder" defaultChecked={orderDetail.order.orderStatusDone.indexOf('InProgress') >= 0} />
+                    <input type="checkbox" onClick={(e) => { e.preventDefault() }} className="form-check-input" id="preparingOrder" defaultChecked={orderDetail && orderDetail.order.orderStatusDone.indexOf('InProgress') >= 0} />
                     <label className="form-check-label" htmlFor="preparingOrder">We are preparing your
                         order</label>
                 </div>
                 <div className="form-check mt-1">
-                    <input type="checkbox" onClick={(e) => { e.preventDefault() }} className="form-check-input" id="EnjoyOrder" defaultChecked={orderDetail.order.orderStatusDone.indexOf('Completed') >= 0} />
+                    <input type="checkbox" onClick={(e) => { e.preventDefault() }} className="form-check-input" id="EnjoyOrder" defaultChecked={orderDetail && orderDetail.order.orderStatusDone.indexOf('Completed') >= 0} />
                     <label className="form-check-label" htmlFor="EnjoyOrder">Enjoy</label>
                 </div>
             </form>
