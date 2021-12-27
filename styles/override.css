@@ -100,3 +100,7 @@ body.dark-mode .flag-mbl-input input
     margin-left: 0px;
     padding-left: 0px;
 }
+.order-type-name
+{
+    padding-top: 10px;
+}

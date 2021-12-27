@@ -135,8 +135,9 @@ const Checkout = () => {
             </div>
         </div>
         {
+            
             saleItems.length > 0 && <> <div className="section mt-3">
-                <div className="border-bottom">
+                <div className="border-bottom">                    
                     <div className="total-item">
                         <h4>Total Items</h4>
                         <h4>{cartData && cartData.saleDetails.length}</h4>
@@ -144,6 +145,12 @@ const Checkout = () => {
                     <div className="total-amount">
                         <h4>Total Amount</h4>
                         <h4>{cartData && cartData.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h4>
+                    </div>
+                </div>
+                <div>                    
+                    <div className="total-item">
+                        <h4>Order Type</h4>
+                        <h4>{cartData && cartData.onlineOrderTypeName}</h4>
                     </div>
                 </div>
             </div>

@@ -22,8 +22,18 @@ const Restaurant = ({ restaurantdata }) => {
     const startWithOrderType = useCallback((orderType) => {
         orderType = parseInt(orderType);
         let cart = sessionStorage.getItem(cartName);
+        let onlineOrderTypeName = 'Take Away';
+        if(orderType == 2)
+        {
+            onlineOrderTypeName = 'Delivery';
+        }
+        else if(orderType == 3)
+        {
+            onlineOrderTypeName = 'Dine In';
+        }
+
         if (cart) {
-            cart = { ...JSON.parse(cart), ...{ onlineOrderType: orderType } };
+            cart = { ...JSON.parse(cart), ...{ onlineOrderType: orderType, onlineOrderTypeName } };
             sessionStorage.setItem(cartName, JSON.stringify(cart));
         } else {
             const userNumber = userLoggedIn ? userLoggedIn.user.mobileNumber : '';
