@@ -142,12 +142,12 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
                             <div className="input-wrapper not-empty">
                                 <input type="text" className="form-control" ref={autoCompleteRef} id="enterCode" />
                                 <i className="clear-input">
-                                    <CloseCircle />
+                                    <CloseCircle className="switchSVGColor" />
                                 </i>
                             </div>
                             <div>
                                 <Link href={`/restaurant/${id}/delivery-address-edit`}>
-                                    <a><CreateOutline /></a>
+                                    <a><CreateOutline className="switchSVGColor" /></a>
                                 </Link>
                                 {/* <span>
                                     {address.formattedAddress}, {address.city} <br />

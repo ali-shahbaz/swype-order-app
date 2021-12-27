@@ -68,6 +68,11 @@
 
 body.dark-mode .switchSVGColor svg {
     color: #fff !important;
+    fill: #fff !important;
+}
+body.dark-mode .flag-mbl-input input
+{
+    color: #fff !important;
 }
 
 .btn-group .btn.myDeliveryButton {
@@ -89,4 +94,9 @@ body.dark-mode .switchSVGColor svg {
 .image-listview.darkmode-switcher>li .item .in
 {
     margin-left: 0px;
+}
+.image-listview.darkmode-switcher>li .item
+{
+    margin-left: 0px;
+    padding-left: 0px;
 }
