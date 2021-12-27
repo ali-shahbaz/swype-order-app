@@ -11,8 +11,7 @@ const OrderSuccess = () => {
     const { id, orderid , ordernumber} = router.query;
     const cartName = `cart${id}`;
     const [cart, setCart] = useRecoilState(cartState);
-    if (!ordernumber)
-        ordernumber = id;
+
     useEffect(() => {
         if (orderid && window) {
             sessionStorage.removeItem(cartName);
