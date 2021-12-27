@@ -16,11 +16,8 @@ function Sidebar({ restaurantdata }) {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const loggedIn = useRecoilValue(userLoggedInState);
     const [profileUrl, setProfileUrl] = useState('/user/profile');
-<<<<<<< HEAD
     const [ordersUrl, setOrdersUrl] = useState('/orders');
     const darkModeName = `dark-mode-${id}`;
-=======
->>>>>>> cf9a533e783c46b8f0f5ed3cde2417b6ff6ecc28
     const [isDarkModeOn, setIsDarkModeOn] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState('');
     const [restaurantId, setRestaurantId] = useState();
@@ -139,11 +136,7 @@ function Sidebar({ restaurantdata }) {
                     </div>
                     <ul className="listview flush transparent no-line image-listview">
                         <li>
-<<<<<<< HEAD
-                        <Link href={`/restaurant/${id}/menu`}>
-=======
                             <Link href={`/restaurant/${restaurantId}/menu`}>
->>>>>>> cf9a533e783c46b8f0f5ed3cde2417b6ff6ecc28
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <CartOutline color="#FFF" />
@@ -155,11 +148,7 @@ function Sidebar({ restaurantdata }) {
                             </Link>
                         </li>
                         <li>
-<<<<<<< HEAD
-                        <Link href={`/restaurant/${id}/menu`}>
-=======
                             <Link href={`/restaurant/${restaurantId}/menu`}>
->>>>>>> cf9a533e783c46b8f0f5ed3cde2417b6ff6ecc28
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <PricetagsOutline color="#FFF" />
