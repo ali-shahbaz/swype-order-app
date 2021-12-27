@@ -101,7 +101,7 @@ const Restaurant = ({ restaurantdata }) => {
         <div className="section full welcome-section">
             <div className="wide-block py-2">
                 <div className="under-logo">
-                    <Image src={restaurantdata.logo} width={124} height={104} alt="under logo" />
+                    <Image src={restaurantdata.logo} width={124} height={104} alt="logo" className='welcomeLogo' />
                 </div>
                 <div className="welcome-txt mt-2">
                     <h2>{restaurantdata.welcomePageVM.header}</h2>
@@ -117,7 +117,7 @@ const Restaurant = ({ restaurantdata }) => {
                     <ul id="langFlag" className="lang-flag my-2">
                         {restaurantdata.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
                             return <li key={item.languagecode} title={item.languagecode} onClick={() => changeLanguage(item.languagecode)} className={locale == item.languagecode ? 'single-flag flag-active' : 'single-flag'}>
-                                <Image src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} objectFit='' alt={item.languagecode} />
+                                <Image  src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} objectFit='' alt={item.languagecode} />
                             </li>
                         })}
                     </ul>
@@ -136,7 +136,7 @@ const Restaurant = ({ restaurantdata }) => {
                     <label className="btn btn-outline-primary" htmlFor="DineIn">Dine In</label>
 
                     <input type="radio" className="btn-check" value="2" name="btnRadioOrderType" id="Delivery" />
-                    <label className="btn btn-outline-primary" htmlFor="Delivery">Delivery</label>
+                    <label className="btn btn-outline-primary myDeliveryButton" htmlFor="Delivery">Delivery</label>
                 </div>
             </div>
         </div>

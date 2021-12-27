@@ -12,6 +12,7 @@ import { GetRestaurantData } from '../services/restaurant-service';
 function Layout({ props = {}, children }) {
     const router = useRouter();
     let { id, sidebar } = router.query;
+    const {push, asPath} = useRouter()
     const cartCount = useRecoilValue(cartState);
     const [data, setData] = useState(null);
     let restData = useRef(null);
@@ -54,7 +55,7 @@ function Layout({ props = {}, children }) {
                 }
             }
         });
-
+    
         const storageData = window.localStorage.getItem('init_data');
         if (!storageData || (id && JSON.parse(storageData).id != id)) {
             GetRestaurantData(id).then(data => {
@@ -68,9 +69,21 @@ function Layout({ props = {}, children }) {
             const value = localStorage.getItem('init_data');
             const data = !!value ? JSON.parse(value) : undefined;
             restData.current = data;
+            setTimeout(() => {
+                GetRestaurantData(id).then(data => {
+                    if (data.status == 1) {
+                        localStorage.setItem('init_data', JSON.stringify(data.payload.data));
+                    }
+    
+                });
+            }, 1000);
+        }
+        function delQuery(asPath) {
+            return asPath.split('?')[0]
         }
 
         if (sidebar == 1) {
+            push(delQuery(asPath));
             setTimeout(() => {
                 sidebarBtnRef.current.click();
             }, 100);
@@ -84,7 +97,7 @@ function Layout({ props = {}, children }) {
             <div className="appHeader order-welcome-header">
                 <div className="left">
                     <a href="#" ref={sidebarBtnRef} className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
-                        <MenuOutline class="md hydrated" />
+                        <MenuOutline className="md hydrated switchSVGColor" />
                     </a>
                 </div>
             </div></>) :
@@ -92,9 +105,9 @@ function Layout({ props = {}, children }) {
 
                 <div className="left">
                     {props.showBack ? <div onClick={() => router.back()} className="headerButton">
-                        <ChevronBackOutline />
+                        <ChevronBackOutline className="switchSVGColor" />
                     </div> : <a href="#" id='hamburgerMenu' className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
-                        <MenuOutline class="md hydrated" />
+                        <MenuOutline className="md hydrated switchSVGColor" />
                     </a>}
                 </div>
 
@@ -103,7 +116,7 @@ function Layout({ props = {}, children }) {
                     props.showCart && <div className="right">
                         <Link href={`/restaurant/${id}/checkout`}>
                             <a className="headerButton">
-                                <CartOutline />
+                                <CartOutline className="switchSVGColor" />
                                 <div className="badge badge-danger">{cartCount != 0 ? cartCount : cartStorage && cartStorage.saleDetails.length}</div>
                             </a>
                         </Link>

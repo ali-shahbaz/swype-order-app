@@ -43,7 +43,7 @@ export default function Home({ data }) {
 // This gets called on every request
 export async function getServerSideProps({ params }) {
   // Fetch data from external API
-  const res = await fetch(`${apiSettings.apiUrl}/orderapp/GetRestaurants`)
+  const res = await fetch(`${apiSettings.apiUrl}orderapp/GetRestaurants`);
   const data = await res.json()
   // Pass data to the page via props
   return { props: { data } }

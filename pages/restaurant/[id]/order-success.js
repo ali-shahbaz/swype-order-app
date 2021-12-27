@@ -8,7 +8,7 @@ import { cartState } from "../../../states/atoms";
 
 const OrderSuccess = () => {
     const router = useRouter();
-    const { id, orderid } = router.query;
+    const { id, orderid , ordernumber} = router.query;
     const cartName = `cart${id}`;
     const [cart, setCart] = useRecoilState(cartState);
 
@@ -26,7 +26,7 @@ const OrderSuccess = () => {
                 <Image src="/images/paid.png" width={87} height={80} alt="" />
                 <div>
                     <h2 className="title mb-1">Thanks for your order</h2>
-                    <h4>Order id <span>#{orderid}</span></h4>
+                    <h4>Order id <span>#{ordernumber}</span></h4>
                 </div>
             </div>
         </div>
