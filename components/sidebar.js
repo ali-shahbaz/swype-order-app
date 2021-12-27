@@ -88,7 +88,7 @@ function Sidebar({ restaurantdata }) {
                             </a>
                         </Link>
                         <a href="#" ref={closeRef} className="btn btn-link btn-icon sidebar-close" data-bs-dismiss="modal">
-                            <CloseOutline />
+                            <CloseOutline className="switchSVGColor" />
                         </a>
                     </div>
                     <div className="bg-primary">
@@ -192,7 +192,7 @@ function Sidebar({ restaurantdata }) {
                     </div>
                     <ul className="listview darkmode-switcher image-listview text inset no-line mt-2">
                         <li>
-                            <div className="item">
+                            <div className="item darkMode">
                                 <div className="in">
                                     <div className="form-check form-switch me-2">
                                         <input checked={isDarkModeOn ? true : false} onChange={(e) => changeDarkMode(e)} className="form-check-input dark-mode-switch" type="checkbox"

@@ -165,12 +165,12 @@ const ItemDetail = ({ restaurantdata }) => {
                         <div className="card-body">
                             <div className="options">
                                 {
-                                    (itemIndex != 0) && <div onClick={() => removeAnotherItem(itemIndex)} className="remove-item"><CloseCircleOutline /></div>
+                                    (itemIndex != 0) && <div onClick={() => removeAnotherItem(itemIndex)} className="remove-item"><CloseCircleOutline className="switchSVGColor" /></div>
                                 }
                             </div>
                             <div className="modification-item-name">
                                 <h4>{item.name}</h4>
-                                <h3>{item.salesprice}</h3>
+                                <h3>{item.salesprice.toFixed(2)}</h3>
                             </div>
                             <div ref={varificationEl} className="modification input-list w-100">
                                 {
