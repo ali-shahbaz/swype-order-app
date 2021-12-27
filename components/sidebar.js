@@ -11,16 +11,19 @@ import useLocalStorage from '../hooks/useLocalStorage';
 function Sidebar({ restaurantdata }) {
     const router = useRouter();
     const { query, locale } = router;
-    const { id } = query;
     const loggedInUser = useLocalStorage('logged_in_user');
     const closeRef = useRef(null);
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const loggedIn = useRecoilValue(userLoggedInState);
     const [profileUrl, setProfileUrl] = useState('/user/profile');
+<<<<<<< HEAD
     const [ordersUrl, setOrdersUrl] = useState('/orders');
     const darkModeName = `dark-mode-${id}`;
+=======
+>>>>>>> cf9a533e783c46b8f0f5ed3cde2417b6ff6ecc28
     const [isDarkModeOn, setIsDarkModeOn] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState('');
+    const [restaurantId, setRestaurantId] = useState();
 
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {
@@ -37,26 +40,32 @@ function Sidebar({ restaurantdata }) {
             setOrdersUrl('/user/login')
         }
 
-        // set for dark mode
-        if (!darkModeName in localStorage) {
-            localStorage.setItem(darkModeName, false);
-        } else {
-            setDarkMode(JSON.parse(localStorage.getItem(darkModeName)));
-        }
+
 
         if (restaurantdata) {
             const lng = restaurantdata.welcomePageVM.profileLanguagesVM.languages.find(p => p.languagecode == locale);
             setSelectedLanguage(lng.name);
+
+            setRestaurantId(restaurantdata.id);
+
+            const darkModeName = `dark-mode-${restaurantdata.id}`;
+            // set for dark mode
+            if (!darkModeName in localStorage) {
+                localStorage.setItem(darkModeName, false);
+            } else {
+                setDarkMode(JSON.parse(localStorage.getItem(darkModeName)));
+            }
         }
 
-    }, [darkModeName, locale, loggedIn, loggedInUser, restaurantdata, router.events])
+    }, [locale, loggedIn, loggedInUser, restaurantdata, router.events])
 
     const logout = () => {
-        sessionStorage.removeItem('logged_in_user');
+        localStorage.removeItem('logged_in_user');
         setIsUserLoggedIn(false);
     }
 
     const changeDarkMode = (event) => {
+        const darkModeName = `dark-mode-${restaurantdata.id}`;
         localStorage.setItem(darkModeName, event.target.checked);
         setDarkMode(event.target.checked);
     }
@@ -130,7 +139,11 @@ function Sidebar({ restaurantdata }) {
                     </div>
                     <ul className="listview flush transparent no-line image-listview">
                         <li>
+<<<<<<< HEAD
                         <Link href={`/restaurant/${id}/menu`}>
+=======
+                            <Link href={`/restaurant/${restaurantId}/menu`}>
+>>>>>>> cf9a533e783c46b8f0f5ed3cde2417b6ff6ecc28
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <CartOutline color="#FFF" />
@@ -142,7 +155,11 @@ function Sidebar({ restaurantdata }) {
                             </Link>
                         </li>
                         <li>
+<<<<<<< HEAD
                         <Link href={`/restaurant/${id}/menu`}>
+=======
+                            <Link href={`/restaurant/${restaurantId}/menu`}>
+>>>>>>> cf9a533e783c46b8f0f5ed3cde2417b6ff6ecc28
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <PricetagsOutline color="#FFF" />

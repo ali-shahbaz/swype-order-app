@@ -3,7 +3,6 @@ import Header from '../../components/head';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import Link from 'next/link';
-import useSessionStorage from '../../hooks/useSessionStorage';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -11,7 +10,7 @@ import useLocalStorage from '../../hooks/useLocalStorage';
 
 const Restaurant = ({ restaurantdata }) => {
     const [offers, setOffers] = useState([]);
-    const userLoggedIn = useSessionStorage('logged_in_user');
+    const userLoggedIn = useLocalStorage('logged_in_user');
     const router = useRouter();
     const { query, locale } = router;
     const { id } = query;
