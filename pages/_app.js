@@ -12,6 +12,8 @@ import Router from 'next/router';
 
 const MyApp = ({ Component, pageProps }) => {
   const [loading, setLoading] = useState(false);
+  //let [SidebarObj, setSidebarObj] = useState(null);
+  let sidebarObj = 0;
   useEffect(() => {
     import('bootstrap/dist/js/bootstrap.bundle');
     Router.onRouteChangeStart = (url) => {
@@ -36,7 +38,7 @@ const MyApp = ({ Component, pageProps }) => {
           <img src="/images/loading-icon.png" alt="icon" className="loading-icon" />
         </div>
       )}
-      <Sidebar />
+      <Sidebar abc={++sidebarObj} />
       <ToastContainer hideProgressBar={true} autoClose={3000} position="top-center" />
     </Layout>
   </RecoilRoot>

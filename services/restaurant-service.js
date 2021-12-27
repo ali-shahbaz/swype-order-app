@@ -34,3 +34,15 @@ export const GetOrderDetail = (token, orderId) => {
     return fetch(`${apiSettings.apiUrl}orderapp/GetOrderDetail/${orderId}`, requestOptions)
         .then(response => response.json())
 }
+
+export const GetCurrentOrder = (token) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+        }
+    };
+    return fetch(`${apiSettings.apiUrl}orderapp/GetCurrentOrder`, requestOptions)
+        .then(response => response.json())
+}

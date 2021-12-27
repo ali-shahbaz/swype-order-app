@@ -6,9 +6,11 @@ import { useEffect, useRef, useState } from 'react';
 import { userLoggedInState } from '../states/atoms';
 import { useRecoilValue } from 'recoil';
 import useLocalStorage from '../hooks/useLocalStorage';
+import { GetCurrentOrder } from '../services/restaurant-service';
+import { RestaurantOutline } from 'react-ionicons';
 
 
-function Sidebar({ restaurantdata }) {
+function Sidebar({ restaurantdata, sidebarclickedcount }) {
     const router = useRouter();
     const { query, locale } = router;
     const loggedInUser = useLocalStorage('logged_in_user');
@@ -20,7 +22,11 @@ function Sidebar({ restaurantdata }) {
     const [isDarkModeOn, setIsDarkModeOn] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState('');
     const [restaurantId, setRestaurantId] = useState();
-
+    const sidebarPanel = useRef(null);
+    const [currentOrder, setCurrentOrder] = useState(null);
+    const [currentOrderURL, setCurrentOrderURL] = useState('/');
+    const [restaurantMenuUrl, setRestaurantMenuUrl] = useState('/');
+    
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {
             if (closeRef && closeRef.current)
@@ -43,7 +49,8 @@ function Sidebar({ restaurantdata }) {
             setSelectedLanguage(lng.name);
 
             setRestaurantId(restaurantdata.id);
-
+            setCurrentOrderURL(`/restaurant/${restaurantdata.id}/menu`);
+            setRestaurantMenuUrl(`/restaurant/${restaurantdata.id}/menu`);
             const darkModeName = `dark-mode-${restaurantdata.id}`;
             // set for dark mode
             if (!darkModeName in localStorage) {
@@ -52,8 +59,23 @@ function Sidebar({ restaurantdata }) {
                 setDarkMode(JSON.parse(localStorage.getItem(darkModeName)));
             }
         }
+        
 
     }, [locale, loggedIn, loggedInUser, restaurantdata, router.events])
+
+
+    useEffect(() => {
+        if(loggedInUser && sidebarclickedcount && sidebarclickedcount > 0 && loggedInUser)
+        {
+            GetCurrentOrder(loggedInUser.token).then(data => {
+                if (data.status == 1 && data.payload.currentorder) {
+                    setCurrentOrder(data.payload.currentorder);
+                    setCurrentOrderURL('/order-detail/' + (data.payload.currentorder.orderId));
+                }
+            });
+        }
+
+    }, [sidebarclickedcount])
 
     const logout = () => {
         localStorage.removeItem('logged_in_user');
@@ -77,7 +99,7 @@ function Sidebar({ restaurantdata }) {
         router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
     }
 
-    const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" tabIndex="-1" role="dialog">
+    const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" ref={sidebarPanel}  tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
             <div className="modal-content">
                 <div className="modal-body p-0">
@@ -100,14 +122,16 @@ function Sidebar({ restaurantdata }) {
                         </a>
                     </div>
                     <div className="bg-primary">
-                        <div className="sidebar-balance">
+                         
+                        {
+(currentOrder) ? <div className="sidebar-balance">
                             <div className="title-wrapper">
-                                <div className="order-id">Current Order Id: #1020</div>
-                                <span className="order-date text-muted">Placed Today 08:20 PM</span>
+                                <div className="order-id">Current Order Id: #{currentOrder?.orderNumber}</div>
+                                <span className="order-date text-muted">Placed {currentOrder?.dateLabel}</span>
                             </div>
                             <div className="in mt-2">
-                                <h1 className="amount">17.00</h1>
-                                <span className="text-success">Paid</span>
+                                <h1 className="amount">{currentOrder?.amount.toFixed(2)}</h1>
+                                <span className="text-success">{currentOrder?.paymentStatus}</span>
                             </div>
 
                             <div className="section full mt-1">
@@ -115,16 +139,27 @@ function Sidebar({ restaurantdata }) {
 
                                     <div className="input-list">
                                         <div className="form-check">
-                                            <input type="checkbox" className="form-check-input" id="orderConfirmed" />
+                                        
+                                            <input type="checkbox" className="form-check-input" id="orderConfirmed" 
+                                            checked={currentOrder && currentOrder?.orderStatusDone.indexOf('OrderConfirmed')  > -1} 
+                                            disabled='true'
+                                            />
                                             <label className="form-check-label" htmlFor="orderConfirmed">Order Confirmed</label>
                                         </div>
                                         <div className="form-check">
-                                            <input type="checkbox" className="form-check-input" id="preparingOrder" />
+                                            <input type="checkbox" className="form-check-input" id="preparingOrder" 
+                                            disabled='true'
+                                            checked={currentOrder && currentOrder?.orderStatusDone.indexOf('InProgress')  > -1} 
+                                            />
                                             <label className="form-check-label" htmlFor="preparingOrder">We are preparing your
                                                 order</label>
                                         </div>
                                         <div className="form-check">
-                                            <input type="checkbox" className="form-check-input" id="EnjoyOrder" />
+                                            <input type="checkbox" className="form-check-input" id="EnjoyOrder"
+                                            disabled='true'
+                                            checked={currentOrder && currentOrder?.orderStatusDone.indexOf('Completed')  > -1} 
+                                            
+                                            />
                                             <label className="form-check-label" htmlFor="EnjoyOrder">Enjoy</label>
                                         </div>
                                     </div>
@@ -132,10 +167,18 @@ function Sidebar({ restaurantdata }) {
                                 </div>
                             </div>
                         </div>
+                        : 
+                        <div className="sidebar-balance">
+                            <div className="in mt-2">
+                                <h2 className="amount">Start from here</h2>
+                            </div>
+                        </div>
+                        }
+
                     </div>
                     <ul className="listview flush transparent no-line image-listview">
                         <li>
-                            <Link href={`/restaurant/${restaurantId}/menu`}>
+                            <Link href={currentOrderURL}>
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <CartOutline color="#FFF" />
@@ -147,7 +190,7 @@ function Sidebar({ restaurantdata }) {
                             </Link>
                         </li>
                         <li>
-                            <Link href={`/restaurant/${restaurantId}/menu`}>
+                            <Link href={restaurantMenuUrl}>
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <PricetagsOutline color="#FFF" />
@@ -159,7 +202,7 @@ function Sidebar({ restaurantdata }) {
                             </Link>
                         </li>
                         <li>
-                            <Link  href={ordersUrl}>
+                            <Link href={ordersUrl}>
                                 <a className="item">
                                     <div className="icon-box bg-primary card-border">
                                         <ReceiptOutline color="#FFF" />

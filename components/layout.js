@@ -19,6 +19,8 @@ function Layout({ props = {}, children }) {
     const sidebarBtnRef = useRef(null);
 
     const cartStorage = useSessionStorage(`cart${id}`);
+    const [sidebarclickedcount, setSidebarClickedCount] = useState(0);
+
     useEffect(() => {
         // clear
         const clearInput = document.querySelectorAll(".clear-input");
@@ -92,11 +94,17 @@ function Layout({ props = {}, children }) {
 
     }, [id, sidebar]);
 
+    function SidebarClickedEvent(event)
+    {
+        setSidebarClickedCount(++sidebarclickedcount);
+        return false;
+    }
+    
     return <>
         {props.name == 'Restaurant' ? (<>
             <div className="appHeader order-welcome-header">
                 <div className="left">
-                    <a href="#" ref={sidebarBtnRef} className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
+                    <a ref={sidebarBtnRef} onClick={SidebarClickedEvent} className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
                         <MenuOutline className="md hydrated switchSVGColor" />
                     </a>
                 </div>
@@ -106,7 +114,7 @@ function Layout({ props = {}, children }) {
                 <div className="left">
                     {props.showBack ? <div onClick={() => router.back()} className="headerButton">
                         <ChevronBackOutline className="switchSVGColor" />
-                    </div> : <a href="#" id='hamburgerMenu' className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
+                    </div> : <a href="#" id='hamburgerMenu'onClick={SidebarClickedEvent} className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
                         <MenuOutline className="md hydrated switchSVGColor" />
                     </a>}
                 </div>
@@ -130,7 +138,7 @@ function Layout({ props = {}, children }) {
             </script>
             {
                 React.Children.map(children, (child, i) =>
-                    React.cloneElement(child, { restaurantdata: restData.current || data })
+                    React.cloneElement(child, { restaurantdata: restData.current || data, sidebarclickedcount: sidebarclickedcount || null })
                 )
             }
         </div>
