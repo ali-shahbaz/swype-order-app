@@ -62,3 +62,12 @@ export const GetUserReceipts = (token) => {
     return fetch(`${apiSettings.apiUrl}orderapp/GetReceipts`, requestOptions)
         .then(response => response.json())
 }
+
+export const GetCurrentOrder = (token) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Authorization': token }
+    };
+    return fetch(`${apiSettings.apiUrl}orderapp/GetCurrentOrder`, requestOptions)
+        .then(response => response.json())
+}

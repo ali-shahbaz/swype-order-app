@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import { apiSettings } from '../configs/api-settings';
 const Header = ({ title, children }) => {
     return <Head>
         <title>{title} - Swype Order App</title>

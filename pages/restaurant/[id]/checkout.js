@@ -9,6 +9,8 @@ import Header from '../../../components/head';
 import { loadStripe } from '@stripe/stripe-js';
 import { CloseCircleOutline } from 'react-ionicons';
 import useLocalStorage from '../../../hooks/useLocalStorage';
+import { useRecoilState } from 'recoil';
+import { cartState } from '../../../states/atoms';
 
 const Checkout = () => {
     const router = useRouter();
@@ -19,6 +21,7 @@ const Checkout = () => {
     const [saleItems, setSaleItems] = useState([]);
     const [cartData, setCartData] = useState(null);
     const cartName = `cart${id}`;
+    const [cartCount, setCartCount] = useRecoilState(cartState);
 
     const payNow = (event) => {
         if (loggedInUser) {
@@ -110,6 +113,7 @@ const Checkout = () => {
             myCart = { ...JSON.parse(myCart), ...{ saleDetails } };
             sessionStorage.setItem(cartName, JSON.stringify(myCart));
             setCartData(myCart);
+            setCartCount(myCart.saleDetails.length);
         }
     }
 
@@ -130,22 +134,25 @@ const Checkout = () => {
                 })}
             </div>
         </div>
-        <div className="section mt-3">
-            <div className="border-bottom">
-                <div className="total-item">
-                    <h4>Total Items</h4>
-                    <h4>{cartData && cartData.saleDetails.length}</h4>
-                </div>
-                <div className="total-amount">
-                    <h4>Total Amount</h4>
-                    <h4>{cartData && cartData.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h4>
+        {
+            saleItems.length > 0 && <> <div className="section mt-3">
+                <div className="border-bottom">
+                    <div className="total-item">
+                        <h4>Total Items</h4>
+                        <h4>{cartData && cartData.saleDetails.length}</h4>
+                    </div>
+                    <div className="total-amount">
+                        <h4>Total Amount</h4>
+                        <h4>{cartData && cartData.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h4>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div className="section mt-4">
-            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => payNow(e)}>Pay Now</button>
-        </div>
+                <div className="section mt-4">
+                    <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => payNow(e)}>Pay Now</button>
+                </div>
+            </>
+        }
     </div>
 }
 

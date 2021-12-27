@@ -12,7 +12,7 @@ import { GetRestaurantData } from '../services/restaurant-service';
 function Layout({ props = {}, children }) {
     const router = useRouter();
     let { id, sidebar } = router.query;
-    const {push, asPath} = useRouter()
+    const { push, asPath } = useRouter()
     const cartCount = useRecoilValue(cartState);
     const [data, setData] = useState(null);
     let restData = useRef(null);
@@ -57,7 +57,7 @@ function Layout({ props = {}, children }) {
                 }
             }
         });
-    
+
         const storageData = window.localStorage.getItem('init_data');
         if (!storageData || (id && JSON.parse(storageData).id != id)) {
             GetRestaurantData(id).then(data => {
@@ -72,11 +72,11 @@ function Layout({ props = {}, children }) {
             const data = !!value ? JSON.parse(value) : undefined;
             restData.current = data;
             setTimeout(() => {
-                GetRestaurantData(id).then(data => {
+                GetRestaurantData(data.id).then(data => {
                     if (data.status == 1) {
                         localStorage.setItem('init_data', JSON.stringify(data.payload.data));
                     }
-    
+
                 });
             }, 1000);
         }
@@ -92,7 +92,7 @@ function Layout({ props = {}, children }) {
         }
 
 
-    }, [id, sidebar]);
+    }, [asPath, id, push, sidebar]);
 
     function SidebarClickedEvent(event)
     {

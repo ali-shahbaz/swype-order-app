@@ -26,7 +26,7 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
     const [currentOrder, setCurrentOrder] = useState(null);
     const [currentOrderURL, setCurrentOrderURL] = useState('/');
     const [restaurantMenuUrl, setRestaurantMenuUrl] = useState('/');
-    
+
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {
             if (closeRef && closeRef.current)
@@ -59,14 +59,13 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
                 setDarkMode(JSON.parse(localStorage.getItem(darkModeName)));
             }
         }
-        
+
 
     }, [locale, loggedIn, loggedInUser, restaurantdata, router.events])
 
 
     useEffect(() => {
-        if(loggedInUser && sidebarclickedcount && sidebarclickedcount > 0 && loggedInUser)
-        {
+        if (loggedInUser && sidebarclickedcount && sidebarclickedcount > 0 && loggedInUser) {
             GetCurrentOrder(loggedInUser.token).then(data => {
                 if (data.status == 1 && data.payload.currentorder) {
                     setCurrentOrder(data.payload.currentorder);
@@ -75,7 +74,7 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
             });
         }
 
-    }, [sidebarclickedcount])
+    }, [loggedInUser, sidebarclickedcount])
 
     const logout = () => {
         localStorage.removeItem('logged_in_user');
@@ -99,7 +98,7 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
         router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
     }
 
-    const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" ref={sidebarPanel}  tabIndex="-1" role="dialog">
+    const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" ref={sidebarPanel} tabIndex="-1" role="dialog">
         <div className="modal-dialog" role="document">
             <div className="modal-content">
                 <div className="modal-body p-0">
@@ -122,57 +121,56 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
                         </a>
                     </div>
                     <div className="bg-primary">
-                         
                         {
-(currentOrder) ? <div className="sidebar-balance">
-                            <div className="title-wrapper">
-                                <div className="order-id">Current Order Id: #{currentOrder?.orderNumber}</div>
-                                <span className="order-date text-muted">Placed {currentOrder?.dateLabel}</span>
-                            </div>
-                            <div className="in mt-2">
-                                <h1 className="amount">{currentOrder?.amount.toFixed(2)}</h1>
-                                <span className="text-success">{currentOrder?.paymentStatus}</span>
-                            </div>
+                            (currentOrder) ? <div className="sidebar-balance">
+                                <div className="title-wrapper">
+                                    <div className="order-id">Current Order Id: #{currentOrder?.orderNumber}</div>
+                                    <span className="order-date text-muted">Placed {currentOrder?.dateLabel}</span>
+                                </div>
+                                <div className="in mt-2">
+                                    <h1 className="amount">{currentOrder?.amount.toFixed(2)}</h1>
+                                    <span className="text-success">{currentOrder?.paymentStatus}</span>
+                                </div>
 
-                            <div className="section full mt-1">
-                                <div className="wide-block p-0">
+                                <div className="section full mt-1">
+                                    <div className="wide-block p-0">
 
-                                    <div className="input-list">
-                                        <div className="form-check">
-                                        
-                                            <input type="checkbox" className="form-check-input" id="orderConfirmed" 
-                                            checked={currentOrder && currentOrder?.orderStatusDone.indexOf('OrderConfirmed')  > -1} 
-                                            disabled='true'
-                                            />
-                                            <label className="form-check-label" htmlFor="orderConfirmed">Order Confirmed</label>
+                                        <div className="input-list">
+                                            <div className="form-check">
+
+                                                <input type="checkbox" className="form-check-input" id="orderConfirmed"
+                                                    checked={currentOrder && currentOrder?.orderStatusDone.indexOf('OrderConfirmed') > -1}
+                                                    disabled={true}
+                                                />
+                                                <label className="form-check-label" htmlFor="orderConfirmed">Order Confirmed</label>
+                                            </div>
+                                            <div className="form-check">
+                                                <input type="checkbox" className="form-check-input" id="preparingOrder"
+                                                    disabled={true}
+                                                    checked={currentOrder && currentOrder?.orderStatusDone.indexOf('InProgress') > -1}
+                                                />
+                                                <label className="form-check-label" htmlFor="preparingOrder">We are preparing your
+                                                    order</label>
+                                            </div>
+                                            <div className="form-check">
+                                                <input type="checkbox" className="form-check-input" id="EnjoyOrder"
+                                                    disabled={true}
+                                                    checked={currentOrder && currentOrder?.orderStatusDone.indexOf('Completed') > -1}
+
+                                                />
+                                                <label className="form-check-label" htmlFor="EnjoyOrder">Enjoy</label>
+                                            </div>
                                         </div>
-                                        <div className="form-check">
-                                            <input type="checkbox" className="form-check-input" id="preparingOrder" 
-                                            disabled='true'
-                                            checked={currentOrder && currentOrder?.orderStatusDone.indexOf('InProgress')  > -1} 
-                                            />
-                                            <label className="form-check-label" htmlFor="preparingOrder">We are preparing your
-                                                order</label>
-                                        </div>
-                                        <div className="form-check">
-                                            <input type="checkbox" className="form-check-input" id="EnjoyOrder"
-                                            disabled='true'
-                                            checked={currentOrder && currentOrder?.orderStatusDone.indexOf('Completed')  > -1} 
-                                            
-                                            />
-                                            <label className="form-check-label" htmlFor="EnjoyOrder">Enjoy</label>
-                                        </div>
+
                                     </div>
-
                                 </div>
                             </div>
-                        </div>
-                        : 
-                        <div className="sidebar-balance">
-                            <div className="in mt-2">
-                                <h2 className="amount">Start from here</h2>
-                            </div>
-                        </div>
+                                :
+                                <div className="sidebar-balance">
+                                    <div className="in mt-2">
+                                        <h2 className="amount">Start from here</h2>
+                                    </div>
+                                </div>
                         }
 
                     </div>
