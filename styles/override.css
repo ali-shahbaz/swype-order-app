@@ -62,7 +62,7 @@
 body.dark-mode .switchSVGColor svg{
     color: #fff !important;
 }
-.myDeliveryButton{
+.btn-group .btn.myDeliveryButton{
     margin-left: -1px !important;
 }
 

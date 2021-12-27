@@ -54,7 +54,7 @@ const Login = () => {
                         <div className="input-wrapper">
                             <label className="label" htmlFor="phone">Mobile</label>
                             <IntlTelInput onPhoneNumberChange={changeHandler}
-                                fieldName="phone" preferredCountries={['pk', 'gb']}
+                            fieldName="phone" preferredCountries={['us', 'gb', 'es','se']} 
                             />
                         </div>
                     </div>
