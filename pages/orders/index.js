@@ -27,7 +27,7 @@ const Orders = () => {
                 {
                     receipts.map(item => {
                         return <li key={item.orderId} className="items-card card card-border">
-                            <Link href={`/order-detail/${item.orderId}`}>
+                            <Link href={`/restaurant/${item.companyId}/order-detail/${item.orderId}`}>
                                 <a className="item">
                                     <Image src={item.companyLogoUrl ? item.companyLogoUrl : "/images/under-logo.png"} width={36} height={36} alt="image" className="image" />
                                     <div className="in">

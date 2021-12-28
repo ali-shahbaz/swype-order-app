@@ -1,9 +1,9 @@
-import Header from "../../components/head";
+import Header from "../../../../components/head";
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from "react";
-import { GetOrderDetail } from "../../services/restaurant-service";
-import useLocalStorage from "../../hooks/useLocalStorage";
+import { GetOrderDetail } from "../../../../services/restaurant-service";
+import useLocalStorage from "../../../../hooks/useLocalStorage";
 import { useRouter } from "next/router";
 import { toast } from 'react-toastify';
 

@@ -49,7 +49,7 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
             setSelectedLanguage(lng.name);
 
             setRestaurantId(restaurantdata.id);
-            setCurrentOrderURL(`/restaurant/${restaurantdata.id}/menu`);
+            setCurrentOrderURL(`/restaurant/${restaurantdata.id}/checkout`);
             setRestaurantMenuUrl(`/restaurant/${restaurantdata.id}/menu`);
             const darkModeName = `dark-mode-${restaurantdata.id}`;
             // set for dark mode
@@ -69,12 +69,12 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
             GetCurrentOrder(loggedInUser.token).then(data => {
                 if (data.status == 1 && data.payload.currentorder) {
                     setCurrentOrder(data.payload.currentorder);
-                    setCurrentOrderURL('/order-detail/' + (data.payload.currentorder.orderId));
+                    setCurrentOrderURL(`/restaurant/${restaurantdata.id}/order-detail/${data.payload.currentorder.orderId}`);
                 }
             });
         }
 
-    }, [loggedInUser, sidebarclickedcount])
+    }, [loggedInUser, restaurantdata, sidebarclickedcount])
 
     const logout = () => {
         localStorage.removeItem('logged_in_user');
@@ -95,7 +95,7 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
     }
 
     const changeLanguage = (lngCode) => {
-        router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
+        router.push(`/restaurant/${restaurantdata.id}`, `/restaurant/${restaurantdata.id}`, { locale: lngCode });
     }
 
     const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" ref={sidebarPanel} tabIndex="-1" role="dialog">
@@ -167,7 +167,7 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
                             </div>
                                 :
                                 <div className="sidebar-balance">
-                                    <div className="in mt-2">
+                                    <div className="in mt-2 mb-2">
                                         <h2 className="amount">Start from here</h2>
                                     </div>
                                 </div>
