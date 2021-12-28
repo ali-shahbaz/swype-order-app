@@ -11,11 +11,12 @@ export const GetRestaurantData = (restaurantId) => {
         .then(response => response.json())
 }
 
-export const PlaceOrder = (data, restaurantId, orderType) => {
+export const PlaceOrder = (data, restaurantId, orderType, token) => {
     const requestOptions = {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': token
         },
         body: data
     };

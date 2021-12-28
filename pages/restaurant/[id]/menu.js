@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import Header from '../../../components/head';
 import { useRecoilState } from 'recoil';
 import { menuTabState } from '../../../states/atoms';
+import useLocalStorage from '../../../hooks/useLocalStorage';
 
 const Menu = ({ restaurantdata }) => {
     const tabRef = useRef(null);
@@ -12,20 +13,22 @@ const Menu = ({ restaurantdata }) => {
     const { id } = router.query;
     const [menu, setMenu] = useState(null);
     const [tab, setTab] = useRecoilState(menuTabState);
+    const selectedTabIndex = useLocalStorage(`selected-menu-tab-index-${id}`);
 
 
     useEffect(() => {
         setTimeout(() => {
-            if(restaurantdata){
+            if (restaurantdata) {
                 if (tabRef && tabRef.current) {
                     tabRef.current.click();
                 }
             }
-            
-        }, 0);
-    }, [restaurantdata, tabRef])
 
-    const categoryClick = (event, categoryID) => {
+        }, 0);
+    }, [id, restaurantdata, selectedTabIndex, tabRef])
+
+    const categoryClick = (event, categoryID, index) => {
+        localStorage.setItem(`selected-menu-tab-index-${id}`, index);
         setTab(event.currentTarget);
         const filterMenuChildren = event.currentTarget.parentElement.children;
         for (let i = 0; i < filterMenuChildren.length; i++) {
@@ -42,7 +45,7 @@ const Menu = ({ restaurantdata }) => {
         <ul id="menuCategory" className="categories pt-1 pb-1">
             {
                 restaurantdata.quickKeyCategoryList.map((item, i) => {
-                    return <li key={item.categoryID} ref={el => i == 0 ? tabRef.current = el : null} onClick={(e) => categoryClick(e, item.categoryID)} className="single-category" data-target={item.name}>
+                    return <li key={item.categoryID} ref={el => i == selectedTabIndex ? tabRef.current = el : null} onClick={(e) => categoryClick(e, item.categoryID, i)} className="single-category" data-target={item.name}>
                         <span>{item.name}</span>
                     </li>
                 })

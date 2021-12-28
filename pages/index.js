@@ -27,7 +27,9 @@ export default function Home({ data }) {
               <Link href={`/restaurant/${item.companyId}`}>
                 <a>
                   <div className="card item-card card-border p-0">
-                    <Image src={item.companyLogoUrl} height={300} width={400} layout="responsive" className="card-img-top" alt="image" />
+                    <div>
+                      <Image src={item.companyLogoUrl} height={300} width={400} layout="responsive" priority className="card-img-top" alt="image" />
+                    </div>
                     <h4>{item.companyName}</h4>
                   </div>
                 </a>

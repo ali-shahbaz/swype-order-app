@@ -59,27 +59,30 @@ function Layout({ props = {}, children }) {
         });
 
         const storageData = window.localStorage.getItem('init_data');
-        if (!storageData || (id && JSON.parse(storageData).id != id)) {
-            GetRestaurantData(id).then(data => {
-                if (data.status == 1) {
-                    localStorage.setItem('init_data', JSON.stringify(data.payload.data));
-                    setData(data.payload.data);
-                }
-
-            });
-        } else {
-            const value = localStorage.getItem('init_data');
-            const data = !!value ? JSON.parse(value) : undefined;
-            restData.current = data;
-            setTimeout(() => {
-                GetRestaurantData(data.id).then(data => {
-                    if (data.status == 1) {
-                        localStorage.setItem('init_data', JSON.stringify(data.payload.data));
+        if (id) {
+            if (!storageData || JSON.parse(storageData).id != id) {
+                GetRestaurantData(id).then(response => {
+                    if (response.status == 1) {
+                        localStorage.setItem('init_data', JSON.stringify(response.payload.data));
+                        setData(response.payload.data);
                     }
 
                 });
-            }, 1000);
+            } else {
+                const value = localStorage.getItem('init_data');
+                const data = !!value ? JSON.parse(value) : undefined;
+                restData.current = data;
+                setTimeout(() => {
+                    GetRestaurantData(data.id).then(response => {
+                        if (response.status == 1) {
+                            localStorage.setItem('init_data', JSON.stringify(response.payload.data));
+                        }
+
+                    });
+                }, 1000);
+            }
         }
+
         function delQuery(asPath) {
             return asPath.split('?')[0]
         }
@@ -94,12 +97,11 @@ function Layout({ props = {}, children }) {
 
     }, [asPath, id, push, sidebar]);
 
-    function SidebarClickedEvent(event)
-    {
+    function SidebarClickedEvent(event) {
         setSidebarClickedCount(++sidebarclickedcount);
         return false;
     }
-    
+
     return <>
         {props.name == 'Restaurant' ? (<>
             <div className="appHeader order-welcome-header">
@@ -114,7 +116,7 @@ function Layout({ props = {}, children }) {
                 <div className="left">
                     {props.showBack ? <div onClick={() => router.back()} className="headerButton">
                         <ChevronBackOutline className="switchSVGColor" />
-                    </div> : <a href="#" id='hamburgerMenu'onClick={SidebarClickedEvent} className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
+                    </div> : <a href="#" id='hamburgerMenu' onClick={SidebarClickedEvent} className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
                         <MenuOutline className="md hydrated switchSVGColor" />
                     </a>}
                 </div>

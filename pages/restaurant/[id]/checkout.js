@@ -51,7 +51,7 @@ const Checkout = () => {
                 }
 
 
-                PlaceOrder(JSON.stringify(newCart), id, newCart.onlineOrderType).then(response => {
+                PlaceOrder(JSON.stringify(newCart), id, newCart.onlineOrderType, loggedInUser.token).then(response => {
                     if (response.status == 1) {
                         if (response.payload.paymentProvider == 'stripe') {
                             const stripePromise = loadStripe(response.payload.stripePublicKey, {
@@ -109,7 +109,7 @@ const Checkout = () => {
 
         let myCart = sessionStorage.getItem(cartName);
         if (myCart) {
-            const saleDetails = cart.saleDetails.filter(p => p.itemid != itemId);
+            const saleDetails = cartData.saleDetails.filter(p => p.itemid != itemId);
             myCart = { ...JSON.parse(myCart), ...{ saleDetails } };
             sessionStorage.setItem(cartName, JSON.stringify(myCart));
             setCartData(myCart);
@@ -135,26 +135,48 @@ const Checkout = () => {
             </div>
         </div>
         {
-            
-            saleItems.length > 0 && <> <div className="section mt-3">
-                <div className="border-bottom">                    
-                    <div className="total-item">
-                        <h4>Total Items</h4>
-                        <h4>{cartData && cartData.saleDetails.length}</h4>
+            saleItems.length > 0 && <>
+                <div className="section mt-3">
+                    <div className="border-bottom">
+                        <div className="total-item">
+                            <h4>Total Items</h4>
+                            <h4>{cartData && cartData.saleDetails.length}</h4>
+                        </div>
+                        <div className="total-amount">
+                            <h4>Total Amount</h4>
+                            <h4>{cartData && cartData.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h4>
+                        </div>
                     </div>
-                    <div className="total-amount">
-                        <h4>Total Amount</h4>
-                        <h4>{cartData && cartData.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h4>
+                    <div className='mt-2'>
+                        <div className="total-item">
+                            <h4>Order Type</h4>
+                            <h4 className='fw-normal'>{cartData && cartData.onlineOrderTypeName}</h4>
+                        </div>
+                        {
+                            cartData.tableId != 0 && <>
+                                <div className="total-item">
+                                    <h4>Table Name</h4>
+                                    <h4 className='fw-normal'>{cartData && cartData.tableName}</h4>
+                                </div>
+                            </>
+                        }
+                        {
+                            cartData.onlineOrderType == 2 && cartData.DeliveryAddress.address && <>
+                                <div className="total-item">
+                                    <h4>Delivery Address</h4>
+                                    <h4 className='fw-normal'>{cartData.DeliveryAddress.address}{cartData.DeliveryAddress.postalCode ? `, ${cartData.DeliveryAddress.postalCode}` : ''}
+                                        {cartData.DeliveryAddress.city ? `, ${cartData.DeliveryAddress.city}` : ''}</h4>
+                                </div>
+                                {cartData.DeliveryAddress.notes && <>
+                                    <div className="total-item">
+                                        <h4>Notes</h4>
+                                        <h4 className='fw-normal'>{cartData.DeliveryAddress.notes}</h4>
+                                    </div>
+                                </>}
+                            </>
+                        }
                     </div>
                 </div>
-                <div>                    
-                    <div className="total-item">
-                        <h4>Order Type</h4>
-                        <h4>{cartData && cartData.onlineOrderTypeName}</h4>
-                    </div>
-                </div>
-            </div>
-
                 <div className="section mt-4">
                     <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => payNow(e)}>Pay Now</button>
                 </div>

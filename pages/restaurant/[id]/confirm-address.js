@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { useRouter } from "next/router";
 import { CreateOutline } from "react-ionicons";
-import { apiSettings } from "../../../configs/api-settings";
+import useSessionStorage from "../../../hooks/useSessionStorage";
 
 const ConfirmAddress = ({ width, height, lat, lng, zoom,
     zoomControl, scaleControl, fullscreenControl, disableDefaultUI }) => {
@@ -16,6 +16,8 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
     const router = useRouter();
     const [address, setAddress] = useState({});
     const { id } = router.query;
+    const cartName = `cart${id}`;
+    const cart = useSessionStorage(cartName);
     const options = {
         center: { lat, lng },
         zoom,
@@ -123,6 +125,21 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
                     country: response.results[0].address_components.find(p => p.types.indexOf('country') >= 0).long_name,
                     countryCode: response.results[0].address_components.find(p => p.types.indexOf('country') >= 0).short_name
                 }
+
+                const DeliveryAddress = {
+                    name: '',
+                    contact: '',
+                    address: location.formattedAddress,
+                    addressDetails: response.results[0].formatted_address,
+                    postalCode: '',
+                    city: location.city,
+                    notes: '',
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    country: location.country
+                }
+
+                sessionStorage.setItem(cartName, JSON.stringify({ ...cart, ...{ DeliveryAddress } }));
 
                 // setAddress(location);
                 localStorage.setItem('location', JSON.stringify(location))

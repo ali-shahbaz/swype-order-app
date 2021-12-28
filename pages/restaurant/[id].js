@@ -18,17 +18,16 @@ const Restaurant = ({ restaurantdata }) => {
     const { t } = useTranslation();
     const cartName = `cart${id}`;
     const [selectedLanguage, setSelectedLanguage] = useState('');
+    const selectedTabIndex = useLocalStorage(`selected-menu-tab-index-${id}`);
 
     const startWithOrderType = useCallback((orderType) => {
         orderType = parseInt(orderType);
         let cart = sessionStorage.getItem(cartName);
         let onlineOrderTypeName = 'Take Away';
-        if(orderType == 2)
-        {
+        if (orderType == 2) {
             onlineOrderTypeName = 'Delivery';
         }
-        else if(orderType == 3)
-        {
+        else if (orderType == 3) {
             onlineOrderTypeName = 'Dine In';
         }
 
@@ -61,8 +60,8 @@ const Restaurant = ({ restaurantdata }) => {
                 }],
                 onlineOrderType: orderType,
                 verifyfullname: userFullName,
-                verifymobile: userNumber
-
+                verifymobile: userNumber,
+                DeliveryAddress: {}
             }
             sessionStorage.setItem(cartName, JSON.stringify(orderObj));
         }
@@ -70,13 +69,17 @@ const Restaurant = ({ restaurantdata }) => {
 
     useEffect(() => {
         startWithOrderType(1);
+        if (selectedTabIndex == null) {
+            localStorage.setItem(`selected-menu-tab-index-${id}`, 0);
+        }
+        
         if (restaurantdata) {
             const lng = restaurantdata.welcomePageVM.profileLanguagesVM.languages.find(p => p.languagecode == locale);
             setSelectedLanguage(lng.name);
             setOffersData(restaurantdata);
         }
 
-    }, [locale, id, restaurantdata, startWithOrderType]);
+    }, [locale, id, restaurantdata, startWithOrderType, selectedTabIndex]);
 
     const setOffersData = (data) => {
         const offers = data.welcomePageVM.todaySpecials.map((value, index) => {
@@ -127,7 +130,7 @@ const Restaurant = ({ restaurantdata }) => {
                     <ul id="langFlag" className="lang-flag my-2">
                         {restaurantdata.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
                             return <li key={item.languagecode} title={item.languagecode} onClick={() => changeLanguage(item.languagecode)} className={locale == item.languagecode ? 'single-flag flag-active' : 'single-flag'}>
-                                <Image  src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} objectFit='' alt={item.languagecode} />
+                                <Image src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} objectFit='' alt={item.languagecode} />
                             </li>
                         })}
                     </ul>
