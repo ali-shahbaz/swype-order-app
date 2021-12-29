@@ -1,25 +1,26 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Header from '../../../components/head';
+import { KEY_CART } from '../../../constants';
 
 const Tables = ({restaurantdata}) => {
     const router = useRouter();
     const { id } = router.query;
-    const cartName = `cart${id}`;
+    const cartKey = `${KEY_CART}-${id}`;
 
     const setCartTable = (tableId, tableName) => {
-        let cart = sessionStorage.getItem(cartName);
+        let cart = sessionStorage.getItem(cartKey);
         if (cart) {
             cart = { ...JSON.parse(cart), ...{ tableId: tableId, tableName: tableName } };
-            sessionStorage.setItem(cartName, JSON.stringify(cart));
+            sessionStorage.setItem(cartKey, JSON.stringify(cart));
         }
     }
 
     const removeTableFromCart = () => {
-        let cart = sessionStorage.getItem(cartName);
+        let cart = sessionStorage.getItem(cartKey);
         if (cart) {
             cart = { ...JSON.parse(cart), ...{ tableId: 0, tableName: null } };
-            sessionStorage.setItem(cartName, JSON.stringify(cart));
+            sessionStorage.setItem(cartKey, JSON.stringify(cart));
         }
     }
 

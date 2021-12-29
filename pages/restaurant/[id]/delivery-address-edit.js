@@ -3,12 +3,13 @@ import { useRouter } from "next/router";
 import Header from "../../../components/head";
 import useSessionStorage from "../../../hooks/useSessionStorage";
 import { useEffect, useState } from "react";
+import { KEY_CART } from "../../../constants";
 
 const DeliveryAddressEdit = () => {
     const router = useRouter();
     const { id } = router.query;
-    const cartName = `cart${id}`;
-    const cart = useSessionStorage(cartName);
+    const cartKey = `${KEY_CART}-${id}`;
+    const cart = useSessionStorage(cartKey);
     const [address, setAddress] = useState();
 
     useEffect(() => {
@@ -22,7 +23,7 @@ const DeliveryAddressEdit = () => {
     }
 
     const confirmAddress = () => {
-        sessionStorage.setItem(cartName, JSON.stringify({ ...cart, ...{ DeliveryAddress: address } }));
+        sessionStorage.setItem(cartKey, JSON.stringify({ ...cart, ...{ DeliveryAddress: address } }));
         router.push(`/restaurant/${id}/menu`);
     }
 

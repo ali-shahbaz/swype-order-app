@@ -1,14 +1,18 @@
 import Header from '../../components/head';
 import Image from 'next/image'
 import useLocalStorage from '../../hooks/useLocalStorage';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { GetUserProfile, UpdateProfile, UploadUserImage } from '../../services/user-service';
 import { CloseCircle } from 'react-ionicons';
 import { toast } from 'react-toastify';
+import { KEY_LOGGED_IN_USER } from '../../constants';
+import { LocalStorageHelper } from '../../helpers/local-storage-helper';
+import LoadingBar from 'react-top-loading-bar';
 
 const Profile = () => {
-    const loggedInUser = useLocalStorage('logged_in_user');
+    const loggedInUser = useLocalStorage(KEY_LOGGED_IN_USER);
     const [userDetail, setUserDetail] = useState(null);
+    const ref = useRef(null);
 
     useEffect(() => {
         if (loggedInUser) {
@@ -20,7 +24,7 @@ const Profile = () => {
                     loggedInUser.name = data.payload.user.name;
 
                     setUserDetail(loggedInUser);
-                    localStorage.setItem('logged_in_user', JSON.stringify(loggedInUser));
+                    LocalStorageHelper.store(KEY_LOGGED_IN_USER, loggedInUser);
                 } else {
                     toast.error(data.error);
                 }
@@ -34,12 +38,14 @@ const Profile = () => {
         if (event.target.files && event.target.files.length) {
             const formData = new FormData();
             formData.append('file', event.target.files[0]);
+            ref.current.continuousStart();
 
             UploadUserImage(formData, loggedInUser.token).then(data => {
+                ref.current.complete();
                 if (data.status == 1) {
                     loggedInUser.imageUrl = data.payload.image.url;
                     setUserDetail(prev => prev = { ...prev, ...{ imageUrl: data.payload.image.url } });
-                    localStorage .setItem('logged_in_user', JSON.stringify(loggedInUser));
+                    LocalStorageHelper.store(KEY_LOGGED_IN_USER, loggedInUser);
                     toast.success('Image uploaded, click Save button for save changes.');
                 } else {
                     toast.error(data.message ? data.message : data.error);
@@ -48,15 +54,22 @@ const Profile = () => {
         }
     }
 
-    const updateUserProfile = () => {
+    const updateUserProfile = (event) => {
         const params = {
             Email: userDetail.email,
             ImageUrl: userDetail.imageUrl,
             Name: userDetail.name,
             MobileNumber: userDetail.MobileNumber
         }
+        event.target.disabled = true;
+        ref.current.continuousStart();
+
         UpdateProfile(JSON.stringify(params), loggedInUser.token).then(response => {
+            event.target.disabled = false;
+            ref.current.complete();
             if (response.status == 1) {
+                loggedInUser.user = response.payload.user;
+                LocalStorageHelper.store(KEY_LOGGED_IN_USER, loggedInUser);
                 toast.success('Profile updated successfully');
             } else {
                 toast.error(response.message ? response.message : response.error);
@@ -72,6 +85,7 @@ const Profile = () => {
     if (!userDetail) return <></>
     return <>
         <Header title="My Profile"></Header>
+        <LoadingBar color='#F07D00' ref={ref} />
         <div className="section mt-2">
             <div className="row m-0">
                 <div className="col-6 ps-0">
@@ -117,7 +131,7 @@ const Profile = () => {
                 </div>
             </div>
             <div className="mt-4">
-                <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={updateUserProfile}>Save</button>
+                <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => updateUserProfile(e)}>Save</button>
             </div>
         </div>
     </>

@@ -9,9 +9,11 @@ import { userLoggedInState } from "../../states/atoms";
 import React, { useRef } from 'react';
 import LoadingBar from 'react-top-loading-bar';
 import Header from "../../components/head";
+import { KEY_CART, KEY_LOGGED_IN_USER, KEY_RESTAURANT_DATA, KEY_USER_NUMBER } from "../../constants";
+import { LocalStorageHelper } from "../../helpers/local-storage-helper";
 
-const LoginVerify = ({ restaurantdata }) => {
-    const userPhoneNumber = useSessionStorage('user_number');
+const LoginVerify = () => {
+    const userPhoneNumber = useSessionStorage(KEY_USER_NUMBER);
     const [number, setNumber] = useState(null);
     const router = useRouter();
     const ref = useRef(null);
@@ -27,19 +29,21 @@ const LoginVerify = ({ restaurantdata }) => {
                 ref.current.complete();
 
                 if (data.status == 1) {
-                    localStorage.setItem('logged_in_user', JSON.stringify({ ...data.payload, ...userPhoneNumber }));
+                    LocalStorageHelper.store(KEY_LOGGED_IN_USER, { ...data.payload, ...userPhoneNumber });
                     setIsUserLoggedIn(true);
-                    const id = restaurantdata.id;
-                    const cartStorage = sessionStorage.getItem(`cart${id}`) ? JSON.parse(sessionStorage.getItem(`cart${id}`)) : null;
+                    const storageData = LocalStorageHelper.load(KEY_RESTAURANT_DATA);
+                    const id = storageData.id;
+                    const cartKey = `${KEY_CART}-${id}`;
+                    const cartStorage = sessionStorage.getItem(cartKey) ? JSON.parse(sessionStorage.getItem(cartKey)) : null;
                     if (cartStorage) {
-                        sessionStorage.removeItem('user_number');
+                        sessionStorage.removeItem(KEY_USER_NUMBER);
                         cartStorage = {
                             ...cartStorage, ...{
                                 verifymobile: userPhoneNumber.MobileNumber,
                                 verifyfullname: data.payload.user.name
                             }
                         };
-                        sessionStorage.setItem(`cart${id}`, JSON.stringify(cartStorage));
+                        sessionStorage.setItem(cartKey, JSON.stringify(cartStorage));
 
                         if (cartStorage.saleDetails.length > 0) {
                             router.push(`/restaurant/${id}/checkout`);
@@ -64,7 +68,7 @@ const LoginVerify = ({ restaurantdata }) => {
 
     return <div className="section mt-2">
         <Header title="Verify Login"></Header>
-        <LoadingBar color='#3b3a3a' ref={ref} />
+        <LoadingBar color='#F07D00' ref={ref} />
         <div className="card card-border mt-2">
             <div className="card-body">
                 <form>

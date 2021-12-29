@@ -7,22 +7,29 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import useLocalStorage from '../../hooks/useLocalStorage';
+import { LocalStorageHelper } from '../../helpers/local-storage-helper';
+import { KEY_CART, KEY_LOGGED_IN_USER, KEY_SELECTED_MENU, KEY_SELECTED_ORDER_TYPE } from '../../constants';
 
 const Restaurant = ({ restaurantdata }) => {
     const [offers, setOffers] = useState([]);
-    const userLoggedIn = useLocalStorage('logged_in_user');
+    const userLoggedIn = useLocalStorage(KEY_LOGGED_IN_USER);
     const router = useRouter();
     const { query, locale } = router;
     const { id } = query;
     const [orderUrl, setOrderUrl] = useState(`/restaurant/${id}/menu`);
     const { t } = useTranslation();
-    const cartName = `cart${id}`;
+    const cartKay = `${KEY_CART}-${id}`;
+    const selectedMenuTabKey = `${KEY_SELECTED_MENU}-${id}`;
+    const selectedOrderTypeKey = `${KEY_SELECTED_ORDER_TYPE}-${id}`;
+
     const [selectedLanguage, setSelectedLanguage] = useState('');
-    const selectedTabIndex = useLocalStorage(`selected-menu-tab-index-${id}`);
+    const [orderType, setOrderType] = useState(null);
+    const selectedTabIndex = useLocalStorage(selectedMenuTabKey);
+    const selectedOrderType = useLocalStorage(selectedOrderTypeKey);
 
     const startWithOrderType = useCallback((orderType) => {
         orderType = parseInt(orderType);
-        let cart = sessionStorage.getItem(cartName);
+        let cart = sessionStorage.getItem(cartKay);
         let onlineOrderTypeName = 'Take Away';
         if (orderType == 2) {
             onlineOrderTypeName = 'Delivery';
@@ -33,7 +40,7 @@ const Restaurant = ({ restaurantdata }) => {
 
         if (cart) {
             cart = { ...JSON.parse(cart), ...{ onlineOrderType: orderType, onlineOrderTypeName } };
-            sessionStorage.setItem(cartName, JSON.stringify(cart));
+            sessionStorage.setItem(cartKay, JSON.stringify(cart));
         } else {
             const userNumber = userLoggedIn ? userLoggedIn.user.mobileNumber : '';
             const userFullName = userLoggedIn ? userLoggedIn.user.name : '';
@@ -63,23 +70,44 @@ const Restaurant = ({ restaurantdata }) => {
                 verifymobile: userNumber,
                 DeliveryAddress: {}
             }
-            sessionStorage.setItem(cartName, JSON.stringify(orderObj));
+            sessionStorage.setItem(cartKay, JSON.stringify(orderObj));
         }
-    }, [cartName, userLoggedIn]);
+    }, [cartKay, userLoggedIn]);
+
+    const setStartOrderUrl = useCallback((val) => {
+        if (val == 1 || (restaurantdata && restaurantdata.quickTables.length == 0 && val != 2)) {
+            setOrderUrl(`/restaurant/${id}/menu`);
+        } else if (val == 3) {
+            setOrderUrl(`/restaurant/${id}/tables`);
+        } else {
+            setOrderUrl(`/restaurant/${id}/confirm-address`);
+        }
+    }, [id, restaurantdata]);
 
     useEffect(() => {
-        startWithOrderType(1);
-        if (selectedTabIndex == null) {
-            localStorage.setItem(`selected-menu-tab-index-${id}`, 0);
+        // if (selectedTabIndex == null) {
+        //     LocalStorageHelper.store(selectedMenuTabKey, 0);
+        // }
+
+        if (selectedOrderType == null) {
+            LocalStorageHelper.store(selectedOrderTypeKey, 1);
+            setOrderType(1);
+            setStartOrderUrl(1);
+            startWithOrderType(1);
+        } else {
+            LocalStorageHelper.store(selectedOrderTypeKey, selectedOrderType);
+            setOrderType(selectedOrderType);
+            setStartOrderUrl(selectedOrderType);
+            startWithOrderType(selectedOrderType);
         }
-        
+
         if (restaurantdata) {
             const lng = restaurantdata.welcomePageVM.profileLanguagesVM.languages.find(p => p.languagecode == locale);
             setSelectedLanguage(lng.name);
             setOffersData(restaurantdata);
         }
 
-    }, [locale, id, restaurantdata, startWithOrderType, selectedTabIndex]);
+    }, [locale, restaurantdata, selectedMenuTabKey, selectedOrderType, selectedOrderTypeKey, selectedTabIndex, setStartOrderUrl, startWithOrderType]);
 
     const setOffersData = (data) => {
         const offers = data.welcomePageVM.todaySpecials.map((value, index) => {
@@ -93,13 +121,9 @@ const Restaurant = ({ restaurantdata }) => {
     const orderTypeChange = (event) => {
         const val = event.target.value.toLowerCase();
         startWithOrderType(val);
-        if (val == 1 || (restaurantdata.quickTables.length == 0 && val != 2)) {
-            setOrderUrl(`/restaurant/${id}/menu`);
-        } else if (val == 3) {
-            setOrderUrl(`/restaurant/${id}/tables`);
-        } else {
-            setOrderUrl(`/restaurant/${id}/confirm-address`);
-        }
+        LocalStorageHelper.store(selectedOrderTypeKey, val);
+        setOrderType(val);
+        setStartOrderUrl(val);
     }
 
     const changeLanguage = (lngCode) => {
@@ -141,14 +165,14 @@ const Restaurant = ({ restaurantdata }) => {
 
         <div className="wide-block border-0">
             <div className="options content-center">
-                <div className="btn-group" role="group" onChange={(e) => orderTypeChange(e)}>
-                    <input type="radio" className="btn-check" value="1" name="btnRadioOrderType" id="TakeAway" defaultChecked />
+                <div className="btn-group" role="group">
+                    <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="1" name="btnRadioOrderType" id="TakeAway" checked={orderType == 1} />
                     <label className="btn btn-outline-primary" htmlFor="TakeAway">Take Away</label>
 
-                    <input type="radio" className="btn-check" value="3" name="btnRadioOrderType" id="DineIn" />
+                    <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="3" name="btnRadioOrderType" id="DineIn" checked={orderType == 3} />
                     <label className="btn btn-outline-primary" htmlFor="DineIn">Dine In</label>
 
-                    <input type="radio" className="btn-check" value="2" name="btnRadioOrderType" id="Delivery" />
+                    <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="2" name="btnRadioOrderType" id="Delivery" checked={orderType == 2} />
                     <label className="btn btn-outline-primary myDeliveryButton" htmlFor="Delivery">Delivery</label>
                 </div>
             </div>

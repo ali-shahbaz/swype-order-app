@@ -6,6 +6,8 @@ import { AddCircle, CloseCircleOutline } from "react-ionicons";
 import { useRecoilState } from 'recoil';
 import { cartState } from '../../../../states/atoms';
 import { toast } from 'react-toastify';
+import { LocalStorageHelper } from '../../../../helpers/local-storage-helper';
+import { KEY_CART, KEY_LAST_VISITED_ITEM } from '../../../../constants';
 
 const ItemDetail = ({ restaurantdata }) => {
     const [itemState, setItemState] = useState(null); // state to set detail of order item
@@ -14,7 +16,8 @@ const ItemDetail = ({ restaurantdata }) => {
     const varificationEl = useRef();
     const router = useRouter();
     const { id, itemid } = router.query;
-    const cartName = `cart${id}`;
+    const cartKey = `${KEY_CART}-${id}`;
+    const itemKey = `${KEY_LAST_VISITED_ITEM}-${id}`;
 
     useEffect(() => {
         if (restaurantdata) {
@@ -26,8 +29,9 @@ const ItemDetail = ({ restaurantdata }) => {
                 itemDetail.total = itemState.salesprice;
                 setOrderItemsState(orderItems => [...orderItems, itemDetail]);
             }
+            LocalStorageHelper.store(itemKey, itemid);
         }
-    }, [restaurantdata, itemState, itemid]);
+    }, [restaurantdata, itemState, itemid, itemKey]);
 
     const addAnotherItem = () => {
         const itemDetail = JSON.parse(JSON.stringify(itemState));
@@ -47,6 +51,7 @@ const ItemDetail = ({ restaurantdata }) => {
             if (variation) {
                 if (e.target.checked) {
                     orderItemsState[itemIndex].variationName = variation.name;
+                    orderItemsState[itemIndex].variationId = variation.itemvariationid;
                     orderItemsState[itemIndex].total = orderItemsState[itemIndex].salesprice + variation.salesprice;
 
                     [...varificationEl.current.getElementsByTagName("input")].forEach(element => {
@@ -57,6 +62,7 @@ const ItemDetail = ({ restaurantdata }) => {
 
                 } else {
                     orderItemsState[itemIndex].variationName = '';
+                    orderItemsState[itemIndex].variationId = 0;
                     orderItemsState[itemIndex].total = orderItemsState[itemIndex].salesprice;
                 }
 
@@ -123,14 +129,51 @@ const ItemDetail = ({ restaurantdata }) => {
             }
         }
 
-        let cart = sessionStorage.getItem(cartName);
+        let cart = sessionStorage.getItem(cartKey);
         if (cart) {
-            const saleDetails = [...JSON.parse(cart).saleDetails, ...orderItemsState];
+            const items = [];
+            for (let i = 0; i < orderItemsState.length; i++) {
+                const itemObj = {
+                    id: orderItemsState[i].itemid,
+                    itemid: orderItemsState[i].itemid,
+                    itemVariationId: orderItemsState[i].variationId,
+                    itemName: orderItemsState[i].name,
+                    variationName: orderItemsState[i].variationName,
+                    imageUrl: orderItemsState[i].detailimageurl,
+                    sellingPrice: orderItemsState[i].salesprice,
+                    retailprice: orderItemsState[i].retailprice,
+                    costprice: orderItemsState[i].costprice,
+                    tax: orderItemsState[i].tax,
+                    taxAmount: orderItemsState[i].taxamount,
+                    quantity: 1,
+                    discount: 0,
+                    discountAmount: 0,
+                    totalTax: orderItemsState[i].taxamount,
+                    total: orderItemsState[i].total,
+                    isCustomItem: 0,
+                    detailimageurl: orderItemsState[i].detailimageurl,
+                    originalTaxAmount: orderItemsState[i].taxamount,
+                    originalSellingPrice: orderItemsState[i].salesprice,
+                    isSplitItem: false,
+                    equitySplitCount: 0,
+                    description: orderItemsState[i].description,
+                    note: orderItemsState[i].instructions,
+                    categoryid: orderItemsState[i].categoryid,
+                    categoryname: orderItemsState[i].categoryname,
+                    hasvariations: orderItemsState[i].hasvariations,
+                    hasmodifier: orderItemsState[i].hasmodifier,
+                    modifiers: orderItemsState[i].modifiers,
+                    selectedModifiers: orderItemsState[i].selectedModifiers
+                }
+                items.push(itemObj);
+            }
+
+            const saleDetails = [...JSON.parse(cart).saleDetails, ...items];
             cart = { ...JSON.parse(cart), ...{ saleDetails } };
-            sessionStorage.setItem(cartName, JSON.stringify(cart));
+            sessionStorage.setItem(cartKey, JSON.stringify(cart));
         }
 
-        const orderItemsCount = JSON.parse(sessionStorage.getItem(cartName)).saleDetails.length;
+        const orderItemsCount = JSON.parse(sessionStorage.getItem(cartKey)).saleDetails.length;
         setCart(orderItemsCount);
         router.push(`/restaurant/${id}/menu`);
     }

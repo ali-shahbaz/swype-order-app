@@ -8,12 +8,15 @@ import { useRecoilValue } from 'recoil';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { GetCurrentOrder } from '../services/restaurant-service';
 import { RestaurantOutline } from 'react-ionicons';
+import { KEY_LOGGED_IN_USER, KEY_RESTAURANT_DATA } from '../constants';
+import { LocalStorageHelper } from '../helpers/local-storage-helper';
 
 
-function Sidebar({ restaurantdata, sidebarclickedcount }) {
+function Sidebar({ props, restaurantdata, sidebarclickedcount }) {
     const router = useRouter();
     const { query, locale } = router;
-    const loggedInUser = useLocalStorage('logged_in_user');
+    const loggedInUserKey = KEY_LOGGED_IN_USER;
+    const loggedInUser = useLocalStorage(loggedInUserKey);
     const closeRef = useRef(null);
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const loggedIn = useRecoilValue(userLoggedInState);
@@ -26,6 +29,9 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
     const [currentOrder, setCurrentOrder] = useState(null);
     const [currentOrderURL, setCurrentOrderURL] = useState('/');
     const [restaurantMenuUrl, setRestaurantMenuUrl] = useState('/');
+    const [userData, setUserData] = useState({});
+    const storedData = useLocalStorage(KEY_RESTAURANT_DATA);
+    const ref = useRef();
 
     useEffect(() => {
         const handleRouteChange = (url, { shallow }) => {
@@ -37,53 +43,57 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
             setProfileUrl('/user/profile');
             setOrdersUrl('/orders');
             setIsUserLoggedIn(true);
+            setUserData(LocalStorageHelper.load(loggedInUserKey));
+
         } else {
             setProfileUrl('/user/login');
             setOrdersUrl('/user/login')
         }
 
+        const outsideRestaurantPages = ['Profile', 'Login', 'LoginVerify', 'Orders'];
 
-
-        if (restaurantdata) {
-            const lng = restaurantdata.welcomePageVM.profileLanguagesVM.languages.find(p => p.languagecode == locale);
-            setSelectedLanguage(lng.name);
-
-            setRestaurantId(restaurantdata.id);
-            setCurrentOrderURL(`/restaurant/${restaurantdata.id}/checkout`);
-            setRestaurantMenuUrl(`/restaurant/${restaurantdata.id}/menu`);
-            const darkModeName = `dark-mode-${restaurantdata.id}`;
-            // set for dark mode
-            if (!darkModeName in localStorage) {
-                localStorage.setItem(darkModeName, false);
-            } else {
-                setDarkMode(JSON.parse(localStorage.getItem(darkModeName)));
-            }
+        if (outsideRestaurantPages.indexOf(props.name) >= 0) {
+            ref.current = storedData;
+        } else {
+            ref.current = restaurantdata;
         }
 
+        if (ref.current) {
+            const lng = ref.current.welcomePageVM.profileLanguagesVM.languages.find(p => p.languagecode == locale);
+            setSelectedLanguage(lng.name);
 
-    }, [locale, loggedIn, loggedInUser, restaurantdata, router.events])
+            setRestaurantId(ref.current.id);
+            setCurrentOrderURL(`/restaurant/${ref.current.id}/checkout`);
+            setRestaurantMenuUrl(`/restaurant/${ref.current.id}/menu`);
+        }
 
-
-    useEffect(() => {
         if (loggedInUser && sidebarclickedcount && sidebarclickedcount > 0 && loggedInUser) {
+            setUserData(LocalStorageHelper.load(KEY_LOGGED_IN_USER));
             GetCurrentOrder(loggedInUser.token).then(data => {
                 if (data.status == 1 && data.payload.currentorder) {
                     setCurrentOrder(data.payload.currentorder);
-                    setCurrentOrderURL(`/restaurant/${restaurantdata.id}/order-detail/${data.payload.currentorder.orderId}`);
+                    setCurrentOrderURL(`/restaurant/${ref.current.id}/order-detail/${data.payload.currentorder.orderId}`);
                 }
             });
         }
 
-    }, [loggedInUser, restaurantdata, sidebarclickedcount])
+        // set for dark mode
+        if (!'dark-mode' in localStorage) {
+            localStorage.setItem('dark-mode', false);
+        } else {
+            setDarkMode(JSON.parse(localStorage.getItem('dark-mode')));
+        }
+
+
+    }, [locale, loggedIn, loggedInUser, loggedInUserKey, props, router.events, sidebarclickedcount, storedData])
 
     const logout = () => {
-        localStorage.removeItem('logged_in_user');
+        localStorage.removeItem(KEY_LOGGED_IN_USER);
         setIsUserLoggedIn(false);
     }
 
     const changeDarkMode = (event) => {
-        const darkModeName = `dark-mode-${restaurantdata.id}`;
-        localStorage.setItem(darkModeName, event.target.checked);
+        localStorage.setItem('dark-mode', event.target.checked);
         setDarkMode(event.target.checked);
     }
 
@@ -95,7 +105,7 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
     }
 
     const changeLanguage = (lngCode) => {
-        router.push(`/restaurant/${restaurantdata.id}`, `/restaurant/${restaurantdata.id}`, { locale: lngCode });
+        router.push(`/restaurant/${ref.current.id}`, `/restaurant/${ref.current.id}`, { locale: lngCode });
     }
 
     const content = <div className="modal fade panelbox panelbox-left order-sidebar" id="sidebarPanel" ref={sidebarPanel} tabIndex="-1" role="dialog">
@@ -106,12 +116,12 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
                         <Link href={profileUrl}>
                             <a className="user-info">
                                 {
-                                    loggedInUser && loggedInUser.user.name ? <>
+                                    userData && userData.user && userData.user.name ? <>
                                         <div className="image-wrapper">
-                                            <Image src={loggedInUser.user.imageUrl ? loggedInUser.user.imageUrl : '/images/profile/profile.png'} width={36} height={36} objectFit='cover' alt="image" className="imaged w36" />
+                                            <Image src={userData.user.imageUrl ? userData.user.imageUrl : '/images/profile/profile.png'} width={36} height={36} objectFit='cover' alt="image" className="imaged w36" />
                                         </div>
                                         <div className="in">
-                                            <strong>{loggedInUser.user.name}</strong>
+                                            <strong>{userData.user.name}</strong>
                                         </div> </> : <h2 className="mb-0">Set Up Your Profile</h2>
                                 }
                             </a>
@@ -229,7 +239,7 @@ function Sidebar({ restaurantdata, sidebarclickedcount }) {
                             <div className="wide-block py-2">
                                 <h4>Select preferred language</h4>
                                 <ul id="sidebarLangFlag" className="sidebar-lang-flag my-2">
-                                    {restaurantdata && restaurantdata.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
+                                    {ref.current && ref.current.welcomePageVM.profileLanguagesVM.languages.map((item, index) => {
                                         return <li key={item.languagecode} title={item.languagecode} onClick={() => changeLanguage(item.languagecode)} className={locale == item.languagecode ? 'sidebar-single-flag sidebar-flag-active' : 'sidebar-single-flag'}>
                                             <Image src={`/images/flag/${item.name.toLowerCase()}.jpg`} width={40} height={40} objectFit='' alt={item.languagecode} />
                                         </li>

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import React, { useRef } from 'react';
 import LoadingBar from 'react-top-loading-bar';
 import Header from '../../components/head';
+import { KEY_USER_NUMBER } from '../../constants';
 
 
 const Login = () => {
@@ -24,7 +25,7 @@ const Login = () => {
                     event.target.disabled = false;
                     ref.current.complete();
                     if (data.status == 1) {
-                        sessionStorage.setItem('user_number', JSON.stringify(number));
+                        sessionStorage.setItem(KEY_USER_NUMBER, JSON.stringify(number));
                         router.push('/user/login-verify');
                     } else {
                         ref.current.complete();
@@ -46,7 +47,7 @@ const Login = () => {
 
     return <div className="section">
         <Header title="Login"></Header>
-        <LoadingBar color='#3b3a3a' ref={ref} />
+        <LoadingBar color='#F07D00' ref={ref} />
         <div className="card card-border mt-2">
             <div className="card-body">
                 <form>

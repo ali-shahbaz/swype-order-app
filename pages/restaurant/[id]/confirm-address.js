@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { useRouter } from "next/router";
 import { CreateOutline } from "react-ionicons";
 import useSessionStorage from "../../../hooks/useSessionStorage";
+import { KEY_CART, KEY_LOCATION } from "../../../constants";
+import { LocalStorageHelper } from "../../../helpers/local-storage-helper";
 
 const ConfirmAddress = ({ width, height, lat, lng, zoom,
     zoomControl, scaleControl, fullscreenControl, disableDefaultUI }) => {
@@ -16,8 +18,8 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
     const router = useRouter();
     const [address, setAddress] = useState({});
     const { id } = router.query;
-    const cartName = `cart${id}`;
-    const cart = useSessionStorage(cartName);
+    const cartKey = `${KEY_CART}-${id}`;
+    const cart = useSessionStorage(cartKey);
     const options = {
         center: { lat, lng },
         zoom,
@@ -62,7 +64,7 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
 
     const initMap = () => {
         setTimeout(() => {
-            getAddress(options.center)
+            getAddress(options.center);
             const map = new google.maps.Map(mapDivRef.current, options);
             const autoCompleteOptions = {
                 fields: ["address_components", "geometry", "icon", "name"],
@@ -105,8 +107,8 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
         const geocoder = new google.maps.Geocoder();
         geocoder.geocode({ location: latLng }).then((response) => {
             if (response.results[0]) {
-                console.log(response.results[0]);
                 const address = response.results[0].address_components.filter(p =>
+                    p.types.indexOf('plus_code') >= 0 ||
                     p.types.indexOf('establishment') >= 0 ||
                     p.types.indexOf('premise') >= 0 ||
                     p.types.indexOf('sublocality_level_3') >= 0 ||
@@ -139,10 +141,10 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
                     country: location.country
                 }
 
-                sessionStorage.setItem(cartName, JSON.stringify({ ...cart, ...{ DeliveryAddress } }));
+                sessionStorage.setItem(cartKey, JSON.stringify({ ...cart, ...{ DeliveryAddress } }));
 
                 // setAddress(location);
-                localStorage.setItem('location', JSON.stringify(location))
+                LocalStorageHelper.store(KEY_LOCATION, location);
             }
         }).catch((e) => console.log("Geocoder failed due to: " + e));
 
@@ -166,10 +168,6 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
                                 <Link href={`/restaurant/${id}/delivery-address-edit`}>
                                     <a><CreateOutline className="switchSVGColor" /></a>
                                 </Link>
-                                {/* <span>
-                                    {address.formattedAddress}, {address.city} <br />
-                                    {address.country}
-                                </span> */}
                             </div>
                         </div>
                     </form>

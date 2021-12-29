@@ -4,8 +4,9 @@ import { GetUserReceipts } from '../../services/user-service';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import useLocalStorage from '../../hooks/useLocalStorage';
+import { KEY_LOGGED_IN_USER } from '../../constants';
 const Orders = () => {
-    const loggedInUser = useLocalStorage('logged_in_user');
+    const loggedInUser = useLocalStorage(KEY_LOGGED_IN_USER);
     const [receipts, setReceipts] = useState([]);
 
     useEffect(() => {

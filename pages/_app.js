@@ -38,7 +38,7 @@ const MyApp = ({ Component, pageProps }) => {
           <img src="/images/loading-icon.png" alt="icon" className="loading-icon" />
         </div>
       )}
-      <Sidebar abc={++sidebarObj} />
+      <Sidebar props={Component.defaultProps} abc={++sidebarObj} />
       <ToastContainer hideProgressBar={true} autoClose={3000} position="top-center" />
     </Layout>
   </RecoilRoot>

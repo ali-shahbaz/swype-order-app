@@ -6,6 +6,8 @@ import Header from '../../../components/head';
 import { useRecoilState } from 'recoil';
 import { menuTabState } from '../../../states/atoms';
 import useLocalStorage from '../../../hooks/useLocalStorage';
+import { KEY_SELECTED_MENU } from '../../../constants';
+import { LocalStorageHelper } from '../../../helpers/local-storage-helper';
 
 const Menu = ({ restaurantdata }) => {
     const tabRef = useRef(null);
@@ -13,27 +15,30 @@ const Menu = ({ restaurantdata }) => {
     const { id } = router.query;
     const [menu, setMenu] = useState(null);
     const [tab, setTab] = useRecoilState(menuTabState);
-    const selectedTabIndex = useLocalStorage(`selected-menu-tab-index-${id}`);
+    const selectedIndexKey = id && `${KEY_SELECTED_MENU}-${id}`;
+    const selectedTabIndex = useLocalStorage(selectedIndexKey);
 
 
     useEffect(() => {
-        setTimeout(() => {
-            if (restaurantdata) {
-                if (tabRef && tabRef.current) {
-                    tabRef.current.click();
-                }
+        if (restaurantdata) {
+            if (selectedTabIndex === null) {
+                LocalStorageHelper.store(selectedIndexKey, 0);
             }
+            if (tabRef && tabRef.current) {
+                tabRef.current.click();
+            }
+        }
 
-        }, 0);
-    }, [id, restaurantdata, selectedTabIndex, tabRef])
+    }, [restaurantdata, selectedIndexKey, selectedTabIndex])
 
     const categoryClick = (event, categoryID, index) => {
-        localStorage.setItem(`selected-menu-tab-index-${id}`, index);
+        selectedIndexKey && LocalStorageHelper.store(selectedIndexKey, index);
         setTab(event.currentTarget);
         const filterMenuChildren = event.currentTarget.parentElement.children;
         for (let i = 0; i < filterMenuChildren.length; i++) {
             filterMenuChildren[i].classList.remove('category-active');
         }
+
         event.currentTarget.classList.add('category-active');
         const products = restaurantdata.quickProducts.filter(p => p.categoryid == categoryID);
         setMenu(products);

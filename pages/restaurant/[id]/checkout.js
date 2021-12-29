@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import useSessionStorage from '../../../hooks/useSessionStorage';
 import { useRouter } from 'next/router';
 import { PlaceOrder } from '../../../services/restaurant-service';
@@ -11,73 +12,78 @@ import { CloseCircleOutline } from 'react-ionicons';
 import useLocalStorage from '../../../hooks/useLocalStorage';
 import { useRecoilState } from 'recoil';
 import { cartState } from '../../../states/atoms';
+import { LocalStorageHelper } from '../../../helpers/local-storage-helper';
+import { KEY_CART, KEY_LOGGED_IN_USER } from '../../../constants';
 
 const Checkout = () => {
     const router = useRouter();
     const { id, status } = router.query;
-    const cart = useSessionStorage(`cart${id}`);
-    const loggedInUser = useLocalStorage('logged_in_user');
+    const cartKey = `${KEY_CART}-${id}`;
+    const cart = useSessionStorage(cartKey);
+    const loggedInUser = useLocalStorage(KEY_LOGGED_IN_USER);
     const ref = useRef(null);
     const [saleItems, setSaleItems] = useState([]);
     const [cartData, setCartData] = useState(null);
-    const cartName = `cart${id}`;
+
     const [cartCount, setCartCount] = useRecoilState(cartState);
 
     const payNow = (event) => {
         if (loggedInUser) {
-            if (cart) {
-                event.target.disabled = true;
-                ref.current.continuousStart();
+            const cart = JSON.parse(sessionStorage.getItem(cartKey));
+            event.target.disabled = true;
+            ref.current.continuousStart();
 
-                const taxAmount = cart.saleDetails.reduce((a, b) => {
-                    return a + b.taxamount + (b.variationName ? b.variations.find(p => p.name == b.variationName).taxamount : 0)
-                }, 0).toFixed(2);
+            const taxAmount = cart.saleDetails.reduce((a, b) => {
+                return a + b.taxamount + (b.variationName ? b.variations.find(p => p.name == b.variationName).taxamount : 0)
+            }, 0).toFixed(2);
 
-                const netTotal = cart.saleDetails.reduce((a, b) => {
-                    return a + b.retailprice + (b.variationName ? b.variations.find(p => p.name == b.variationName).retailprice : 0)
-                        + (b.selectedModifiers.length > 0 ? b.selectedModifiers.reduce((x, y) => { return x + y.price }, 0) : 0)
-                }, 0).toFixed(2);
+            const netTotal = cart.saleDetails.reduce((a, b) => {
+                return a + b.retailprice + (b.variationName ? b.variations.find(p => p.name == b.variationName).retailprice : 0)
+                    + (b.selectedModifiers.length > 0 ? b.selectedModifiers.reduce((x, y) => { return x + y.price }, 0) : 0)
+            }, 0).toFixed(2);
 
-                const grandTotal = cart.saleDetails.reduce((a, b) => {
-                    return a + b.total
-                }, 0).toFixed(2);
+            const grandTotal = cart.saleDetails.reduce((a, b) => {
+                return a + b.total
+            }, 0).toFixed(2);
 
-                const newCart = { ...cart, ...{ netTotal, taxAmount, grandTotal, amount: grandTotal } }
-                newCart.salePayments[0].amount = grandTotal;
-                newCart.salePayments[0].paymentTypeId = 2;
+            const newCart = { ...cart, ...{ netTotal, taxAmount, grandTotal, amount: grandTotal } }
+            newCart.salePayments[0].amount = grandTotal;
+            newCart.salePayments[0].paymentTypeId = 2;
 
-                if (newCart.onlineOrderType == 2) {
-                    newCart['deliveryAddress'] = JSON.parse(localStorage.getItem('location'));
-                }
-
-
-                PlaceOrder(JSON.stringify(newCart), id, newCart.onlineOrderType, loggedInUser.token).then(response => {
-                    if (response.status == 1) {
-                        if (response.payload.paymentProvider == 'stripe') {
-                            const stripePromise = loadStripe(response.payload.stripePublicKey, {
-                                stripeAccount: response.payload.accountId
-                            });
-                            stripePromise.then(stripe => {
-                                event.target.disabled = false;
-                                ref.current.complete();
-                                stripe.redirectToCheckout({
-                                    sessionId: response.payload.sessionId
-                                }).then(function (result) {
-                                    // If `redirectToCheckout` fails due to a browser or network
-                                    // error, display the localized error message to your customer
-                                    // using `result.error.message`.
-                                    toast.error(result.error.message);
-                                });
-                            });
-                        }
-
-                    } else {
-                        toast.error(response.message);
-                    }
-                })
-            } else {
-
+            if (newCart.onlineOrderType == 2) {
+                newCart['deliveryAddress'] = JSON.parse(localStorage.getItem('location'));
             }
+
+
+            PlaceOrder(JSON.stringify(newCart), id, newCart.onlineOrderType, loggedInUser.token).then(response => {
+                if (response.status == 1) {
+                    if (response.payload.paymentProvider == 'stripe') {
+                        const stripePromise = loadStripe(response.payload.stripePublicKey, {
+                            stripeAccount: response.payload.accountId
+                        });
+                        stripePromise.then(stripe => {
+                            event.target.disabled = false;
+                            ref.current.complete();
+                            stripe.redirectToCheckout({
+                                sessionId: response.payload.sessionId
+                            }).then(function (result) {
+                                // If `redirectToCheckout` fails due to a browser or network
+                                // error, display the localized error message to your customer
+                                // using `result.error.message`.
+                                toast.error(result.error.message);
+                            });
+                        });
+                    } else {
+                        event.target.disabled = false;
+                        ref.current.complete();
+                    }
+
+                } else {
+                    event.target.disabled = false;
+                    ref.current.complete();
+                    toast.error(response.error || response.message);
+                }
+            })
         } else {
             router.push('/user/login')
         }
@@ -107,18 +113,18 @@ const Checkout = () => {
     const removeItem = (itemId) => {
         setSaleItems(items => items = items.filter(p => p.itemid != itemId));
 
-        let myCart = sessionStorage.getItem(cartName);
+        let myCart = sessionStorage.getItem(cartKey);
         if (myCart) {
             const saleDetails = cartData.saleDetails.filter(p => p.itemid != itemId);
             myCart = { ...JSON.parse(myCart), ...{ saleDetails } };
-            sessionStorage.setItem(cartName, JSON.stringify(myCart));
+            sessionStorage.setItem(cartKey, JSON.stringify(myCart));
             setCartData(myCart);
             setCartCount(myCart.saleDetails.length);
         }
     }
 
     return <div className="order-checkout">
-        <LoadingBar color='#3b3a3a' ref={ref} />
+        <LoadingBar color='#F07D00' ref={ref} />
         <Header title="Checkout"></Header>
         <div className="section">
             <div className="row checkout-item">
@@ -128,14 +134,14 @@ const Checkout = () => {
                         <div className="count-cart-item">{item.count}</div>
                         <div className="card item-card card-border p-0">
                             <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority={true} className="card-img-top" alt="image" />
-                            <h4>{item.name}</h4>
+                            <h4>{item.itemName}</h4>
                         </div>
                     </div>
                 })}
             </div>
         </div>
         {
-            saleItems.length > 0 && <>
+            saleItems.length > 0 ? <>
                 <div className="section mt-3">
                     <div className="border-bottom">
                         <div className="total-item">
@@ -153,7 +159,7 @@ const Checkout = () => {
                             <h4 className='fw-normal'>{cartData && cartData.onlineOrderTypeName}</h4>
                         </div>
                         {
-                            cartData.tableId != 0 && <>
+                            cartData.onlineOrderType == 3 && cartData.tableId != 0 && <>
                                 <div className="total-item">
                                     <h4>Table Name</h4>
                                     <h4 className='fw-normal'>{cartData && cartData.tableName}</h4>
@@ -179,6 +185,13 @@ const Checkout = () => {
                 </div>
                 <div className="section mt-4">
                     <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => payNow(e)}>Pay Now</button>
+                </div>
+            </> : <>
+                <div className="section mt-4">
+                    <p className='text-center'>There are no items in this cart</p>
+                    <Link href={`/restaurant/${id}/menu`}>
+                        <a className="btn btn-primary btn-shadow btn-lg btn-block mt-2">Start Your Order</a>
+                    </Link>
                 </div>
             </>
         }

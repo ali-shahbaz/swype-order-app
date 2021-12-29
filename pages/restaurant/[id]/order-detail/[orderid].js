@@ -6,9 +6,10 @@ import { GetOrderDetail } from "../../../../services/restaurant-service";
 import useLocalStorage from "../../../../hooks/useLocalStorage";
 import { useRouter } from "next/router";
 import { toast } from 'react-toastify';
+import { KEY_LOGGED_IN_USER } from "../../../../constants";
 
 const OrderDetail = () => {
-    const loggedInUser = useLocalStorage('logged_in_user');
+    const loggedInUser = useLocalStorage(KEY_LOGGED_IN_USER);
     const router = useRouter();
     const { orderid } = router.query;
     const [orderDetail, setOrderDetail] = useState(null);

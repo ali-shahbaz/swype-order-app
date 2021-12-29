@@ -4,17 +4,18 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import Header from "../../../components/head";
+import { KEY_CART } from "../../../constants";
 import { cartState } from "../../../states/atoms";
 
 const OrderSuccess = () => {
     const router = useRouter();
     const { id, orderid , ordernumber} = router.query;
-    const cartName = `cart${id}`;
+    const cartKey = `${KEY_CART}-${id}`;
     const [cart, setCart] = useRecoilState(cartState);
 
     useEffect(() => {
         if (orderid && window) {
-            sessionStorage.removeItem(cartName);
+            sessionStorage.removeItem(cartKey);
             setCart(0);
         }
     })

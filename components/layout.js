@@ -7,6 +7,8 @@ import useSessionStorage from '../hooks/useSessionStorage';
 import React, { useEffect, useRef, useState } from 'react';
 import { apiSettings } from '../configs/api-settings';
 import { GetRestaurantData } from '../services/restaurant-service';
+import { LocalStorageHelper } from '../helpers/local-storage-helper';
+import { KEY_CART, KEY_RESTAURANT_DATA, KEY_LAST_VISITED_ITEM } from '../constants';
 
 
 function Layout({ props = {}, children }) {
@@ -17,22 +19,25 @@ function Layout({ props = {}, children }) {
     const [data, setData] = useState(null);
     let restData = useRef(null);
     const sidebarBtnRef = useRef(null);
-
-    const cartStorage = useSessionStorage(`cart${id}`);
+    const cartKey = `${KEY_CART}-${id}`;
+    const cartStorage = useSessionStorage(cartKey);
     const [sidebarclickedcount, setSidebarClickedCount] = useState(0);
 
     useEffect(() => {
         // clear
-        const clearInput = document.querySelectorAll(".clear-input");
-        clearInput.forEach(function (el) {
-            el.addEventListener("click", function () {
-                const parent = this.parentElement;
-                const input = parent.querySelector(".form-control");
-                input.focus();
-                input.value = "";
-                parent.classList.remove("not-empty");
+        setTimeout(() => {
+            const clearInput = document.querySelectorAll(".clear-input");
+            clearInput.forEach(function (el) {
+                el.addEventListener("click", function () {
+                    const parent = this.parentElement;
+                    const input = parent.querySelector(".form-control");
+                    input.focus();
+                    input.value = "";
+                    parent.classList.remove("not-empty");
+                });
             });
-        });
+        }, 100);
+
 
         // active
         const formControl = document.querySelectorAll(".form-group .form-control");
@@ -58,30 +63,29 @@ function Layout({ props = {}, children }) {
             }
         });
 
-        const storageData = window.localStorage.getItem('init_data');
+        const storageData = LocalStorageHelper.load(KEY_RESTAURANT_DATA);
         if (id) {
-            if (!storageData || JSON.parse(storageData).id != id) {
+            if (!storageData || storageData.id != id) {
                 GetRestaurantData(id).then(response => {
                     if (response.status == 1) {
-                        localStorage.setItem('init_data', JSON.stringify(response.payload.data));
+                        LocalStorageHelper.store(KEY_RESTAURANT_DATA, response.payload.data);
                         setData(response.payload.data);
                     }
 
                 });
             } else {
-                const value = localStorage.getItem('init_data');
-                const data = !!value ? JSON.parse(value) : undefined;
-                restData.current = data;
-                setTimeout(() => {
-                    GetRestaurantData(data.id).then(response => {
-                        if (response.status == 1) {
-                            localStorage.setItem('init_data', JSON.stringify(response.payload.data));
-                        }
+                restData.current = LocalStorageHelper.load(KEY_RESTAURANT_DATA);
+                // setTimeout(() => {
+                //     GetRestaurantData(data.id).then(response => {
+                //         if (response.status == 1) {
+                //             localStorage.setItem('init_data', JSON.stringify(response.payload.data));
+                //         }
 
-                    });
-                }, 1000);
+                //     });
+                // }, 1000);
             }
         }
+
 
         function delQuery(asPath) {
             return asPath.split('?')[0]
@@ -102,6 +106,23 @@ function Layout({ props = {}, children }) {
         return false;
     }
 
+    const goBack = (e) => {
+        const restaurantId = id || LocalStorageHelper.load(KEY_RESTAURANT_DATA).id;
+        if (props.name == 'Checkout') {
+            const itemKey = `${KEY_LAST_VISITED_ITEM}-${restaurantId}`;
+            const itemId = LocalStorageHelper.load(itemKey);
+            router.push(`/restaurant/${restaurantId}/item-detail/${itemId}`);
+        } else if (props.name == 'ItemDetail') {
+            router.push(`/restaurant/${restaurantId}/menu`);
+        } else if (props.name == 'Menu' || props.name == 'ConfirmAddress') {
+            router.push(`/restaurant/${restaurantId}`);
+        } else if (props.name == 'DeliveryAddressEdit') {
+            router.push(`/restaurant/${restaurantId}/confirm-address`);
+        } else {
+            router.back();
+        }
+    }
+
     return <>
         {props.name == 'Restaurant' ? (<>
             <div className="appHeader order-welcome-header">
@@ -114,7 +135,7 @@ function Layout({ props = {}, children }) {
             (<div className="appHeader">
 
                 <div className="left">
-                    {props.showBack ? <div onClick={() => router.back()} className="headerButton">
+                    {props.showBack ? <div onClick={(e) => goBack(e)} className="headerButton">
                         <ChevronBackOutline className="switchSVGColor" />
                     </div> : <a href="#" id='hamburgerMenu' onClick={SidebarClickedEvent} className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
                         <MenuOutline className="md hydrated switchSVGColor" />
