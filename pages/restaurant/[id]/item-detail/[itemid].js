@@ -131,14 +131,15 @@ const ItemDetail = ({ restaurantdata }) => {
 
         let cart = sessionStorage.getItem(cartKey);
         if (cart) {
+            debugger
             const items = [];
             for (let i = 0; i < orderItemsState.length; i++) {
                 const itemObj = {
                     id: orderItemsState[i].itemid,
                     itemid: orderItemsState[i].itemid,
-                    itemVariationId: orderItemsState[i].variationId,
+                    itemVariationId: orderItemsState[i].variationId || 0,
                     itemName: orderItemsState[i].name,
-                    variationName: orderItemsState[i].variationName,
+                    variationName: orderItemsState[i].variationName || '',
                     imageUrl: orderItemsState[i].detailimageurl,
                     sellingPrice: orderItemsState[i].salesprice,
                     retailprice: orderItemsState[i].retailprice,
@@ -157,13 +158,14 @@ const ItemDetail = ({ restaurantdata }) => {
                     isSplitItem: false,
                     equitySplitCount: 0,
                     description: orderItemsState[i].description,
-                    note: orderItemsState[i].instructions,
+                    note: orderItemsState[i].instructions || '',
                     categoryid: orderItemsState[i].categoryid,
                     categoryname: orderItemsState[i].categoryname,
                     hasvariations: orderItemsState[i].hasvariations,
                     hasmodifier: orderItemsState[i].hasmodifier,
                     modifiers: orderItemsState[i].modifiers,
-                    selectedModifiers: orderItemsState[i].selectedModifiers
+                    selectedModifiers: orderItemsState[i].selectedModifiers,
+                    variations: orderItemsState[i].variations
                 }
                 items.push(itemObj);
             }

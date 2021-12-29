@@ -13,7 +13,7 @@ import useLocalStorage from '../../../hooks/useLocalStorage';
 import { useRecoilState } from 'recoil';
 import { cartState } from '../../../states/atoms';
 import { LocalStorageHelper } from '../../../helpers/local-storage-helper';
-import { KEY_CART, KEY_LOGGED_IN_USER } from '../../../constants';
+import { KEY_CART, KEY_LOCATION, KEY_LOGGED_IN_USER } from '../../../constants';
 
 const Checkout = () => {
     const router = useRouter();
@@ -34,7 +34,7 @@ const Checkout = () => {
             ref.current.continuousStart();
 
             const taxAmount = cart.saleDetails.reduce((a, b) => {
-                return a + b.taxamount + (b.variationName ? b.variations.find(p => p.name == b.variationName).taxamount : 0)
+                return a + b.taxAmount + (b.variationName ? b.variations.find(p => p.name == b.variationName).taxAmount : 0)
             }, 0).toFixed(2);
 
             const netTotal = cart.saleDetails.reduce((a, b) => {
@@ -51,7 +51,7 @@ const Checkout = () => {
             newCart.salePayments[0].paymentTypeId = 2;
 
             if (newCart.onlineOrderType == 2) {
-                newCart['deliveryAddress'] = JSON.parse(localStorage.getItem('location'));
+                newCart['deliveryAddress'] = LocalStorageHelper.load(KEY_LOCATION);
             }
 
 
