@@ -131,7 +131,6 @@ const ItemDetail = ({ restaurantdata }) => {
 
         let cart = sessionStorage.getItem(cartKey);
         if (cart) {
-            debugger
             const items = [];
             for (let i = 0; i < orderItemsState.length; i++) {
                 const itemObj = {

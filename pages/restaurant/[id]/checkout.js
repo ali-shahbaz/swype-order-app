@@ -119,6 +119,7 @@ const Checkout = () => {
             myCart = { ...JSON.parse(myCart), ...{ saleDetails } };
             sessionStorage.setItem(cartKey, JSON.stringify(myCart));
             setCartData(myCart);
+            console.log(myCart.saleDetails.length);
             setCartCount(myCart.saleDetails.length);
         }
     }
