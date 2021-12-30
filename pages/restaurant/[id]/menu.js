@@ -23,6 +23,7 @@ const Menu = ({ restaurantdata }) => {
         if (restaurantdata) {
             if (selectedTabIndex === null) {
                 LocalStorageHelper.store(selectedIndexKey, 0);
+                selectedTabIndex = 0;
             }
             if (tabRef && tabRef.current) {
                 tabRef.current.click();
