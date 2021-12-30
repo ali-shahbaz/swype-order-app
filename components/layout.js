@@ -109,9 +109,7 @@ function Layout({ props = {}, children }) {
     const goBack = (e) => {
         const restaurantId = id || LocalStorageHelper.load(KEY_RESTAURANT_DATA).id;
         if (props.name == 'Checkout') {
-            const itemKey = `${KEY_LAST_VISITED_ITEM}-${restaurantId}`;
-            const itemId = LocalStorageHelper.load(itemKey);
-            router.push(`/restaurant/${restaurantId}/item-detail/${itemId}`);
+            router.push(`/restaurant/${restaurantId}/menu`);
         } else if (props.name == 'ItemDetail') {
             router.push(`/restaurant/${restaurantId}/menu`);
         } else if (props.name == 'Menu' || props.name == 'ConfirmAddress') {
