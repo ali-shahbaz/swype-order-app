@@ -44,14 +44,14 @@ export default function Home({ data }) {
         }`}
       </style>
     </Header>
-    <div class="section confirmed-email mt-2">
+    <div className="section confirmed-email mt-2">
             <form action="#">
-                <div class="card card-border">
-                    <div class="card-body">
-                        <div class="form-group basic">
-                            <div class="input-wrapper">
-                                <label class="label">Search</label>
-                                <input type="email" class="form-control" required="" onChange={(e)=>SearchRestaurant(e.target.value)}/>
+                <div className="card card-border">
+                    <div className="card-body">
+                        <div className="form-group basic">
+                            <div className="input-wrapper">
+                                <label className="label">Search</label>
+                                <input type="email" className="form-control" required="" onChange={(e)=>SearchRestaurant(e.target.value)}/>
                             </div>
                         </div>
                     </div>
