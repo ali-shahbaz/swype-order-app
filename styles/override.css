@@ -104,3 +104,17 @@ body.dark-mode .flag-mbl-input input
 {
     padding-top: 10px;
 }
+.ulRestaurant{
+padding-left: 0;
+}
+.restaurant-card .card-text
+{
+    margin-left: 10px;
+    margin-bottom: 15px;
+}
+.restaurant-card h4.card-title
+{
+    text-align: left;
+    margin-left: 10px;
+    margin-bottom: 15px;
+}
