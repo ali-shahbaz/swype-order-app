@@ -8,6 +8,7 @@ import React, { useRef } from 'react';
 import LoadingBar from 'react-top-loading-bar';
 import Header from '../../components/head';
 import { KEY_USER_NUMBER } from '../../constants';
+import { LocalStorageHelper } from '../../helpers/local-storage-helper';
 
 
 const Login = () => {
@@ -25,7 +26,7 @@ const Login = () => {
                     event.target.disabled = false;
                     ref.current.complete();
                     if (data.status == 1) {
-                        sessionStorage.setItem(KEY_USER_NUMBER, JSON.stringify(number));
+                        LocalStorageHelper.store(KEY_USER_NUMBER, number);
                         router.push('/user/login-verify');
                     } else {
                         ref.current.complete();

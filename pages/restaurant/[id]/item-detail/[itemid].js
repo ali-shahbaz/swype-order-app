@@ -8,6 +8,7 @@ import { cartState } from '../../../../states/atoms';
 import { toast } from 'react-toastify';
 import { LocalStorageHelper } from '../../../../helpers/local-storage-helper';
 import { KEY_CART, KEY_LAST_VISITED_ITEM } from '../../../../constants';
+import useLocalStorage from '../../../../hooks/useLocalStorage';
 
 const ItemDetail = ({ restaurantdata }) => {
     const [itemState, setItemState] = useState(null); // state to set detail of order item
@@ -18,25 +19,75 @@ const ItemDetail = ({ restaurantdata }) => {
     const { id, itemid } = router.query;
     const cartKey = `${KEY_CART}-${id}`;
     const itemKey = `${KEY_LAST_VISITED_ITEM}-${id}`;
+    const cartStorage = useLocalStorage(cartKey);
 
     useEffect(() => {
         if (restaurantdata) {
-            setItemState(restaurantdata.quickProducts.find(p => p.itemid == itemid));
-            if (itemState) {
+            const item = restaurantdata.quickProducts.find(p => p.itemid == itemid);
+            setItemState(item);
+            if (cartStorage) {
                 setOrderItemsState([]);
-                const itemDetail = JSON.parse(JSON.stringify(itemState));
-                itemDetail.selectedModifiers = [];
-                itemDetail.total = itemState.salesprice;
-                setOrderItemsState(orderItems => [...orderItems, itemDetail]);
+                if (cartStorage.saleDetails.findIndex(p => p.itemid == itemid) < 0) {
+                    setOrderItemsState(orderItems => [...orderItems, getItemForCart(item)]);
+                } else {
+                    const items = cartStorage.saleDetails.filter(p => p.itemid == itemid);
+                    setOrderItemsState(orderItems => [...orderItems, ...items]);
+                }
+
             }
+
+            // if (itemState) {
+            // setOrderItemsState([]);
+            // const itemDetail = JSON.parse(JSON.stringify(itemState));
+            // itemDetail.selectedModifiers = [];
+            // itemDetail.total = itemState.salesprice;
+            // setOrderItemsState(orderItems => [...orderItems, itemDetail]);
+            // }
             LocalStorageHelper.store(itemKey, itemid);
         }
-    }, [restaurantdata, itemState, itemid, itemKey]);
+    }, [cartStorage, itemKey, itemid, restaurantdata]);
+
+    const getItemForCart = (item) => {
+        const itemObj = {
+            LineItemId: 0,
+            id: item.itemid,
+            itemid: item.itemid,
+            itemVariationId: 0,
+            itemName: item.name,
+            variationName: '',
+            imageUrl: item.detailimageurl,
+            sellingPrice: item.salesprice,
+            retailprice: item.retailprice,
+            costprice: item.costprice,
+            tax: item.tax,
+            taxAmount: item.taxamount,
+            quantity: 1,
+            discount: 0,
+            discountAmount: 0,
+            totalTax: item.taxamount,
+            total: item.salesprice,
+            isCustomItem: 0,
+            detailimageurl: item.detailimageurl,
+            originalTaxAmount: item.taxamount,
+            originalSellingPrice: item.salesprice,
+            isSplitItem: false,
+            equitySplitCount: 0,
+            description: item.description,
+            note: '',
+            categoryid: item.categoryid,
+            categoryname: item.categoryname,
+            hasvariations: item.hasvariations,
+            hasmodifier: item.hasmodifier,
+            modifiers: item.modifiers,
+            selectedModifiers: [],
+            variations: item.variations
+        }
+
+        return itemObj;
+    }
 
     const addAnotherItem = () => {
-        const itemDetail = JSON.parse(JSON.stringify(itemState));
-        itemDetail.selectedModifiers = [];
-        itemDetail.total = itemState.salesprice;
+        const itemDetail = getItemForCart(itemState);
         setOrderItemsState(orderItems => [...orderItems, itemDetail]);
     }
 
@@ -47,12 +98,13 @@ const ItemDetail = ({ restaurantdata }) => {
 
     const changeHandler = (e, itemIndex, id, parentId, type) => {
         if (id && type == 'variation') {
+            debugger
             const variation = itemState.variations.find(p => p.itemvariationid == id);
             if (variation) {
                 if (e.target.checked) {
                     orderItemsState[itemIndex].variationName = variation.name;
                     orderItemsState[itemIndex].variationId = variation.itemvariationid;
-                    orderItemsState[itemIndex].total = orderItemsState[itemIndex].salesprice + variation.salesprice;
+                    orderItemsState[itemIndex].total = orderItemsState[itemIndex].sellingPrice + variation.salesprice;
 
                     [...varificationEl.current.getElementsByTagName("input")].forEach(element => {
                         if (element.name != e.target.name) {
@@ -63,7 +115,7 @@ const ItemDetail = ({ restaurantdata }) => {
                 } else {
                     orderItemsState[itemIndex].variationName = '';
                     orderItemsState[itemIndex].variationId = 0;
-                    orderItemsState[itemIndex].total = orderItemsState[itemIndex].salesprice;
+                    orderItemsState[itemIndex].total = orderItemsState[itemIndex].sellingPrice;
                 }
 
                 setOrderItemsState(prev => prev = [...orderItemsState]);
@@ -91,7 +143,7 @@ const ItemDetail = ({ restaurantdata }) => {
                     orderItemsState[itemIndex].selectedModifiers.push(modifier);
                 }
 
-                orderItemsState[itemIndex].total = orderItemsState[itemIndex].salesprice + orderItemsState[itemIndex].selectedModifiers.reduce((acc, obj) => { return acc + obj.price; }, 0);
+                orderItemsState[itemIndex].total = orderItemsState[itemIndex].sellingPrice + orderItemsState[itemIndex].selectedModifiers.reduce((acc, obj) => { return acc + obj.price; }, 0);
                 setOrderItemsState(prev => prev = [...orderItemsState]);
 
                 // now unlock next panel
@@ -129,57 +181,19 @@ const ItemDetail = ({ restaurantdata }) => {
             }
         }
 
-        let cart = sessionStorage.getItem(cartKey);
-        if (cart) {
-            const items = [];
-            for (let i = 0; i < orderItemsState.length; i++) {
-                const itemObj = {
-                    id: orderItemsState[i].itemid,
-                    itemid: orderItemsState[i].itemid,
-                    itemVariationId: orderItemsState[i].variationId || 0,
-                    itemName: orderItemsState[i].name,
-                    variationName: orderItemsState[i].variationName || '',
-                    imageUrl: orderItemsState[i].detailimageurl,
-                    sellingPrice: orderItemsState[i].salesprice,
-                    retailprice: orderItemsState[i].retailprice,
-                    costprice: orderItemsState[i].costprice,
-                    tax: orderItemsState[i].tax,
-                    taxAmount: orderItemsState[i].taxamount,
-                    quantity: 1,
-                    discount: 0,
-                    discountAmount: 0,
-                    totalTax: orderItemsState[i].taxamount,
-                    total: orderItemsState[i].total,
-                    isCustomItem: 0,
-                    detailimageurl: orderItemsState[i].detailimageurl,
-                    originalTaxAmount: orderItemsState[i].taxamount,
-                    originalSellingPrice: orderItemsState[i].salesprice,
-                    isSplitItem: false,
-                    equitySplitCount: 0,
-                    description: orderItemsState[i].description,
-                    note: orderItemsState[i].instructions || '',
-                    categoryid: orderItemsState[i].categoryid,
-                    categoryname: orderItemsState[i].categoryname,
-                    hasvariations: orderItemsState[i].hasvariations,
-                    hasmodifier: orderItemsState[i].hasmodifier,
-                    modifiers: orderItemsState[i].modifiers,
-                    selectedModifiers: orderItemsState[i].selectedModifiers,
-                    variations: orderItemsState[i].variations
-                }
-                items.push(itemObj);
-            }
-
-            const saleDetails = [...JSON.parse(cart).saleDetails, ...items];
-            cart = { ...JSON.parse(cart), ...{ saleDetails } };
-            sessionStorage.setItem(cartKey, JSON.stringify(cart));
+        if (cartStorage) {
+            cartStorage.saleDetails = cartStorage.saleDetails.filter(p=> p.itemid != itemid);
+            const saleDetails = [...cartStorage.saleDetails, ...orderItemsState];
+            cartStorage = { ...cartStorage, ...{ saleDetails } };
+            LocalStorageHelper.store(cartKey, cartStorage);
         }
 
-        const orderItemsCount = JSON.parse(sessionStorage.getItem(cartKey)).saleDetails.length;
+        const orderItemsCount = LocalStorageHelper.load(cartKey).saleDetails.length;
         setCart(orderItemsCount);
         router.push(`/restaurant/${id}/menu`);
     }
 
-    if (!restaurantdata || !itemState || !orderItemsState) return <></>
+    if (!restaurantdata || !itemState || orderItemsState.length == 0 || !cartStorage) return <></>
     return <>
         <Header title={itemState.name}></Header>
         <div className="section mt-2 order-item">
@@ -213,8 +227,8 @@ const ItemDetail = ({ restaurantdata }) => {
                                 }
                             </div>
                             <div className="modification-item-name">
-                                <h4>{item.name}</h4>
-                                <h3>{item.salesprice.toFixed(2)}</h3>
+                                <h4>{item.itemName}</h4>
+                                <h3>{item.sellingPrice.toFixed(2)}</h3>
                             </div>
                             <div ref={varificationEl} className="modification input-list w-100">
                                 {
@@ -222,7 +236,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                         return <div key={variation.itemvariationid} className="single-modification">
                                             <div className="card-title mb-0">+{variation.salesprice.toFixed(2)}</div>
                                             <div className="form-check">
-                                                <input type="checkbox" className="form-check-input" name={`${variation.itemvariationid}-${itemIndex}`} onChange={(e) => changeHandler(e, itemIndex, variation.itemvariationid, -1, 'variation')} id={`id${variation.itemvariationid}${itemIndex}`} />
+                                                <input type="checkbox" className="form-check-input" checked={item.variationId == variation.itemvariationid} name={`${variation.itemvariationid}-${itemIndex}`} onChange={(e) => changeHandler(e, itemIndex, variation.itemvariationid, -1, 'variation')} id={`id${variation.itemvariationid}${itemIndex}`} />
                                                 <label className="form-check-label" htmlFor={`id${variation.itemvariationid}${itemIndex}`}>{item.name} {variation.name}</label>
                                             </div>
                                         </div>
@@ -235,12 +249,12 @@ const ItemDetail = ({ restaurantdata }) => {
                                         const quickModifier = restaurantdata.quickModifiers.find(p => p.modifierId == modifier.modifierId);
                                         if (quickModifier) {
                                             return <div key={index} data-optional={quickModifier.isOptional} className="accordion-item">
-                                                <h2 className="accordion-header" id={`modifier${modifier.itemModifierId}`}>
-                                                    <button id={`headerBtn${index}`} className={"accordion-button" + (index != 0 ? ' collapsed' : '')} disabled={index == 0 ? false : true} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${modifier.itemModifierId}`} aria-expanded={index == 0 ? 'true' : 'false'} aria-controls={`modifier${modifier.itemModifierId}`}>
+                                                <h2 className="accordion-header" id={`modifier${modifier.itemModifierId}-${itemIndex}`}>
+                                                    <button id={`headerBtn${index}`} className={"accordion-button" + (index != 0 ? ' collapsed' : '')} disabled={index == 0 || (item.selectedModifiers.findIndex(p=> p.modifierId == modifier.modifierId) >= 0) ? false : true} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${modifier.itemModifierId}-${itemIndex}`} aria-expanded={index == 0 ? 'true' : 'false'} aria-controls={`modifier${modifier.itemModifierId}-${itemIndex}`}>
                                                         {quickModifier.displayName}
                                                     </button>
                                                 </h2>
-                                                <div id={`collapse${modifier.itemModifierId}`} className={"accordion-collapse collapse" + (index == 0 ? ' show' : '')} aria-labelledby={`modifier${modifier.itemModifierId}`} data-bs-parent="#modifiers">
+                                                <div id={`collapse${modifier.itemModifierId}-${itemIndex}`} className={"accordion-collapse collapse" + (index == 0 ? ' show' : '')} aria-labelledby={`modifier${modifier.itemModifierId}-${itemIndex}`} data-bs-parent="#modifiers">
                                                     <div className="accordion-body modification optional input-list w-100">
                                                         {
                                                             (quickModifier.selectionAllowed === 1 ?
@@ -248,7 +262,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                                                     return <div key={modifierOption.modifierOptionId} className="single-modification">
                                                                         <div className="card-title mb-0">{modifierOption.price != 0 && `+${modifierOption.price.toFixed(2)}`}</div>
                                                                         <div className="form-check">
-                                                                            <input type="radio" className="form-check-input" onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
+                                                                            <input type="radio" className="form-check-input" checked={item.selectedModifiers.findIndex(p=> p.modifierOptionId == modifierOption.modifierOptionId) >= 0} onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
                                                                             <label className="radio form-check-label" htmlFor={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
                                                                         </div>
                                                                     </div>
@@ -257,7 +271,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                                                     return <div key={modifierOption.modifierOptionId} className="single-modification">
                                                                         <div className="card-title mb-0">{modifierOption.price != 0 && `+${modifierOption.price.toFixed(2)}`}</div>
                                                                         <div className="form-check">
-                                                                            <input type="checkbox" className="form-check-input" onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
+                                                                            <input type="checkbox" className="form-check-input" checked={item.selectedModifiers.findIndex(p=> p.modifierOptionId == modifierOption.modifierOptionId) >= 0} onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
                                                                             <label className="form-check-label" htmlFor={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
                                                                         </div>
                                                                     </div>
@@ -280,7 +294,7 @@ const ItemDetail = ({ restaurantdata }) => {
                             </div>
                             <div className="instruction mt-3">
                                 <textarea name={`instructions-${itemIndex}`} id={`instructions${itemIndex}`} rows="2"
-                                    placeholder="Add an instruction to this item" onChange={(e) => changeHandler(e, itemIndex)} className="w-100 p-1"></textarea>
+                                    placeholder="Add an instruction to this item" onChange={(e) => changeHandler(e, itemIndex)} className="w-100 p-1" value={item.instructions}></textarea>
                             </div>
                         </div>
                     </div>

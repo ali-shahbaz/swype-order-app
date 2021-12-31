@@ -29,7 +29,7 @@ const Restaurant = ({ restaurantdata }) => {
 
     const startWithOrderType = useCallback((orderType) => {
         orderType = parseInt(orderType);
-        let cart = sessionStorage.getItem(cartKay);
+        let cart = LocalStorageHelper.load(cartKay);
         let onlineOrderTypeName = 'Take Away';
         if (orderType == 2) {
             onlineOrderTypeName = 'Delivery';
@@ -39,8 +39,8 @@ const Restaurant = ({ restaurantdata }) => {
         }
 
         if (cart) {
-            cart = { ...JSON.parse(cart), ...{ onlineOrderType: orderType, onlineOrderTypeName } };
-            sessionStorage.setItem(cartKay, JSON.stringify(cart));
+            cart = { ...cart, ...{ onlineOrderType: orderType, onlineOrderTypeName } };
+            LocalStorageHelper.store(cartKay, cart);
         } else {
             const userNumber = userLoggedIn ? userLoggedIn.user.mobileNumber : '';
             const userFullName = userLoggedIn ? userLoggedIn.user.name : '';
@@ -70,7 +70,7 @@ const Restaurant = ({ restaurantdata }) => {
                 verifymobile: userNumber,
                 DeliveryAddress: {}
             }
-            sessionStorage.setItem(cartKay, JSON.stringify(orderObj));
+            LocalStorageHelper.store(cartKay, orderObj);
         }
     }, [cartKay, userLoggedIn]);
 
@@ -85,9 +85,9 @@ const Restaurant = ({ restaurantdata }) => {
     }, [id, restaurantdata]);
 
     useEffect(() => {
-        // if (selectedTabIndex == null) {
-        //     LocalStorageHelper.store(selectedMenuTabKey, 0);
-        // }
+        if (selectedTabIndex === undefined) {
+            LocalStorageHelper.store(selectedMenuTabKey, 0);
+        }
 
         if (selectedOrderType == null) {
             LocalStorageHelper.store(selectedOrderTypeKey, 1);

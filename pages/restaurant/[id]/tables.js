@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Header from '../../../components/head';
 import { KEY_CART } from '../../../constants';
+import { LocalStorageHelper } from '../../../helpers/local-storage-helper';
 
 const Tables = ({restaurantdata}) => {
     const router = useRouter();
@@ -9,18 +10,18 @@ const Tables = ({restaurantdata}) => {
     const cartKey = `${KEY_CART}-${id}`;
 
     const setCartTable = (tableId, tableName) => {
-        let cart = sessionStorage.getItem(cartKey);
+        let cart = LocalStorageHelper.load(cartKey);
         if (cart) {
-            cart = { ...JSON.parse(cart), ...{ tableId: tableId, tableName: tableName } };
-            sessionStorage.setItem(cartKey, JSON.stringify(cart));
+            cart = { ...cart, ...{ tableId: tableId, tableName: tableName } };
+            LocalStorageHelper.store(cartKey, cart);
         }
     }
 
     const removeTableFromCart = () => {
-        let cart = sessionStorage.getItem(cartKey);
+        let cart = LocalStorageHelper.load(cartKey);
         if (cart) {
-            cart = { ...JSON.parse(cart), ...{ tableId: 0, tableName: null } };
-            sessionStorage.setItem(cartKey, JSON.stringify(cart));
+            cart = { ...cart, ...{ tableId: 0, tableName: null } };
+            LocalStorageHelper.store(cartKey, cart);
         }
     }
 

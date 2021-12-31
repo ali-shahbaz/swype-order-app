@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import useSessionStorage from '../../../hooks/useSessionStorage';
 import { useRouter } from 'next/router';
 import { PlaceOrder } from '../../../services/restaurant-service';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -19,7 +18,7 @@ const Checkout = () => {
     const router = useRouter();
     const { id, status } = router.query;
     const cartKey = `${KEY_CART}-${id}`;
-    const cart = useSessionStorage(cartKey);
+    const cartStorage = useLocalStorage(cartKey);
     const loggedInUser = useLocalStorage(KEY_LOGGED_IN_USER);
     const ref = useRef(null);
     const [saleItems, setSaleItems] = useState([]);
@@ -29,7 +28,7 @@ const Checkout = () => {
 
     const payNow = (event) => {
         if (loggedInUser) {
-            const cart = JSON.parse(sessionStorage.getItem(cartKey));
+            const cart = LocalStorageHelper.load(cartKey);
             event.target.disabled = true;
             ref.current.continuousStart();
 
@@ -96,33 +95,32 @@ const Checkout = () => {
     }, [status]);
 
     useEffect(() => {
-        if (cart) {
+        if (cartStorage) {
             const newCart = [];
-            for (let i = 0; i < cart.saleDetails.length; i++) {
-                const items = cart.saleDetails.filter(p => p.itemid == cart.saleDetails[i].itemid);
-                if (newCart.findIndex(p => p.itemid == cart.saleDetails[i].itemid) < 0) {
+            for (let i = 0; i < cartStorage.saleDetails.length; i++) {
+                const items = cartStorage.saleDetails.filter(p => p.itemid == cartStorage.saleDetails[i].itemid);
+                if (newCart.findIndex(p => p.itemid == cartStorage.saleDetails[i].itemid) < 0) {
                     items[0].count = items.length;
                     newCart.push(items[0]);
                 }
             }
             setSaleItems(newCart);
-            setCartData(cart);
+            setCartData(cartStorage);
         }
-    }, [cart]);
+    }, [cartStorage]);
 
     const removeItem = (itemId) => {
         setSaleItems(items => items = items.filter(p => p.itemid != itemId));
 
-        let myCart = sessionStorage.getItem(cartKey);
-        if (myCart) {
+        if (cartStorage) {
             const saleDetails = cartData.saleDetails.filter(p => p.itemid != itemId);
-            myCart = { ...JSON.parse(myCart), ...{ saleDetails } };
-            sessionStorage.setItem(cartKey, JSON.stringify(myCart));
-            setCartData(myCart);
-            console.log(myCart.saleDetails.length);
-            setCartCount(myCart.saleDetails.length);
+            cartStorage = { ...cartStorage, ...{ saleDetails } };
+            LocalStorageHelper.store(cartKey, cartStorage);
+            setCartData(cartStorage);
+            setCartCount(cartStorage.saleDetails.length);
         }
     }
+
 
     return <div className="order-checkout">
         <LoadingBar color='#F07D00' ref={ref} />
@@ -131,11 +129,15 @@ const Checkout = () => {
             <div className="row checkout-item">
                 {saleItems.map((item, i) => {
                     return <div key={i} className="col-4 mt-2 cart-item">
-                        <div onClick={() => removeItem(item.itemid)} className="remove-cart-item"><CloseCircleOutline className="" /></div>
-                        <div className="count-cart-item">{item.count}</div>
+                        <div title="Remove from cart" onClick={() => removeItem(item.itemid)} className="remove-cart-item"><CloseCircleOutline className="" /></div>
+                        <div className="count-cart-item" title={`${item.count} item(s)`}>{item.count}</div>
                         <div className="card item-card card-border p-0">
-                            <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority={true} className="card-img-top" alt="image" />
-                            <h4>{item.itemName}</h4>
+                            <Link href={`/restaurant/${id}/item-detail/${item.itemid}`}>
+                                <a>
+                                    <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority={true} className="card-img-top" alt="image" />
+                                    <h4 className='mt-0'>{item.itemName}</h4>
+                                </a>
+                            </Link>
                         </div>
                     </div>
                 })}

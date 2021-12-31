@@ -1,5 +1,4 @@
 import { CloseCircle } from "react-ionicons";
-import useSessionStorage from "../../hooks/useSessionStorage";
 import { VerifyLogin } from "../../services/user-service";
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -11,9 +10,10 @@ import LoadingBar from 'react-top-loading-bar';
 import Header from "../../components/head";
 import { KEY_CART, KEY_LOGGED_IN_USER, KEY_RESTAURANT_DATA, KEY_USER_NUMBER } from "../../constants";
 import { LocalStorageHelper } from "../../helpers/local-storage-helper";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
 const LoginVerify = () => {
-    const userPhoneNumber = useSessionStorage(KEY_USER_NUMBER);
+    const userPhoneNumber = useLocalStorage(KEY_USER_NUMBER);
     const [number, setNumber] = useState(null);
     const router = useRouter();
     const ref = useRef(null);
@@ -34,16 +34,16 @@ const LoginVerify = () => {
                     const storageData = LocalStorageHelper.load(KEY_RESTAURANT_DATA);
                     const id = storageData.id;
                     const cartKey = `${KEY_CART}-${id}`;
-                    const cartStorage = sessionStorage.getItem(cartKey) ? JSON.parse(sessionStorage.getItem(cartKey)) : null;
+                    const cartStorage = LocalStorageHelper.load(cartKey) || null;
                     if (cartStorage) {
-                        sessionStorage.removeItem(KEY_USER_NUMBER);
+                        LocalStorageHelper.remove(KEY_USER_NUMBER);
                         cartStorage = {
                             ...cartStorage, ...{
                                 verifymobile: userPhoneNumber.MobileNumber,
                                 verifyfullname: data.payload.user.name
                             }
                         };
-                        sessionStorage.setItem(cartKey, JSON.stringify(cartStorage));
+                        LocalStorageHelper.store(cartKey, cartStorage);
 
                         if (cartStorage.saleDetails.length > 0) {
                             router.push(`/restaurant/${id}/checkout`);

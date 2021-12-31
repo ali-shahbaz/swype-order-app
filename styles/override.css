@@ -30,6 +30,7 @@
 
 .cart-item {
     position: relative;
+    cursor: pointer;
 }
 
 .cart-item .remove-cart-item {

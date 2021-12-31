@@ -3,12 +3,12 @@ import { MenuOutline, ChevronBackOutline, CartOutline } from 'react-ionicons'
 import Link from 'next/link';
 import { useRecoilValue } from 'recoil';
 import { cartState } from '../states/atoms';
-import useSessionStorage from '../hooks/useSessionStorage';
 import React, { useEffect, useRef, useState } from 'react';
 import { apiSettings } from '../configs/api-settings';
 import { GetRestaurantData } from '../services/restaurant-service';
 import { LocalStorageHelper } from '../helpers/local-storage-helper';
 import { KEY_CART, KEY_RESTAURANT_DATA, KEY_LAST_VISITED_ITEM } from '../constants';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 
 function Layout({ props = {}, children }) {
@@ -20,7 +20,7 @@ function Layout({ props = {}, children }) {
     let restData = useRef(null);
     const sidebarBtnRef = useRef(null);
     const cartKey = `${KEY_CART}-${id}`;
-    const cartStorage = useSessionStorage(cartKey);
+    const cartStorage = useLocalStorage(cartKey);
     const [sidebarclickedcount, setSidebarClickedCount] = useState(0);
 
     useEffect(() => {

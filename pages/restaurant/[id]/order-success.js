@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import Header from "../../../components/head";
 import { KEY_CART } from "../../../constants";
+import { LocalStorageHelper } from "../../../helpers/local-storage-helper";
 import { cartState } from "../../../states/atoms";
 
 const OrderSuccess = () => {
@@ -15,7 +16,7 @@ const OrderSuccess = () => {
 
     useEffect(() => {
         if (orderid && window) {
-            sessionStorage.removeItem(cartKey);
+            LocalStorageHelper.remove(cartKey);
             setCart(0);
         }
     })

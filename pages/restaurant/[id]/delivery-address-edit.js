@@ -1,29 +1,29 @@
 import useLocalStorage from "../../../hooks/useLocalStorage";
 import { useRouter } from "next/router";
 import Header from "../../../components/head";
-import useSessionStorage from "../../../hooks/useSessionStorage";
 import { useEffect, useState } from "react";
 import { KEY_CART } from "../../../constants";
+import { LocalStorageHelper } from "../../../helpers/local-storage-helper";
 
 const DeliveryAddressEdit = () => {
     const router = useRouter();
     const { id } = router.query;
     const cartKey = `${KEY_CART}-${id}`;
-    const cart = useSessionStorage(cartKey);
+    const cartStorage = useLocalStorage(cartKey);
     const [address, setAddress] = useState();
 
     useEffect(() => {
-        if (cart) {
-            setAddress(cart.DeliveryAddress);
+        if (cartStorage) {
+            setAddress(cartStorage.DeliveryAddress);
         }
-    }, [cart]);
+    }, [cartStorage]);
 
     const changeHandler = (event) => {
         setAddress(address => address = { ...address, ...{ [event.target.id]: event.target.value } });
     }
 
     const confirmAddress = () => {
-        sessionStorage.setItem(cartKey, JSON.stringify({ ...cart, ...{ DeliveryAddress: address } }));
+        LocalStorageHelper.store(cartKey, { ...cartStorage, ...{ DeliveryAddress: address } });
         router.push(`/restaurant/${id}/menu`);
     }
 

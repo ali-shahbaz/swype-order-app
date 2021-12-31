@@ -6,6 +6,9 @@ export const LocalStorageHelper = {
     store(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
     },
+    remove(key) {
+        localStorage.removeItem(key);
+    },
     modify(key, fn) {
         this.store(key, fn(this.load(key)));
     },

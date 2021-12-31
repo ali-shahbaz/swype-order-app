@@ -55,6 +55,7 @@ const Profile = () => {
     }
 
     const updateUserProfile = (event) => {
+        event.preventDefault();
         const params = {
             Email: userDetail.email,
             ImageUrl: userDetail.imageUrl,
@@ -78,8 +79,16 @@ const Profile = () => {
     }
 
     const changeHandler = (e) => {
+        // if (e.target.name == 'email') {
+        //     validateEmail(e.target.value);
+        // }
         const obj = { [e.target.name]: e.target.value };
         setUserDetail(prev => prev = { ...prev, ...obj });
+    }
+
+    const validateEmail = (email) => {
+        const regexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return regexp.test(email);
     }
 
     if (!userDetail) return <></>
@@ -131,7 +140,7 @@ const Profile = () => {
                 </div>
             </div>
             <div className="mt-4">
-                <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => updateUserProfile(e)}>Save</button>
+                <button type='submit' className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => updateUserProfile(e)}>Save</button>
             </div>
         </div>
     </>
