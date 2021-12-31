@@ -21,6 +21,9 @@ const Menu = ({ restaurantdata }) => {
 
     useEffect(() => {
         if (restaurantdata) {
+            if (selectedTabIndex === null) {
+                LocalStorageHelper.store(selectedIndexKey, 0);
+            }
             if (tabRef && tabRef.current) {
                 tabRef.current.click();
             }
