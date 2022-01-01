@@ -33,7 +33,7 @@ const Checkout = () => {
             ref.current.continuousStart();
 
             const taxAmount = cart.saleDetails.reduce((a, b) => {
-                return a + b.taxAmount + (b.variationName ? b.variations.find(p => p.name == b.variationName).taxAmount : 0)
+                return a + b.taxAmount + (b.variationName ? b.variations.find(p => p.name == b.variationName).taxamount : 0)
             }, 0).toFixed(2);
 
             const netTotal = cart.saleDetails.reduce((a, b) => {

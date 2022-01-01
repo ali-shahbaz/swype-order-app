@@ -243,7 +243,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                     })
                                 }
                             </div>
-                            {item.modifiers.length > 0 && <div className="accordion" id="modifiers">
+                            {item.modifiers.length > 0 && <div className="accordion" id={`modifiers${itemIndex}`}>
                                 {
                                     item.modifiers.map((modifier, index) => {
                                         const quickModifier = restaurantdata.quickModifiers.find(p => p.modifierId == modifier.modifierId);
@@ -254,7 +254,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                                         {quickModifier.displayName}
                                                     </button>
                                                 </h2>
-                                                <div id={`collapse${modifier.itemModifierId}-${itemIndex}`} className={"accordion-collapse collapse" + (index == 0 ? ' show' : '')} aria-labelledby={`modifier${modifier.itemModifierId}-${itemIndex}`} data-bs-parent="#modifiers">
+                                                <div id={`collapse${modifier.itemModifierId}-${itemIndex}`} className={"accordion-collapse collapse" + (index == 0 ? ' show' : '')} aria-labelledby={`modifier${modifier.itemModifierId}-${itemIndex}`} data-bs-parent={`#modifiers${itemIndex}`}>
                                                     <div className="accordion-body modification optional input-list w-100">
                                                         {
                                                             (quickModifier.selectionAllowed === 1 ?
