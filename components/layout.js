@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { MenuOutline, ChevronBackOutline, CartOutline } from 'react-ionicons'
+import { MenuOutline, ChevronBackOutline, CartOutline, HomeOutline } from 'react-ionicons'
 import Link from 'next/link';
 import { useRecoilValue } from 'recoil';
 import { cartState } from '../states/atoms';
@@ -137,7 +137,8 @@ function Layout({ props = {}, children }) {
                         <ChevronBackOutline className="switchSVGColor" />
                     </div> : <a href="#" id='hamburgerMenu' onClick={SidebarClickedEvent} className="headerButton" data-bs-toggle="modal" data-bs-target="#sidebarPanel">
                         <MenuOutline className="md hydrated switchSVGColor" />
-                    </a>}
+                    </a>
+                    }
                 </div>
 
                 <div className="pageTitle">{props.title}</div>

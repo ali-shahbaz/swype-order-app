@@ -35,14 +35,14 @@ const OrderDetail = () => {
             <div className="row checkout-item">
                 {orderDetail && orderDetail.order.details.map((item, i) => {
                     return <div key={i} className="col-4 mt-2">
-                        <Link href={`/restaurant/${orderDetail.companyId}/item-detail/${item.itemId}`}>
-                            <a>
-                                <div className="card item-card card-border p-0">
-                                    <Image src={item.imageUrl ? item.imageUrl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority={true} className="card-img-top" alt="image" />
-                                    <h4>{item.itemName}</h4>
-                                </div>
-                            </a>
-                        </Link>
+                        {/* <Link href={`/restaurant/${orderDetail.companyId}/item-detail/${item.itemId}`}>
+                            <a> */}
+                        <div className="card item-card card-border p-0">
+                            <Image src={item.imageUrl ? item.imageUrl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority={true} className="card-img-top" alt="image" />
+                            <h4>{item.itemName}</h4>
+                        </div>
+                        {/* </a>
+                        </Link> */}
                     </div>
                 })}
             </div>

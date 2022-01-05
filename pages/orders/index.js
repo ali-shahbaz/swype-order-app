@@ -28,21 +28,23 @@ const Orders = () => {
                 {
                     receipts.map(item => {
                         return <li key={item.orderId} className="items-card card card-border">
-                            <Link href={`/restaurant/${item.companyId}/order-detail/${item.orderId}`}>
-                                <a className="item">
-                                    <Image src={item.companyLogoUrl ? item.companyLogoUrl : "/images/under-logo.png"} width={36} height={36} alt="image" className="image" />
-                                    <div className="in">
-                                        <div>
-                                            <h4>{item.companyName}</h4>
-                                            <p>{item.itemsCount} items - {item.dateLabel}</p>
-                                        </div>
-                                        <div>
-                                            <h4>{item.amount}</h4>
-                                            <p>{item.paymentType}</p>
-                                        </div>
+                            {/* <Link href={`/restaurant/${item.companyId}/order-detail/${item.orderId}`}>
+                                <a className="item"> */}
+                            <div className='item'>
+                                <Image src={item.companyLogoUrl ? item.companyLogoUrl : "/images/under-logo.png"} width={36} height={36} alt="image" className="image" />
+                                <div className="in">
+                                    <div>
+                                        <h4>{item.companyName}</h4>
+                                        <p>{item.itemsCount} items - {item.dateLabel}</p>
                                     </div>
-                                </a>
-                            </Link>
+                                    <div>
+                                        <h4>{item.amount}</h4>
+                                        <p>{item.paymentType}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* </a>
+                            </Link> */}
                         </li>
                     })
                 }

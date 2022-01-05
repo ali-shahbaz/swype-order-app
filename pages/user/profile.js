@@ -56,6 +56,11 @@ const Profile = () => {
 
     const updateUserProfile = (event) => {
         event.preventDefault();
+        if (userDetail.email && !validateEmail(userDetail.email)) {
+            document.getElementById('email').focus();
+            toast.error('Invalid email');
+            return;
+        }
         const params = {
             Email: userDetail.email,
             ImageUrl: userDetail.imageUrl,
@@ -79,9 +84,6 @@ const Profile = () => {
     }
 
     const changeHandler = (e) => {
-        // if (e.target.name == 'email') {
-        //     validateEmail(e.target.value);
-        // }
         const obj = { [e.target.name]: e.target.value };
         setUserDetail(prev => prev = { ...prev, ...obj });
     }
@@ -96,19 +98,19 @@ const Profile = () => {
         <Header title="My Profile"></Header>
         <LoadingBar color='#F07D00' ref={ref} />
         <div className="section mt-2">
-            <div className="row m-0">
-                <div className="col-6 ps-0">
-                    <div className="card img-card card-border">
-                        <label className="uploader">
-                            <input accept=".jpg,.jpeg,.png,.jfif" type="file" onChange={(e) => fileSelect(e)} />
-                            <Image src={userDetail.imageUrl ? userDetail.imageUrl : '/images/placeholder.jpg'} height={250} width={250} objectFit="cover" alt="image" />
-                        </label>
+            <form>
+                <div className="row m-0">
+                    <div className="col-6 ps-0">
+                        <div className="card img-card card-border">
+                            <label className="uploader">
+                                <input accept=".jpg,.jpeg,.png,.jfif" type="file" onChange={(e) => fileSelect(e)} />
+                                <Image src={userDetail.imageUrl ? userDetail.imageUrl : '/images/placeholder.jpg'} height={250} width={250} objectFit="cover" alt="image" />
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className="card card-border mt-2">
-                <div className="card-body">
-                    <form>
+                <div className="card card-border mt-2">
+                    <div className="card-body">
                         <div className="form-group basic">
                             <div className="input-wrapper">
                                 <label className="label" htmlFor="name">Name</label>
@@ -135,13 +137,12 @@ const Profile = () => {
                                 <input value={userDetail.MobileNumber} readOnly={true} type="tel" id="phone" name="phone" autoComplete="off" required />
                             </div>
                         </div>
-                    </form>
-
+                    </div>
                 </div>
-            </div>
-            <div className="mt-4">
-                <button type='submit' className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => updateUserProfile(e)}>Save</button>
-            </div>
+                <div className="mt-4">
+                    <button type='submit' className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => updateUserProfile(e)}>Save</button>
+                </div>
+            </form>
         </div>
     </>
 }
