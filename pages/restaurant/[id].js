@@ -163,8 +163,8 @@ const Restaurant = ({ restaurantdata }) => {
             </div>
         </div>
 
-        <div className="wide-block border-0">
-            <div className="options content-center">
+        <div className="section d-flex justify-content-center">
+            <div className="options mt-3">
                 <div className="btn-group" role="group">
                     <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="1" name="btnRadioOrderType" id="TakeAway" checked={orderType == 1} />
                     <label className="btn btn-outline-primary" htmlFor="TakeAway">Take Away</label>

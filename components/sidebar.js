@@ -118,7 +118,7 @@ function Sidebar({ props, restaurantdata, sidebarclickedcount }) {
                                 {
                                     userData && userData.user && userData.user.name ? <>
                                         <div className="image-wrapper">
-                                            <Image src={userData.user.imageUrl ? userData.user.imageUrl : '/images/profile/profile.png'} width={36} height={36} objectFit='cover' alt="image" className="imaged w36" />
+                                            <Image src={userData.user.imageUrl ? userData.user.imageUrl : '/images/profile/profile.png'} width={56} height={56} objectFit='cover' alt="image" className="imaged" />
                                         </div>
                                         <div className="in">
                                             <strong>{userData.user.name}</strong>
@@ -176,9 +176,9 @@ function Sidebar({ props, restaurantdata, sidebarclickedcount }) {
                                 </div>
                             </div>
                                 :
-                                <div className="sidebar-balance">
-                                    <div className="in mt-2 mb-2">
-                                        <h2 className="amount">Start from here</h2>
+                                <div className="bg-primary">
+                                    <div className="sidebar-balance py-4">
+                                        <strong>Start Your Order Here</strong>
                                     </div>
                                 </div>
                         }

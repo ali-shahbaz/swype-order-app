@@ -2,13 +2,14 @@ import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Header from '../../../../components/head';
-import { AddCircle, CloseCircleOutline } from "react-ionicons";
+import { AddCircle, CloseCircleOutline, RemoveCircle } from "react-ionicons";
 import { useRecoilState } from 'recoil';
 import { cartState } from '../../../../states/atoms';
 import { toast } from 'react-toastify';
 import { LocalStorageHelper } from '../../../../helpers/local-storage-helper';
 import { KEY_CART, KEY_LAST_VISITED_ITEM } from '../../../../constants';
 import useLocalStorage from '../../../../hooks/useLocalStorage';
+import { getItemForCart } from '../../../../helpers/cart-helper';
 
 const ItemDetail = ({ restaurantdata }) => {
     const [itemState, setItemState] = useState(null); // state to set detail of order item
@@ -47,53 +48,16 @@ const ItemDetail = ({ restaurantdata }) => {
         }
     }, [cartStorage, itemKey, itemid, restaurantdata]);
 
-    const getItemForCart = (item) => {
-        const itemObj = {
-            LineItemId: 0,
-            id: item.itemid,
-            itemid: item.itemid,
-            itemVariationId: 0,
-            itemName: item.name,
-            variationName: '',
-            imageUrl: item.detailimageurl,
-            sellingPrice: item.salesprice,
-            retailprice: item.retailprice,
-            costprice: item.costprice,
-            tax: item.tax,
-            taxAmount: item.taxamount,
-            quantity: 1,
-            discount: 0,
-            discountAmount: 0,
-            totalTax: item.taxamount,
-            total: item.salesprice,
-            isCustomItem: 0,
-            detailimageurl: item.detailimageurl,
-            originalTaxAmount: item.taxamount,
-            originalSellingPrice: item.salesprice,
-            isSplitItem: false,
-            equitySplitCount: 0,
-            description: item.description,
-            note: '',
-            categoryid: item.categoryid,
-            categoryname: item.categoryname,
-            hasvariations: item.hasvariations,
-            hasmodifier: item.hasmodifier,
-            modifiers: item.modifiers,
-            selectedModifiers: [],
-            variations: item.variations
-        }
-
-        return itemObj;
-    }
-
     const addAnotherItem = () => {
         const itemDetail = getItemForCart(itemState);
         setOrderItemsState(orderItems => [...orderItems, itemDetail]);
     }
 
     const removeAnotherItem = (index) => {
-        const items = orderItemsState.filter((item, i) => i != index);
-        setOrderItemsState(items);
+        if (index > 0) {
+            const items = orderItemsState.filter((item, i) => i != index);
+            setOrderItemsState(items);
+        }
     }
 
     const changeHandler = (e, itemIndex, id, parentId, type) => {
@@ -182,7 +146,7 @@ const ItemDetail = ({ restaurantdata }) => {
         }
 
         if (cartStorage) {
-            cartStorage.saleDetails = cartStorage.saleDetails.filter(p=> p.itemid != itemid);
+            cartStorage.saleDetails = cartStorage.saleDetails.filter(p => p.itemid != itemid);
             const saleDetails = [...cartStorage.saleDetails, ...orderItemsState];
             cartStorage = { ...cartStorage, ...{ saleDetails } };
             LocalStorageHelper.store(cartKey, cartStorage);
@@ -196,8 +160,30 @@ const ItemDetail = ({ restaurantdata }) => {
     if (!restaurantdata || !itemState || orderItemsState.length == 0 || !cartStorage) return <></>
     return <>
         <Header title={itemState.name}></Header>
-        <div className="section mt-2 order-item">
-            <div className="row item-hero">
+        <div className="order-item-img">
+            <Image src={itemState.detailimageurl ? itemState.detailimageurl : '/images/food/wide1.jpg'} width={600} height={400} layout="responsive" objectFit="fill" priority className="card-img-top" alt="image" />
+        </div>
+        <div className="card-text px-3 mt-2">
+            <h3 className="section-titl">{itemState.name}</h3>
+            <p>
+                <small>{itemState.description}</small>
+            </p>
+            <div className="item-price-qnt">
+                <h5>{itemState.salesprice.toFixed(2)}</h5>
+                <div className="qnt-incre-decre qnt-mt-3">
+                    <div className="qnt-incre-decre-bg"></div>
+                    <div></div>
+                    <div onClick={() => removeAnotherItem(orderItemsState.length - 1)} id="qntDecrease">
+                        <RemoveCircle cssClasses="ion-icon" />
+                    </div>
+                    <input type="text" value={orderItemsState.length} />
+                    <div onClick={() => addAnotherItem()} id="qntIncrease">
+                        <AddCircle cssClasses="ion-icon" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        {/* <div className="row item-hero">
                 <div className="col-6 item-card-lg">
                     <div className="card card-border">
                         <Image src={itemState.detailimageurl ? itemState.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority className="card-img" alt="image" />
@@ -216,7 +202,8 @@ const ItemDetail = ({ restaurantdata }) => {
                         <h5 className="card-text">{itemState.description}</h5>
                     </div>
                 </div>
-            </div>
+            </div> */}
+        <div className="section mt-2">
             <div id="addItemContainer">
                 {orderItemsState.map((item, itemIndex) => {
                     return <div key={itemIndex.toString()} className="card card-border mt-2">
@@ -250,7 +237,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                         if (quickModifier) {
                                             return <div key={index} data-optional={quickModifier.isOptional} className="accordion-item">
                                                 <h2 className="accordion-header" id={`modifier${modifier.itemModifierId}-${itemIndex}`}>
-                                                    <button id={`headerBtn${index}`} className={"accordion-button" + (index != 0 ? ' collapsed' : '')} disabled={index == 0 || (item.selectedModifiers.findIndex(p=> p.modifierId == modifier.modifierId) >= 0) ? false : true} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${modifier.itemModifierId}-${itemIndex}`} aria-expanded={index == 0 ? 'true' : 'false'} aria-controls={`modifier${modifier.itemModifierId}-${itemIndex}`}>
+                                                    <button id={`headerBtn${index}`} className={"accordion-button" + (index != 0 ? ' collapsed' : '')} disabled={index == 0 || (item.selectedModifiers.findIndex(p => p.modifierId == modifier.modifierId) >= 0) ? false : true} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${modifier.itemModifierId}-${itemIndex}`} aria-expanded={index == 0 ? 'true' : 'false'} aria-controls={`modifier${modifier.itemModifierId}-${itemIndex}`}>
                                                         {quickModifier.displayName}
                                                     </button>
                                                 </h2>
@@ -262,7 +249,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                                                     return <div key={modifierOption.modifierOptionId} className="single-modification">
                                                                         <div className="card-title mb-0">{modifierOption.price != 0 && `+${modifierOption.price.toFixed(2)}`}</div>
                                                                         <div className="form-check">
-                                                                            <input type="radio" className="form-check-input" checked={item.selectedModifiers.findIndex(p=> p.modifierOptionId == modifierOption.modifierOptionId) >= 0} onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
+                                                                            <input type="radio" className="form-check-input" checked={item.selectedModifiers.findIndex(p => p.modifierOptionId == modifierOption.modifierOptionId) >= 0} onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
                                                                             <label className="radio form-check-label" htmlFor={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
                                                                         </div>
                                                                     </div>
@@ -271,7 +258,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                                                     return <div key={modifierOption.modifierOptionId} className="single-modification">
                                                                         <div className="card-title mb-0">{modifierOption.price != 0 && `+${modifierOption.price.toFixed(2)}`}</div>
                                                                         <div className="form-check">
-                                                                            <input type="checkbox" className="form-check-input" checked={item.selectedModifiers.findIndex(p=> p.modifierOptionId == modifierOption.modifierOptionId) >= 0} onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
+                                                                            <input type="checkbox" className="form-check-input" checked={item.selectedModifiers.findIndex(p => p.modifierOptionId == modifierOption.modifierOptionId) >= 0} onChange={(e) => changeHandler(e, itemIndex, modifierOption.modifierOptionId, quickModifier.modifierId, 'modifier')} name={`${itemIndex}modifier-${quickModifier.modifierId}`} id={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`} />
                                                                             <label className="form-check-label" htmlFor={`${itemIndex}modifierid-${modifierOption.modifierOptionId}`}>{modifierOption.name}</label>
                                                                         </div>
                                                                     </div>
@@ -302,7 +289,7 @@ const ItemDetail = ({ restaurantdata }) => {
             </div>
         </div>
 
-        <div className="section mt-2">
+        {/* <div className="section mt-2">
             <div id="addOrderItem">
                 <button onClick={() => addAnotherItem()} className="btn add-tag-anchor btn-primary mt-2">
                     <span>
@@ -311,7 +298,7 @@ const ItemDetail = ({ restaurantdata }) => {
                     Add Another
                 </button>
             </div>
-        </div>
+        </div> */}
 
         <div className="section mt-4">
             <button className="btn btn-primary btn-shadow btn-lg btn-block" onClick={() => addToOrder()}>Add to Order</button>

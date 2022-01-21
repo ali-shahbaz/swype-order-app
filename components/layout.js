@@ -130,7 +130,7 @@ function Layout({ props = {}, children }) {
                     </a>
                 </div>
             </div></>) :
-            (<div className="appHeader">
+            (<div className={props.name == 'ItemDetail' ? 'appHeader transparent no-border order-item-header' : 'appHeader'}>
 
                 <div className="left">
                     {props.showBack ? <div onClick={(e) => goBack(e)} className="headerButton">
@@ -141,20 +141,20 @@ function Layout({ props = {}, children }) {
                     }
                 </div>
 
-                <div className="pageTitle">{props.title}</div>
+                {props.name != 'ItemDetail' && <div className="pageTitle">{props.title}</div>}
                 {
                     props.showCart && <div className="right">
                         <Link href={`/restaurant/${id}/checkout`}>
                             <a className="headerButton">
                                 <CartOutline className="switchSVGColor" />
-                                <div className="badge badge-danger">{cartCount != 0 ? cartCount : cartStorage && cartStorage.saleDetails.length}</div>
+                                <div className="badge badge-danger">{cartCount != 0 ? cartCount : cartStorage && cartStorage.saleDetails.reduce((prev, next) => { return prev + next.quantity }, 0)}</div>
                             </a>
                         </Link>
                     </div>
                 }
             </div>)
         }
-        <div id="appCapsule" className={props.name == 'Restaurant' ? 'pt-0' : ''}>
+        <div id="appCapsule" className={props.name == 'Restaurant' ? 'pt-0' : props.name == 'ItemDetail' ? 'order-item pt-0' : ''}>
             <script async
                 src={`https://maps.googleapis.com/maps/api/js?key=${apiSettings.mapApiKey}&libraries=places`}>
             </script>

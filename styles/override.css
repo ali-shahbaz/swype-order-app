@@ -119,3 +119,9 @@ padding-left: 0;
     margin-left: 10px;
     margin-bottom: 15px;
 }
+
+.hide-incre-decre, .show-incre-decre{
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
