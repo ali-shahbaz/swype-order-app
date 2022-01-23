@@ -13,6 +13,7 @@ import { useRecoilState } from 'recoil';
 import { cartState } from '../../../states/atoms';
 import { LocalStorageHelper } from '../../../helpers/local-storage-helper';
 import { KEY_CART, KEY_LOCATION, KEY_LOGGED_IN_USER } from '../../../constants';
+import Confirm from '../../../components/confirm';
 
 const Checkout = () => {
     const router = useRouter();
@@ -33,16 +34,16 @@ const Checkout = () => {
             ref.current.continuousStart();
 
             const taxAmount = cart.saleDetails.reduce((a, b) => {
-                return a + b.taxAmount + (b.variationName ? b.variations.find(p => p.name == b.variationName).taxamount : 0)
+                return a + (b.taxAmount * b.quantity) + (b.variationName ? b.variations.find(p => p.name == b.variationName).taxamount : 0)
             }, 0).toFixed(2);
 
             const netTotal = cart.saleDetails.reduce((a, b) => {
-                return a + b.retailprice + (b.variationName ? b.variations.find(p => p.name == b.variationName).retailprice : 0)
+                return a + (b.retailprice * b.quantity) + (b.variationName ? b.variations.find(p => p.name == b.variationName).retailprice : 0)
                     + (b.selectedModifiers.length > 0 ? b.selectedModifiers.reduce((x, y) => { return x + y.price }, 0) : 0)
             }, 0).toFixed(2);
 
             const grandTotal = cart.saleDetails.reduce((a, b) => {
-                return a + b.total
+                return a + (b.total * b.quantity)
             }, 0).toFixed(2);
 
             const newCart = { ...cart, ...{ netTotal, taxAmount, grandTotal, amount: grandTotal } }
@@ -98,6 +99,7 @@ const Checkout = () => {
         if (cartStorage) {
             const newCart = [];
             cartStorage.saleDetails.map((val, i) => {
+                val = JSON.parse(JSON.stringify(val));
                 const index = newCart && newCart.findIndex(p => p.itemid == val.itemid);
                 if (index >= 0) {
                     newCart[index].quantity += 1;
@@ -107,48 +109,76 @@ const Checkout = () => {
                     newCart.push(val);
                 }
             });
-            // for (let i = 0; i < cartStorage.saleDetails.length; i++) {
-            //     const items = cartStorage.saleDetails.filter(p => p.itemid == cartStorage.saleDetails[i].itemid);
-            //     if (newCart.findIndex(p => p.itemid == cartStorage.saleDetails[i].itemid) < 0) {
-            //         items[0].count = items.length;
-            //         newCart.push(items[0]);
-            //     }
-            // }
+
             setSaleItems(newCart);
             setCartData(cartStorage);
         }
     }, [cartStorage]);
 
     const removeItem = (itemId) => {
-        setSaleItems(items => items = items.filter(p => p.itemid != itemId));
+        if (confirm('Do you wish to delete item?')) {
+            setSaleItems(items => items = items.filter(p => p.itemid != itemId));
 
-        if (cartStorage) {
-            const saleDetails = cartData.saleDetails.filter(p => p.itemid != itemId);
-            cartStorage = { ...cartStorage, ...{ saleDetails } };
-            LocalStorageHelper.store(cartKey, cartStorage);
-            setCartData(cartStorage);
-            setCartCount(cartStorage.saleDetails.reduce((prev, curr) => { return prev + curr.quantity }, 0));
+            if (cartStorage) {
+                const saleDetails = cartData.saleDetails.filter(p => p.itemid != itemId);
+                cartStorage = { ...cartStorage, ...{ saleDetails } };
+                LocalStorageHelper.store(cartKey, cartStorage);
+                setCartData(cartStorage);
+                setTimeout(() => {
+                    setCartCount(cartStorage.saleDetails.reduce((prev, curr) => { return prev + curr.quantity }, 0));    
+                }, 0);
+                
+            }
         }
     }
 
     const addItemQty = (itemId) => {
+        setQuantity(itemId, 'add');
+    }
+
+    const setQuantity = (itemId, addOrRemove) => {
         const item = cartData.saleDetails.find(p => p.itemid == itemId);
         if (item.variations.length == 0 && item.modifiers.length == 0) {
-            item.quantity += 1;
+            if (addOrRemove == 'add') {
+                item.quantity += 1;
+            } else {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                } else {
+                    return removeItem(itemId);
+                }
+
+            }
+
 
             // update cart storage and cart count
             cartStorage = { ...cartStorage, ...{ saleDetails: cartData.saleDetails } };
             LocalStorageHelper.store(cartKey, cartStorage);
+
+            const newCart = [];
+            cartStorage.saleDetails.map((val, i) => {
+                val = JSON.parse(JSON.stringify(val));
+                const index = newCart && newCart.findIndex(p => p.itemid == val.itemid);
+                if (index >= 0) {
+                    newCart[index].quantity += 1;
+                    newCart[index].total += val.total;
+                } else {
+                    val.total = val.total * val.quantity;
+                    newCart.push(val);
+                }
+            });
+
+            setSaleItems(newCart);
             setCartData(cartStorage);
             setCartCount(cartStorage.saleDetails.reduce((prev, curr) => { return prev + curr.quantity }, 0));
 
-            // now update page items
-            // const saleItem = saleItems.find(p => p.itemid == itemId);
-            // saleItem.quantity += 1;
-            // saleItem.total += item.total;
-
-            // setSaleItems(items => items = saleItems);
+        } else {
+            router.push(`/restaurant/${id}/item-detail/${itemId}`)
         }
+    }
+
+    const removeItemQty = (itemId) => {
+        setQuantity(itemId, 'remove');
     }
 
 
@@ -172,7 +202,7 @@ const Checkout = () => {
                                         <div className="hide-incre-decre" onClick={() => removeItemQty(item.itemid)}>
                                             <RemoveCircle cssClasses="ion-icon" />
                                         </div>
-                                        <input type="text" value={item.quantity} />
+                                        <input type="text" value={item.quantity} onChange={() => { }} />
                                         <div className="show-incre-decre" onClick={() => addItemQty(item.itemid)}>
                                             <AddCircle cssClasses="ion-icon" />
                                         </div>
