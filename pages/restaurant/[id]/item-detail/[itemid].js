@@ -152,7 +152,7 @@ const ItemDetail = ({ restaurantdata }) => {
             LocalStorageHelper.store(cartKey, cartStorage);
         }
 
-        const orderItemsCount = LocalStorageHelper.load(cartKey).saleDetails.length;
+        const orderItemsCount = LocalStorageHelper.load(cartKey).saleDetails.reduce((prev, next) => { return prev + next.quantity }, 0)
         setCart(orderItemsCount);
         router.push(`/restaurant/${id}/menu`);
     }
@@ -169,15 +169,15 @@ const ItemDetail = ({ restaurantdata }) => {
                 <small>{itemState.description}</small>
             </p>
             <div className="item-price-qnt">
-                <h5>{itemState.salesprice.toFixed(2)}</h5>
+                <h5>{orderItemsState.reduce((prev, curr) => { return prev + curr.total }, 0).toFixed(2)}</h5>
                 <div className="qnt-incre-decre qnt-mt-3">
                     <div className="qnt-incre-decre-bg"></div>
                     <div></div>
-                    <div onClick={() => removeAnotherItem(orderItemsState.length - 1)} id="qntDecrease">
+                    <div onClick={() => removeAnotherItem(orderItemsState.length - 1)} className="hide-incre-decre">
                         <RemoveCircle cssClasses="ion-icon" />
                     </div>
-                    <input type="text" value={orderItemsState.length} />
-                    <div onClick={() => addAnotherItem()} id="qntIncrease">
+                    <input type="text" value={orderItemsState.length} onChange={() => { }} />
+                    <div onClick={() => addAnotherItem()} className="show-incre-decre">
                         <AddCircle cssClasses="ion-icon" />
                     </div>
                 </div>

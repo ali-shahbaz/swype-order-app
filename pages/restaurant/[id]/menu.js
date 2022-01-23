@@ -38,7 +38,6 @@ const Menu = ({ restaurantdata }) => {
         if (window) {
             window.onscroll = (ev) => {
                 const windscroll = window.scrollY;
-                console.log('window ' + windscroll);
                 if (windscroll >= 100) {
                     document.querySelectorAll('.sell-single-list').forEach((val, key) => {
                         if (val.offsetTop <= windscroll + 10) {
@@ -141,9 +140,9 @@ const Menu = ({ restaurantdata }) => {
 
     const getQuantity = (itemId) => {
         if (cartStorage) {
-            const saleDetailItem = cartStorage.saleDetails.find(p => p.itemid == itemId);
-            if (saleDetailItem) {
-                return saleDetailItem.quantity
+            const saleDetailItems = cartStorage.saleDetails.filter(p => p.itemid == itemId);
+            if (saleDetailItems.length > 0) {
+                return saleDetailItems.reduce((prev, curr) => { return prev + curr.quantity }, 0);
             } else {
                 return 0;
             }

@@ -7,7 +7,7 @@ import LoadingBar from 'react-top-loading-bar';
 import { toast } from 'react-toastify';
 import Header from '../../../components/head';
 import { loadStripe } from '@stripe/stripe-js';
-import { CloseCircleOutline } from 'react-ionicons';
+import { CloseCircleOutline, CloseOutline, RemoveCircle, AddCircle } from 'react-ionicons';
 import useLocalStorage from '../../../hooks/useLocalStorage';
 import { useRecoilState } from 'recoil';
 import { cartState } from '../../../states/atoms';
@@ -97,13 +97,23 @@ const Checkout = () => {
     useEffect(() => {
         if (cartStorage) {
             const newCart = [];
-            for (let i = 0; i < cartStorage.saleDetails.length; i++) {
-                const items = cartStorage.saleDetails.filter(p => p.itemid == cartStorage.saleDetails[i].itemid);
-                if (newCart.findIndex(p => p.itemid == cartStorage.saleDetails[i].itemid) < 0) {
-                    items[0].count = items.length;
-                    newCart.push(items[0]);
+            cartStorage.saleDetails.map((val, i) => {
+                const index = newCart && newCart.findIndex(p => p.itemid == val.itemid);
+                if (index >= 0) {
+                    newCart[index].quantity += 1;
+                    newCart[index].total += val.total;
+                } else {
+                    val.total = val.total * val.quantity;
+                    newCart.push(val);
                 }
-            }
+            });
+            // for (let i = 0; i < cartStorage.saleDetails.length; i++) {
+            //     const items = cartStorage.saleDetails.filter(p => p.itemid == cartStorage.saleDetails[i].itemid);
+            //     if (newCart.findIndex(p => p.itemid == cartStorage.saleDetails[i].itemid) < 0) {
+            //         items[0].count = items.length;
+            //         newCart.push(items[0]);
+            //     }
+            // }
             setSaleItems(newCart);
             setCartData(cartStorage);
         }
@@ -117,7 +127,27 @@ const Checkout = () => {
             cartStorage = { ...cartStorage, ...{ saleDetails } };
             LocalStorageHelper.store(cartKey, cartStorage);
             setCartData(cartStorage);
-            setCartCount(cartStorage.saleDetails.length);
+            setCartCount(cartStorage.saleDetails.reduce((prev, curr) => { return prev + curr.quantity }, 0));
+        }
+    }
+
+    const addItemQty = (itemId) => {
+        const item = cartData.saleDetails.find(p => p.itemid == itemId);
+        if (item.variations.length == 0 && item.modifiers.length == 0) {
+            item.quantity += 1;
+
+            // update cart storage and cart count
+            cartStorage = { ...cartStorage, ...{ saleDetails: cartData.saleDetails } };
+            LocalStorageHelper.store(cartKey, cartStorage);
+            setCartData(cartStorage);
+            setCartCount(cartStorage.saleDetails.reduce((prev, curr) => { return prev + curr.quantity }, 0));
+
+            // now update page items
+            // const saleItem = saleItems.find(p => p.itemid == itemId);
+            // saleItem.quantity += 1;
+            // saleItem.total += item.total;
+
+            // setSaleItems(items => items = saleItems);
         }
     }
 
@@ -125,37 +155,87 @@ const Checkout = () => {
     return <div className="order-checkout">
         <LoadingBar color='#F07D00' ref={ref} />
         <Header title="Checkout"></Header>
-        <div className="section">
-            <div className="row checkout-item">
-                {saleItems.map((item, i) => {
-                    return <div key={i} className="col-4 mt-2 cart-item">
-                        <div title="Remove from cart" onClick={() => removeItem(item.itemid)} className="remove-cart-item"><CloseCircleOutline className="" /></div>
-                        <div className="count-cart-item" title={`${item.count} item(s)`}>{item.count}</div>
-                        <div className="card item-card card-border p-0">
-                            <Link href={`/restaurant/${id}/item-detail/${item.itemid}`}>
-                                <a>
-                                    <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority={true} className="card-img-top" alt="image" />
-                                    <h4 className='mt-0'>{item.itemName}</h4>
-                                </a>
-                            </Link>
+        <ul className="listview separate-list image-listview inset no-line no-arrow">
+            {saleItems.map((item, i) => {
+                return <li key={i} className="items-card card card-border">
+                    <div className="item">
+                        {item.detailimageurl && <Image src={item.detailimageurl} width={250} height={250} objectFit="cover" priority={true} className="image" alt="image" />}
+                        <div className="in">
+                            <div>
+                                <h4>{item.itemName}</h4>
+                                <p>{item.description}</p>
+                                <div className="item-price-qnt">
+                                    <h5>{item.total.toFixed(2)}</h5>
+                                    <div className="qnt-incre-decre">
+                                        <div className="qnt-incre-decre-bg"></div>
+                                        <div className="delete-checkout-modal"></div>
+                                        <div className="hide-incre-decre" onClick={() => removeItemQty(item.itemid)}>
+                                            <RemoveCircle cssClasses="ion-icon" />
+                                        </div>
+                                        <input type="text" value={item.quantity} />
+                                        <div className="show-incre-decre" onClick={() => addItemQty(item.itemid)}>
+                                            <AddCircle cssClasses="ion-icon" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                })}
-            </div>
-        </div>
+                    <div className="delete-item-card" onClick={() => removeItem(item.itemid)}>
+                        <CloseOutline />
+                    </div>
+                    <div className="delete-item-card-holder"></div>
+                </li>
+
+                // return <div key={i} className="col-4 mt-2 cart-item">
+                //     <div title="Remove from cart" onClick={() => removeItem(item.itemid)} className="remove-cart-item"><CloseCircleOutline className="" /></div>
+                //     <div className="count-cart-item" title={`${item.count} item(s)`}>{item.count}</div>
+                //     <div className="card item-card card-border p-0">
+                //         <Link href={`/restaurant/${id}/item-detail/${item.itemid}`}>
+                //             <a>
+                //                 <Image src={item.detailimageurl ? item.detailimageurl : '/images/food/wide1.jpg'} width={250} height={250} objectFit="cover" priority={true} className="card-img-top" alt="image" />
+                //                 <h4 className='mt-0'>{item.itemName}</h4>
+                //             </a>
+                //         </Link>
+                //     </div>
+                // </div>
+            })}
+        </ul>
         {
             saleItems.length > 0 ? <>
-                <div className="section mt-3">
-                    <div className="border-bottom">
-                        <div className="total-item">
-                            <h4>Total Items</h4>
-                            <h4>{cartData && cartData.saleDetails.length}</h4>
-                        </div>
-                        <div className="total-amount">
-                            <h4>Total Amount</h4>
-                            <h4>{cartData && cartData.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h4>
+                <div className="section mt-2">
+                    <div className="grand-total-count">
+                        <div className="card card-border">
+                            <div className="card-body">
+                                <div className="single-data">
+                                    <h3>Net Total</h3>
+                                    <h3>{saleItems.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h3>
+                                </div>
+                                <div className="single-data">
+                                    <h4>Total items</h4>
+                                    <p>{saleItems.reduce((prev, curr) => { return prev + curr.quantity }, 0)}</p>
+                                </div>
+                                <div className="single-data">
+                                    <h4>Tip</h4>
+                                    <a href="#">Add</a>
+                                </div>
+                                <div className="single-data">
+                                    <h4>Tax #1 (12%)</h4>
+                                    <p>12</p>
+                                </div>
+                                <div className="single-data">
+                                    <h4>Tax #1 (25%)</h4>
+                                    <p>Add</p>
+                                </div>
+                                <div className="single-data">
+                                    <h3>Grand Total</h3>
+                                    <h3>{saleItems.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h3>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+                <div className="section">
                     <div className='mt-2'>
                         <div className="total-item">
                             <h4>Order Type</h4>
