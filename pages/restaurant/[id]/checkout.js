@@ -13,7 +13,7 @@ import { useRecoilState } from 'recoil';
 import { cartState } from '../../../states/atoms';
 import { LocalStorageHelper } from '../../../helpers/local-storage-helper';
 import { KEY_CART, KEY_LOCATION, KEY_LOGGED_IN_USER } from '../../../constants';
-import Confirm from '../../../components/confirm';
+import { confirm } from '../../../components/confirm';
 
 const Checkout = () => {
     const router = useRouter();
@@ -24,6 +24,9 @@ const Checkout = () => {
     const ref = useRef(null);
     const [saleItems, setSaleItems] = useState([]);
     const [cartData, setCartData] = useState(null);
+    const [tipAmount, setTipAmount] = useState('');
+    const confirmFun = useRef(null);
+    const [taxes, setTaxes] = useState([]);
 
     const [cartCount, setCartCount] = useRecoilState(cartState);
 
@@ -110,13 +113,36 @@ const Checkout = () => {
                 }
             });
 
+
+            const taxArr = [];
+            cartStorage.saleDetails.reduce((prev, curr) => {
+                const index = taxArr.findIndex(p => p.tax == curr.tax);
+                if (curr.tax != 0) {
+                    if (index < 0) {
+                        taxArr.push({ tax: curr.tax, taxAmount: curr.quantity * curr.taxAmount })
+                    } else {
+                        taxArr[index].taxAmount += (curr.quantity * curr.taxAmount);
+                    }
+                }
+            }, { tax: 0, taxAmount: 0 });
+
+            setTaxes(taxArr);
+            setTipAmount(cartStorage.tipAmount);
             setSaleItems(newCart);
             setCartData(cartStorage);
         }
-    }, [cartStorage]);
+    }, [cartStorage, setTaxes]);
 
-    const removeItem = (itemId) => {
-        if (confirm('Do you wish to delete item?')) {
+    const groupByTax = function (xs, key) {
+        return xs.reduce(function (rv, x) {
+            (rv[x[key]] = rv[x[key]] || []).push(x);
+            return rv;
+        }, {});
+    };
+
+    const removeItem = async (itemId) => {
+        const result = await confirm('Do you wish to delete item?');
+        if (result) {
             setSaleItems(items => items = items.filter(p => p.itemid != itemId));
 
             if (cartStorage) {
@@ -125,11 +151,13 @@ const Checkout = () => {
                 LocalStorageHelper.store(cartKey, cartStorage);
                 setCartData(cartStorage);
                 setTimeout(() => {
-                    setCartCount(cartStorage.saleDetails.reduce((prev, curr) => { return prev + curr.quantity }, 0));    
+                    setCartCount(cartStorage.saleDetails.reduce((prev, curr) => { return prev + curr.quantity }, 0));
                 }, 0);
-                
+
             }
+
         }
+
     }
 
     const addItemQty = (itemId) => {
@@ -179,6 +207,20 @@ const Checkout = () => {
 
     const removeItemQty = (itemId) => {
         setQuantity(itemId, 'remove');
+    }
+
+    const changeHandler = (event) => {
+        if (event.target.name == 'tipAmount') {
+            setTipAmount(event.target.value);
+        }
+    }
+
+    const saveTipAmount = (event) => {
+        cartStorage = { ...cartStorage, ...{ tipAmount: tipAmount } };
+        LocalStorageHelper.store(cartKey, cartStorage);
+        setCartData(cartStorage);
+
+        document.getElementById('btnClose').click();
     }
 
 
@@ -247,16 +289,16 @@ const Checkout = () => {
                                 </div>
                                 <div className="single-data">
                                     <h4>Tip</h4>
-                                    <a href="#">Add</a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#tipModal">{cartData && cartData.tipAmount ? cartData.tipAmount : 'Add'}</a>
                                 </div>
-                                <div className="single-data">
-                                    <h4>Tax #1 (12%)</h4>
-                                    <p>12</p>
-                                </div>
-                                <div className="single-data">
-                                    <h4>Tax #1 (25%)</h4>
-                                    <p>Add</p>
-                                </div>
+                                {
+                                    taxes.map((taxItem, i) => {
+                                        return <div key={i} className="single-data">
+                                            <h4>Tax #{i + 1} ({taxItem.tax}%)</h4>
+                                            <p>{taxItem.taxAmount}</p>
+                                        </div>
+                                    })
+                                }
                                 <div className="single-data">
                                     <h3>Grand Total</h3>
                                     <h3>{saleItems.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h3>
@@ -308,6 +350,27 @@ const Checkout = () => {
                 </div>
             </>
         }
+
+        <div className="modal fade" id="tipModal" tabIndex="-1" aria-labelledby="tipModalLabel" aria-hidden="true">
+            <div className="modal-dialog">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id="tipModalLabel">Tip Amount</h5>
+                        <button type="button" className="btn-close" id="btnClose" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div className="modal-body">
+                        <div className="mb-3">
+                            <label htmlFor="tipAmount" className="col-form-label"></label>
+                            <input type="number" className="form-control" name="tipAmount" id="tipAmount" onChange={(e) => changeHandler(e)} value={tipAmount} />
+                        </div>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-primary" onClick={(e) => saveTipAmount(e)}>Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 }
 

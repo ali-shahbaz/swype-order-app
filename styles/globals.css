@@ -5931,7 +5931,7 @@ textarea,
   width: 78px;
 }
 
-.item-price-qnt .qnt-incre-decre .ion-icon {
+.item-price-qnt .qnt-incre-decre .ion-icon, .modal-icon .ion-icon {
   font-size: 30px;
   line-height: 30px;
   margin: 0;
@@ -7438,6 +7438,7 @@ textarea,
   position: absolute;
   right: 5px;
   top: 5px;
+  cursor: pointer;
 }
 
 .order-checkout .grand-total-count .single-data {

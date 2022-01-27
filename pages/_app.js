@@ -15,7 +15,7 @@ const MyApp = ({ Component, pageProps }) => {
   //let [SidebarObj, setSidebarObj] = useState(null);
   let sidebarObj = 0;
   useEffect(() => {
-    import('bootstrap/dist/js/bootstrap.bundle');
+    window.bootstrap = require('bootstrap/dist/js/bootstrap.bundle.js');
     Router.onRouteChangeStart = (url) => {
       setLoading(true);
     };
