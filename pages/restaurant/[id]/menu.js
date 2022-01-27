@@ -169,15 +169,23 @@ const Menu = ({ restaurantdata }) => {
                 restaurantdata.quickKeyCategoryList.map((item, i) => {
                     return <div id={item.categoryID} key={item.categoryID} className="sell-single-list mt-1">
                         <div className="section-title ms-2">{item.name}</div>
-                        <ul className="listview separate-list image-listview inset no-line no-arrow">
+                        <ul className="listview separate-list image-listview inset no-line">
                             {
                                 restaurantdata.quickProducts.filter(p => p.categoryid == item.categoryID).map((product, index) => {
                                     return <li key={product.itemid} className="items-card card card-border">
                                         <div className="item">
-                                            <Image src={product.detailimageurl ? product.detailimageurl : '/images/food/wide1.jpg'} width={100} height={100} objectFit="cover" priority={true} className="image" alt="image" />
+                                            <Link href={`/restaurant/${id}/item-detail/${product.itemid}`}>
+                                                <a>
+                                                    <Image src={product.detailimageurl ? product.detailimageurl : '/images/food/wide1.jpg'} width={100} height={100} objectFit="cover" priority={true} className="image" alt="image" />
+                                                </a>
+                                            </Link>
                                             <div className="in">
                                                 <div>
-                                                    <h4>{product.name}</h4>
+                                                    <h4>
+                                                        <Link href={`/restaurant/${id}/item-detail/${product.itemid}`}>
+                                                            <a>{product.name}</a>
+                                                        </Link>
+                                                    </h4>
                                                     <p>{product.description}</p>
                                                     <div className="item-price-qnt">
                                                         <h5>{product.salesprice.toFixed(2)}</h5>

@@ -49,15 +49,29 @@ const ItemDetail = ({ restaurantdata }) => {
     }, [cartStorage, itemKey, itemid, restaurantdata]);
 
     const addAnotherItem = () => {
-        const itemDetail = getItemForCart(itemState);
-        setOrderItemsState(orderItems => [...orderItems, itemDetail]);
+        if (itemState.variations.length == 0 && itemState.modifiers.length == 0) {
+            const items = JSON.parse(JSON.stringify(orderItemsState));
+            items[0].quantity += 1;
+            setOrderItemsState(items);
+        } else {
+            const itemDetail = getItemForCart(itemState);
+            setOrderItemsState(orderItems => [...orderItems, itemDetail]);
+        }
+
     }
 
     const removeAnotherItem = (index) => {
-        if (index > 0) {
-            const items = orderItemsState.filter((item, i) => i != index);
+        if (itemState.variations.length == 0 && itemState.modifiers.length == 0 && orderItemsState[0].quantity > 1) {
+            const items = JSON.parse(JSON.stringify(orderItemsState));
+            items[0].quantity -= 1;
             setOrderItemsState(items);
+        } else {
+            if (index > 0) {
+                const items = orderItemsState.filter((item, i) => i != index);
+                setOrderItemsState(items);
+            }
         }
+
     }
 
     const changeHandler = (e, itemIndex, id, parentId, type) => {
@@ -169,14 +183,14 @@ const ItemDetail = ({ restaurantdata }) => {
                 <small>{itemState.description}</small>
             </p>
             <div className="item-price-qnt">
-                <h5>{orderItemsState.reduce((prev, curr) => { return prev + curr.total }, 0).toFixed(2)}</h5>
+                <h5>{orderItemsState.reduce((prev, curr) => { return prev + (curr.quantity * curr.total) }, 0).toFixed(2)}</h5>
                 <div className="qnt-incre-decre qnt-mt-3">
                     <div className="qnt-incre-decre-bg"></div>
                     <div></div>
                     <div onClick={() => removeAnotherItem(orderItemsState.length - 1)} className="hide-incre-decre">
                         <RemoveCircle cssClasses="ion-icon" />
                     </div>
-                    <input type="text" value={orderItemsState.length} onChange={() => { }} />
+                    <input type="text" value={orderItemsState.reduce((prev, curr) => { return prev + curr.quantity }, 0)} onChange={() => { }} />
                     <div onClick={() => addAnotherItem()} className="show-incre-decre">
                         <AddCircle cssClasses="ion-icon" />
                     </div>

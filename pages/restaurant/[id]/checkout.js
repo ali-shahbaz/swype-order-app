@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { PlaceOrder } from '../../../services/restaurant-service';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import LoadingBar from 'react-top-loading-bar';
 import { toast } from 'react-toastify';
 import Header from '../../../components/head';
@@ -98,6 +98,22 @@ const Checkout = () => {
         }
     }, [status]);
 
+    const getGroupByTaxes = useCallback(() => {
+        const taxArr = [];
+        cartStorage.saleDetails.reduce((prev, curr) => {
+            const index = taxArr.findIndex(p => p.tax == curr.tax);
+            if (curr.tax != 0) {
+                if (index < 0) {
+                    taxArr.push({ tax: curr.tax, taxAmount: curr.quantity * curr.taxAmount })
+                } else {
+                    taxArr[index].taxAmount += (curr.quantity * curr.taxAmount);
+                }
+            }
+        }, {});
+
+        setTaxes(taxArr);
+    }, [cartStorage])
+
     useEffect(() => {
         if (cartStorage) {
             const newCart = [];
@@ -113,32 +129,12 @@ const Checkout = () => {
                 }
             });
 
-
-            const taxArr = [];
-            cartStorage.saleDetails.reduce((prev, curr) => {
-                const index = taxArr.findIndex(p => p.tax == curr.tax);
-                if (curr.tax != 0) {
-                    if (index < 0) {
-                        taxArr.push({ tax: curr.tax, taxAmount: curr.quantity * curr.taxAmount })
-                    } else {
-                        taxArr[index].taxAmount += (curr.quantity * curr.taxAmount);
-                    }
-                }
-            }, { tax: 0, taxAmount: 0 });
-
-            setTaxes(taxArr);
+            getGroupByTaxes();
             setTipAmount(cartStorage.tipAmount);
             setSaleItems(newCart);
             setCartData(cartStorage);
         }
-    }, [cartStorage, setTaxes]);
-
-    const groupByTax = function (xs, key) {
-        return xs.reduce(function (rv, x) {
-            (rv[x[key]] = rv[x[key]] || []).push(x);
-            return rv;
-        }, {});
-    };
+    }, [cartStorage, getGroupByTaxes]);
 
     const removeItem = async (itemId) => {
         const result = await confirm('Do you wish to delete item?');
@@ -162,6 +158,7 @@ const Checkout = () => {
 
     const addItemQty = (itemId) => {
         setQuantity(itemId, 'add');
+        getGroupByTaxes();
     }
 
     const setQuantity = (itemId, addOrRemove) => {
@@ -207,6 +204,7 @@ const Checkout = () => {
 
     const removeItemQty = (itemId) => {
         setQuantity(itemId, 'remove');
+        getGroupByTaxes();
     }
 
     const changeHandler = (event) => {
@@ -227,14 +225,24 @@ const Checkout = () => {
     return <div className="order-checkout">
         <LoadingBar color='#F07D00' ref={ref} />
         <Header title="Checkout"></Header>
-        <ul className="listview separate-list image-listview inset no-line no-arrow">
+        <ul className="listview separate-list image-listview inset no-line">
             {saleItems.map((item, i) => {
                 return <li key={i} className="items-card card card-border">
                     <div className="item">
-                        {item.detailimageurl && <Image src={item.detailimageurl} width={250} height={250} objectFit="cover" priority={true} className="image" alt="image" />}
+                        {item.detailimageurl &&
+                            <Link href={`/restaurant/${id}/item-detail/${item.itemid}`}>
+                                <a>
+                                    <Image src={item.detailimageurl} width={250} height={250} objectFit="cover" priority={true} className="image" alt="image" />
+                                </a>
+                            </Link>
+                        }
                         <div className="in">
                             <div>
-                                <h4>{item.itemName}</h4>
+                                <h4>
+                                    <Link href={`/restaurant/${id}/item-detail/${item.itemid}`}>
+                                        <a>{item.itemName}</a>
+                                    </Link>
+                                </h4>
                                 <p>{item.description}</p>
                                 <div className="item-price-qnt">
                                     <h5>{item.total.toFixed(2)}</h5>
@@ -295,7 +303,7 @@ const Checkout = () => {
                                     taxes.map((taxItem, i) => {
                                         return <div key={i} className="single-data">
                                             <h4>Tax #{i + 1} ({taxItem.tax}%)</h4>
-                                            <p>{taxItem.taxAmount}</p>
+                                            <p>{(taxItem.taxAmount).toFixed(2)}</p>
                                         </div>
                                     })
                                 }
