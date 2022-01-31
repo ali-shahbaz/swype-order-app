@@ -147,7 +147,7 @@ function Layout({ props = {}, children }) {
                         <Link href={`/restaurant/${id}/checkout`}>
                             <a className="headerButton">
                                 <CartOutline className="switchSVGColor" />
-                                <div className="badge badge-danger">{cartCount != 0 ? cartCount : cartStorage && cartStorage.saleDetails.reduce((prev, next) => { return prev + next.quantity }, 0)}</div>
+                                <div className="badge badge-danger">{cartCount != -1 ? cartCount : cartStorage && cartStorage.saleDetails.reduce((prev, next) => { return prev + next.quantity }, 0)}</div>
                             </a>
                         </Link>
                     </div>

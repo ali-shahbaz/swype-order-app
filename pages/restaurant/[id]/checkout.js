@@ -45,9 +45,11 @@ const Checkout = () => {
                     + (b.selectedModifiers.length > 0 ? b.selectedModifiers.reduce((x, y) => { return x + y.price }, 0) : 0)
             }, 0).toFixed(2);
 
-            const grandTotal = cart.saleDetails.reduce((a, b) => {
+            let grandTotal = cart.saleDetails.reduce((a, b) => {
                 return a + (b.total * b.quantity)
             }, 0).toFixed(2);
+
+            grandTotal = (parseFloat(grandTotal) + (cart.tipAmount ? parseFloat(cart.tipAmount) : 0)).toFixed(2);
 
             const newCart = { ...cart, ...{ netTotal, taxAmount, grandTotal, amount: grandTotal } }
             newCart.salePayments[0].amount = grandTotal;

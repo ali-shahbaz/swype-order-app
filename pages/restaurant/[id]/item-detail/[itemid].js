@@ -231,7 +231,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                 <h4>{item.itemName}</h4>
                                 <h3>{item.sellingPrice.toFixed(2)}</h3>
                             </div>
-                            <div ref={varificationEl} className="modification input-list w-100">
+                            <div ref={el => varificationEl.current = el} className="modification input-list w-100">
                                 {
                                     item.variations.map(variation => {
                                         return <div key={variation.itemvariationid} className="single-modification">

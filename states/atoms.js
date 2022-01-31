@@ -2,7 +2,7 @@ import { atom } from "recoil";
 
 export const cartState = atom({
     key: 'cart',
-    default: 0
+    default: -1
 });
 
 export const menuTabState = atom({
