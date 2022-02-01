@@ -216,7 +216,7 @@ const Checkout = () => {
     }
 
     const saveTipAmount = (event) => {
-        cartStorage = { ...cartStorage, ...{ tipAmount: tipAmount } };
+        cartStorage = { ...cartStorage, ...{ tipAmount: parseFloat(tipAmount) } };
         LocalStorageHelper.store(cartKey, cartStorage);
         setCartData(cartStorage);
 
@@ -311,7 +311,7 @@ const Checkout = () => {
                                 }
                                 <div className="single-data">
                                     <h3>Grand Total</h3>
-                                    <h3>{saleItems.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h3>
+                                    <h3>{(saleItems.reduce((a, b) => { return a + b.total }, 0) + (cartData.tipAmount ? parseFloat(cartData.tipAmount) : 0)).toFixed(2)}</h3>
                                 </div>
                             </div>
                         </div>
@@ -371,7 +371,7 @@ const Checkout = () => {
                     <div className="modal-body">
                         <div className="mb-3">
                             <label htmlFor="tipAmount" className="col-form-label"></label>
-                            <input type="number" className="form-control" name="tipAmount" id="tipAmount" onChange={(e) => changeHandler(e)} value={tipAmount} />
+                            <input type="number" className="form-control" min={0} name="tipAmount" id="tipAmount" onChange={(e) => changeHandler(e)} value={tipAmount} />
                         </div>
                     </div>
                     <div className="modal-footer">

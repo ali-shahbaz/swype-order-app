@@ -118,7 +118,7 @@ function Sidebar({ props, restaurantdata, sidebarclickedcount }) {
                                 {
                                     userData && userData.user && userData.user.name ? <>
                                         <div className="image-wrapper">
-                                            <Image src={userData.user.imageUrl ? userData.user.imageUrl : '/images/profile/profile.png'} width={56} height={56} objectFit='cover' alt="image" className="imaged" />
+                                            <Image src={userData.user.imageUrl ? userData.user.imageUrl : '/images/profile/profile-icon.png'} width={56} height={56} objectFit='cover' alt="image" className="imaged" />
                                         </div>
                                         <div className="in">
                                             <strong>{userData.user.name}</strong>
