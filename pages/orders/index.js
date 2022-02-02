@@ -15,7 +15,7 @@ const Orders = () => {
         if (loggedInUser) {
             GetUserReceipts(loggedInUser.token).then(data => {
                 if (data.status == 1) {
-                    // setReceipts(data.payload.receipts);
+                    setReceipts(data.payload.receipts);
                 } else {
 
                 }
