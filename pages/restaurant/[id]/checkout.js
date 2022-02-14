@@ -28,12 +28,26 @@ const Checkout = ({ restaurantdata }) => {
     const confirmFun = useRef(null);
     const [taxes, setTaxes] = useState([]);
     const selectedOrderTypeKey = `${KEY_SELECTED_ORDER_TYPE}-${id}`;
+    const dineInBtnRef = useRef();
+    const deliveryBtnRef = useRef();
 
     const [cartCount, setCartCount] = useRecoilState(cartState);
 
     const payNow = (event) => {
         if (loggedInUser) {
             const cart = LocalStorageHelper.load(cartKey);
+
+            if (cart.onlineOrderType == 3 && !cart.tableName && restaurantdata.quickTables.length != 0) {
+                LocalStorageHelper.store(KEY_CHANGE_ORDER_TYPE, true);
+                router.push(`/restaurant/${id}/tables`);
+                return;
+            } else if (cart.onlineOrderType == 2 && Object.entries(cart.DeliveryAddress).length == 0) {
+                LocalStorageHelper.store(KEY_CHANGE_ORDER_TYPE, true);
+                router.push(`/restaurant/${id}/confirm-address`);
+                return;
+            }
+
+
             event.target.disabled = true;
             ref.current.continuousStart();
 
@@ -372,10 +386,10 @@ const Checkout = ({ restaurantdata }) => {
                                     <input type="radio" className="btn-check" onClick={(e) => orderTypeChange(e)} onChange={(e) => orderTypeChange(e)} value="1" name="btnRadioOrderType" id="TakeAway" checked={cartData.onlineOrderType == 1} />
                                     <label className="btn btn-outline-primary" htmlFor="TakeAway">Take Away</label>
 
-                                    <input type="radio" className="btn-check" onClick={(e) => orderTypeChange(e)} onChange={(e) => orderTypeChange(e)} value="3" name="btnRadioOrderType" id="DineIn" checked={cartData.onlineOrderType == 3} />
+                                    <input type="radio" className="btn-check" ref={dineInBtnRef} onClick={(e) => orderTypeChange(e)} onChange={(e) => orderTypeChange(e)} value="3" name="btnRadioOrderType" id="DineIn" checked={cartData.onlineOrderType == 3} />
                                     <label className="btn btn-outline-primary" htmlFor="DineIn">Dine In</label>
 
-                                    <input type="radio" className="btn-check" onClick={(e) => orderTypeChange(e)} onChange={(e) => orderTypeChange(e)} value="2" name="btnRadioOrderType" id="Delivery" checked={cartData.onlineOrderType == 2} />
+                                    <input type="radio" className="btn-check" ref={deliveryBtnRef} onClick={(e) => orderTypeChange(e)} onChange={(e) => orderTypeChange(e)} value="2" name="btnRadioOrderType" id="Delivery" checked={cartData.onlineOrderType == 2} />
                                     <label className="btn btn-outline-primary myDeliveryButton" htmlFor="Delivery">Delivery</label>
                                 </div>
                             </div>
