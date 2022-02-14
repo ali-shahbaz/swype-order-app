@@ -6,3 +6,4 @@ export const KEY_SELECTED_ORDER_TYPE = 'selected-order-type';
 export const KEY_LOGGED_IN_USER = 'logged-in-user';
 export const KEY_LOCATION = 'location';
 export const KEY_USER_NUMBER = 'user-number';
+export const KEY_CHANGE_ORDER_TYPE = 'change-order-type';

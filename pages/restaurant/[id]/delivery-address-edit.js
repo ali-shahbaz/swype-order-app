@@ -2,7 +2,7 @@ import useLocalStorage from "../../../hooks/useLocalStorage";
 import { useRouter } from "next/router";
 import Header from "../../../components/head";
 import { useEffect, useState } from "react";
-import { KEY_CART } from "../../../constants";
+import { KEY_CART, KEY_CHANGE_ORDER_TYPE } from "../../../constants";
 import { LocalStorageHelper } from "../../../helpers/local-storage-helper";
 
 const DeliveryAddressEdit = () => {
@@ -24,7 +24,13 @@ const DeliveryAddressEdit = () => {
 
     const confirmAddress = () => {
         LocalStorageHelper.store(cartKey, { ...cartStorage, ...{ DeliveryAddress: address } });
-        router.push(`/restaurant/${id}/menu`);
+        const isOrderTypeChanged = LocalStorageHelper.load(KEY_CHANGE_ORDER_TYPE);
+        if (isOrderTypeChanged) {
+            router.push(`/restaurant/${id}/checkout`);
+        } else {
+            router.push(`/restaurant/${id}/menu`);
+        }
+        
     }
 
     if (!address) return <></>

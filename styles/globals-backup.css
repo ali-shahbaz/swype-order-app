@@ -426,7 +426,7 @@ a:hover, a:active, a:focus {
 }
 
 .wide-block {
-  background: transparent;
+  background: #fff;
   border-top: 1px solid #DCDCE9;
   border-bottom: 1px solid #DCDCE9;
   padding-left: 16px;
@@ -2626,8 +2626,8 @@ a.badge-dark {
 }
 
 .accordion {
-  /* border-top: 1px solid #DCDCE9;
-  border-bottom: 1px solid #DCDCE9; */
+  border-top: 1px solid #DCDCE9;
+  border-bottom: 1px solid #DCDCE9;
   background: #fff;
   overflow: hidden;
 }
@@ -5913,10 +5913,10 @@ textarea,
   position: absolute;
   content: "";
   background-color: #69696922;
-  height: 32px;
-  width: 69px;
-  top: -16.5px;
-  left: 21px;
+  height: 24px;
+  width: 56px;
+  top: -12.5px;
+  left: 19px;
 }
 
 .item-price-qnt .qnt-incre-decre .qnt-incre-decre-bg.one-length::after {
@@ -5937,8 +5937,8 @@ textarea,
   margin: 0;
   margin-top: -1px;
   color: #3b3a3a;
-  height: 40px;
-  width: 40px;
+  height: 30px;
+  width: 30px;
   fill: #3b3a3a;
 }
 
@@ -5969,10 +5969,10 @@ textarea,
   position: absolute;
   content: "";
   background-color: #69696922;
-  height: 32px;
-  width: 69px;
-  top: -16.5px;
-  left: 21px;
+  height: 24px;
+  width: 56px;
+  top: -14.5px;
+  left: 19px;
 }
 
 .item-price-qnt .qnt-incre-decre.qnt-mt-3 input {
@@ -7173,7 +7173,7 @@ textarea,
 
 .welcome-cover {
   position: relative;
-  height: 310px;
+  height: 260px;
   width: 100%;
   background: -webkit-gradient(linear, left top, left bottom, from(#000000B2), to(#00000000)), url("/images/food/cover.jpg") no-repeat center/cover;
   background: linear-gradient(to bottom, #000000B2, #00000000), url("/images/food/cover.jpg") no-repeat center/cover;
@@ -7181,29 +7181,31 @@ textarea,
 
 .welcome-section {
   position: relative;
+  margin-top: -80px;
+  border-radius: 25px 25px 0 0;
 }
 
 .welcome-section .wide-block {
+  border-radius: 25px 25px 0 0;
   border: none;
 }
 
 .welcome-section .wide-block .under-logo {
   position: relative;
-  margin-top: -144px;
-  margin-bottom: 28px;
+  margin-top: -80px;
   height: 125px;
   width: 125px;
-  left: 0px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
   border-radius: 10px;
   border: 1px solid #dadada;
   overflow: hidden;
 }
 
 .welcome-section .wide-block .under-logo img {
-  height: 125px !important;
-  width: 125px !important;
-  object-fit: cover;
-  object-position: center;
+  height: 100%;
+  width: 100%;
 }
 
 .welcome-section .wide-block .welcome-txt {
@@ -7263,6 +7265,7 @@ textarea,
 }
 
 .special-offer .card img {
+  height: 150px;
   -o-object-fit: cover;
   object-fit: cover;
   -o-object-position: center;
@@ -7351,40 +7354,22 @@ textarea,
   position: relative;
   border-radius: 8px !important;
   min-height: 100px;
-  max-height: 100px;
-  height: 100px;
+  height: 100%;
   width: 100px !important;
-  min-width: 100px;
-  max-width: 100px;
+  margin-right: 8px !important;
   -o-object-fit: cover;
   object-fit: cover;
   -o-object-position: center;
   object-position: center;
 }
 
-.order-list-view-wrapper .items-card .item .in {
-  min-height: 100px;
-}
-
-.order-list-view-wrapper .items-card .item .in .item-details {
-  min-height: 100px;
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-}
-
 .order-list-view-wrapper .items-card .item h4 {
   margin-bottom: 2px;
-  font-size: 20px;
-}
-
-.order-list-view-wrapper .items-card .item h4 a {
-  color: #27173E;
 }
 
 .order-list-view-wrapper .items-card .item p {
-  font-size: 15px;
-  line-height: 18px;
+  font-size: 13px;
+  line-height: 15px;
 }
 
 .order-list-view-wrapper .items-card .item .mbl-no {
@@ -7433,7 +7418,7 @@ textarea,
   min-height: 100px;
   height: 100%;
   width: 100px !important;
-  min-width: 100px;
+  margin-right: 8px !important;
   -o-object-fit: cover;
   object-fit: cover;
   -o-object-position: center;
@@ -7488,11 +7473,6 @@ textarea,
 
 .order-item {
   position: relative;
-}
-
-.order-item .section-title{
-  font-size: 24px;
-  font-weight: 700;
 }
 
 .order-item .item-hero img {
@@ -7777,51 +7757,6 @@ textarea,
 .confirmed-heading .section-heading img {
   height: 80px !important;
 }
-
-
-
-.cash-payment-amount .single-cash-payment {
-  text-align: center;
-  border-bottom: 1px solid #27173E;
-}
-
-.cash-payment-amount .single-cash-payment h2 {
-  font-size: 24px;
-  padding: 3px;
-  margin-bottom: 4px;
-}
-
-.amount-btn {
-  -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
-}
-
-.amount-btn button {
-  padding: 3px 8px;
-  border-radius: 5px;
-  background-color: #ffffff !important;
-}
-
-.tip-option {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center !important;
-      -ms-flex-pack: center !important;
-          justify-content: center !important;
-  gap: 10px;
-}
-
-.tip-option .btn {
-  border-width: 1px;
-}
-
-.tip-option .btn:last-child {
-  border-left: none !important;
-}
-
-
-
 
 html[dir="rtl"],
 body.rtl-mode {

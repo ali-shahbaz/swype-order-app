@@ -31,7 +31,8 @@ export const getItemForCart = (item) => {
         hasmodifier: item.hasmodifier,
         modifiers: item.modifiers,
         selectedModifiers: [],
-        variations: item.variations
+        variations: item.variations,
+        extras : 0
     }
 
     return itemObj;

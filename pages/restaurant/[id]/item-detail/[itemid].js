@@ -76,13 +76,13 @@ const ItemDetail = ({ restaurantdata }) => {
 
     const changeHandler = (e, itemIndex, id, parentId, type) => {
         if (id && type == 'variation') {
-            debugger
             const variation = itemState.variations.find(p => p.itemvariationid == id);
             if (variation) {
                 if (e.target.checked) {
                     orderItemsState[itemIndex].variationName = variation.name;
                     orderItemsState[itemIndex].variationId = variation.itemvariationid;
                     orderItemsState[itemIndex].total = orderItemsState[itemIndex].sellingPrice + variation.salesprice;
+                    orderItemsState[itemIndex].extras =variation.salesprice;
 
                     [...varificationEl.current.getElementsByTagName("input")].forEach(element => {
                         if (element.name != e.target.name) {
@@ -94,6 +94,7 @@ const ItemDetail = ({ restaurantdata }) => {
                     orderItemsState[itemIndex].variationName = '';
                     orderItemsState[itemIndex].variationId = 0;
                     orderItemsState[itemIndex].total = orderItemsState[itemIndex].sellingPrice;
+                    orderItemsState[itemIndex].extras = 0;
                 }
 
                 setOrderItemsState(prev => prev = [...orderItemsState]);
@@ -121,7 +122,10 @@ const ItemDetail = ({ restaurantdata }) => {
                     orderItemsState[itemIndex].selectedModifiers.push(modifier);
                 }
 
-                orderItemsState[itemIndex].total = orderItemsState[itemIndex].sellingPrice + orderItemsState[itemIndex].selectedModifiers.reduce((acc, obj) => { return acc + obj.price; }, 0);
+                const extras = orderItemsState[itemIndex].selectedModifiers.reduce((acc, obj) => { return acc + obj.price; }, 0);
+                orderItemsState[itemIndex].total = orderItemsState[itemIndex].sellingPrice + extras;
+                orderItemsState[itemIndex].extras = extras;
+
                 setOrderItemsState(prev => prev = [...orderItemsState]);
 
                 // now unlock next panel
@@ -178,7 +182,7 @@ const ItemDetail = ({ restaurantdata }) => {
             <Image src={itemState.detailimageurl ? itemState.detailimageurl : '/images/food/wide1.jpg'} width={600} height={400} layout="responsive" objectFit="fill" priority className="card-img-top" alt="image" />
         </div>
         <div className="card-text px-3 mt-2">
-            <h3 className="section-titl">{itemState.name}</h3>
+            <h3 className="section-title">{itemState.name}</h3>
             <p>
                 <small>{itemState.description}</small>
             </p>
@@ -222,15 +226,16 @@ const ItemDetail = ({ restaurantdata }) => {
                 {orderItemsState.map((item, itemIndex) => {
                     return <div key={itemIndex.toString()} className="card card-border mt-2">
                         <div className="card-body">
-                            <div className="options">
-                                {
-                                    (itemIndex != 0) && <div onClick={() => removeAnotherItem(itemIndex)} className="remove-item"><CloseCircleOutline className="switchSVGColor" /></div>
-                                }
-                            </div>
-                            <div className="modification-item-name">
-                                <h4>{item.itemName}</h4>
-                                <h3>{item.sellingPrice.toFixed(2)}</h3>
-                            </div>
+                            {
+                                (itemIndex != 0) && <div onClick={() => removeAnotherItem(itemIndex)} className="remove-item"><CloseCircleOutline className="switchSVGColor" /></div>
+                            }
+                            {/* {
+                                (item.modifiers.length > 0 || item.variations.length > 0) &&
+                                <div className="modification-item-name">
+                                    <h4>{item.itemName}</h4>
+                                    <h3>{item.sellingPrice.toFixed(2)}</h3>
+                                </div>
+                            } */}
                             <div ref={el => varificationEl.current = el} className="modification input-list w-100">
                                 {
                                     item.variations.map(variation => {
@@ -251,7 +256,7 @@ const ItemDetail = ({ restaurantdata }) => {
                                         if (quickModifier) {
                                             return <div key={index} data-optional={quickModifier.isOptional} className="accordion-item">
                                                 <h2 className="accordion-header" id={`modifier${modifier.itemModifierId}-${itemIndex}`}>
-                                                    <button id={`headerBtn${index}`} className={"accordion-button" + (index != 0 ? ' collapsed' : '')} disabled={index == 0 || (item.selectedModifiers.findIndex(p => p.modifierId == modifier.modifierId) >= 0) ? false : true} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${modifier.itemModifierId}-${itemIndex}`} aria-expanded={index == 0 ? 'true' : 'false'} aria-controls={`modifier${modifier.itemModifierId}-${itemIndex}`}>
+                                                    <button id={`headerBtn${index}`} className={"accordion-button" + (index != 0 ? ' collapsed' : '')} type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${modifier.itemModifierId}-${itemIndex}`} aria-expanded={index == 0 ? 'true' : 'false'} aria-controls={`modifier${modifier.itemModifierId}-${itemIndex}`}>
                                                         {quickModifier.displayName}
                                                     </button>
                                                 </h2>
@@ -287,13 +292,27 @@ const ItemDetail = ({ restaurantdata }) => {
                                 }
                             </div>
                             }
-                            <div className="qnt-total input-list w-100">
-                                <h2 className="m-0">Total</h2>
-                                <div className="total-amount">
-                                    <h2 className="m-0">{item.total.toFixed(2)}</h2>
-                                </div>
-                            </div>
-                            <div className="instruction mt-3">
+                            {
+                                (item.modifiers.length > 0 || item.variations.length > 0) &&
+                                <>
+                                    <div className="qnt-total input-list w-100">
+                                        <h3 className="m-0">Item Price</h3>
+                                        <h3 className="m-0">{item.sellingPrice.toFixed(2)}</h3>
+                                    </div>
+                                    <div className="qnt-total input-list w-100">
+                                        <h3 className="m-0">Extras</h3>
+                                        <h3 className="m-0">{item.extras.toFixed(2)}</h3>
+                                    </div>
+                                    <div className="qnt-total input-list w-100">
+                                        <h2 className="m-0">Total</h2>
+                                        <div className="total-amount">
+                                            <h2 className="m-0">{item.total.toFixed(2)}</h2>
+                                        </div>
+                                    </div>
+                                </>
+                            }
+
+                            <div className={(item.modifiers.length > 0 || item.variations.length > 0) ? 'instruction mt-3' : 'instruction'}>
                                 <textarea name={`instructions-${itemIndex}`} id={`instructions${itemIndex}`} rows="2"
                                     placeholder="Add an instruction to this item" onChange={(e) => changeHandler(e, itemIndex)} className="w-100 p-1" value={item.instructions}></textarea>
                             </div>

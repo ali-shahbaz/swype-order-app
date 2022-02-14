@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Header from '../../../components/head';
-import { KEY_CART } from '../../../constants';
+import { KEY_CART, KEY_CHANGE_ORDER_TYPE } from '../../../constants';
 import { LocalStorageHelper } from '../../../helpers/local-storage-helper';
 
-const Tables = ({restaurantdata}) => {
+const Tables = ({ restaurantdata }) => {
     const router = useRouter();
     const { id } = router.query;
     const cartKey = `${KEY_CART}-${id}`;
@@ -14,6 +14,13 @@ const Tables = ({restaurantdata}) => {
         if (cart) {
             cart = { ...cart, ...{ tableId: tableId, tableName: tableName } };
             LocalStorageHelper.store(cartKey, cart);
+            const isOrderTypeChanged = LocalStorageHelper.load(KEY_CHANGE_ORDER_TYPE);
+            if (isOrderTypeChanged) {
+                router.push(`/restaurant/${id}/checkout`);
+            } else {
+                router.push(`/restaurant/${id}/menu`);
+            }
+
         }
     }
 
@@ -30,14 +37,12 @@ const Tables = ({restaurantdata}) => {
         <Header title="Select Your Section"></Header>
         <ul className="listview separate-list image-listview no-line no-arrow inset">
             {restaurantdata.quickTables.map((item, index) => {
-                return <li key={item.tableId} onClick={() => setCartTable(item.tableId, item.name)} className="items-card card card-border">
-                    <Link href={`/restaurant/${id}/menu`}>
-                        <a className="item">
-                            <div className="in">
-                                <h4 className="m-0">{item.name}</h4>
-                            </div>
-                        </a>
-                    </Link>
+                return <li key={item.tableId} onClick={() => setCartTable(item.tableId, item.name)} className="table-select items-card card card-border">
+                    <span className="item">
+                        <div className="in">
+                            <h4 className="m-0">{item.name}</h4>
+                        </div>
+                    </span>
                 </li>
             })}
         </ul>

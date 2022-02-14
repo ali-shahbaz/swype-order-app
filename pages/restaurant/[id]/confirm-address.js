@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { useRouter } from "next/router";
 import { CreateOutline } from "react-ionicons";
-import { KEY_CART, KEY_LOCATION } from "../../../constants";
+import { KEY_CART, KEY_LOCATION, KEY_CHANGE_ORDER_TYPE } from "../../../constants";
 import { LocalStorageHelper } from "../../../helpers/local-storage-helper";
 import useLocalStorage from "../../../hooks/useLocalStorage";
 
@@ -150,6 +150,16 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
 
     }
 
+    const confirmAddress = () => {
+        const isOrderTypeChanged = LocalStorageHelper.load(KEY_CHANGE_ORDER_TYPE);
+        if (isOrderTypeChanged) {
+            router.push(`/restaurant/${id}/checkout`);
+        } else {
+            router.push(`/restaurant/${id}/menu`);
+        }
+
+    }
+
     return <>
         <Header title={'Cofirm Delivery Address'}>
         </Header>
@@ -175,9 +185,9 @@ const ConfirmAddress = ({ width, height, lat, lng, zoom,
             </div>
             <div className="section mt-2" style={{ width, height }} ref={mapDivRef} id="map"></div>
             <div className="section mt-4">
-                <Link href={`/restaurant/${id}/menu`}>
-                    <a className="btn btn-primary btn-shadow btn-lg btn-block">Confirm</a>
-                </Link>
+                <button onClick={() => confirmAddress()} className="btn btn-primary btn-shadow btn-lg btn-block">
+                    Confirm
+                </button>
             </div>
         </div>
     </>

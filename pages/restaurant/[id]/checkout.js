@@ -12,10 +12,10 @@ import useLocalStorage from '../../../hooks/useLocalStorage';
 import { useRecoilState } from 'recoil';
 import { cartState } from '../../../states/atoms';
 import { LocalStorageHelper } from '../../../helpers/local-storage-helper';
-import { KEY_CART, KEY_LOCATION, KEY_LOGGED_IN_USER } from '../../../constants';
+import { KEY_CART, KEY_LOCATION, KEY_LOGGED_IN_USER, KEY_SELECTED_ORDER_TYPE, KEY_CHANGE_ORDER_TYPE } from '../../../constants';
 import { confirm } from '../../../components/confirm';
 
-const Checkout = () => {
+const Checkout = ({ restaurantdata }) => {
     const router = useRouter();
     const { id, status } = router.query;
     const cartKey = `${KEY_CART}-${id}`;
@@ -27,6 +27,7 @@ const Checkout = () => {
     const [tipAmount, setTipAmount] = useState('');
     const confirmFun = useRef(null);
     const [taxes, setTaxes] = useState([]);
+    const selectedOrderTypeKey = `${KEY_SELECTED_ORDER_TYPE}-${id}`;
 
     const [cartCount, setCartCount] = useRecoilState(cartState);
 
@@ -104,13 +105,13 @@ const Checkout = () => {
         const taxArr = [];
         cartStorage.saleDetails.reduce((prev, curr) => {
             const index = taxArr.findIndex(p => p.tax == curr.tax);
-            if (curr.tax != 0) {
-                if (index < 0) {
-                    taxArr.push({ tax: curr.tax, taxAmount: curr.quantity * curr.taxAmount })
-                } else {
-                    taxArr[index].taxAmount += (curr.quantity * curr.taxAmount);
-                }
+            // if (curr.tax != 0) {
+            if (index < 0) {
+                taxArr.push({ tax: curr.tax, taxAmount: curr.quantity * curr.taxAmount })
+            } else {
+                taxArr[index].taxAmount += (curr.quantity * curr.taxAmount);
             }
+            // }
         }, {});
 
         setTaxes(taxArr);
@@ -136,6 +137,7 @@ const Checkout = () => {
             setSaleItems(newCart);
             setCartData(cartStorage);
         }
+
     }, [cartStorage, getGroupByTaxes]);
 
     const removeItem = async (itemId) => {
@@ -223,6 +225,47 @@ const Checkout = () => {
         document.getElementById('btnClose').click();
     }
 
+    const orderTypeChange = (event) => {
+        const val = event.target.value.toLowerCase();
+        const orderType = parseInt(val);
+
+        let onlineOrderTypeName = 'Take Away';
+        if (orderType == 2) {
+            onlineOrderTypeName = 'Delivery';
+        }
+        else if (orderType == 3) {
+            onlineOrderTypeName = 'Dine In';
+        }
+
+        if (cartData) {
+            cartData = { ...cartData, ...{ onlineOrderType: orderType, onlineOrderTypeName } };
+            LocalStorageHelper.store(cartKey, cartData);
+        }
+
+        LocalStorageHelper.store(selectedOrderTypeKey, val);
+
+
+
+        if (val == 1 || (restaurantdata && restaurantdata.quickTables.length == 0 && val != 2)) {
+            router.push(`/restaurant/${id}/checkout`);
+        } else if (val == 3) {
+            LocalStorageHelper.store(KEY_CHANGE_ORDER_TYPE, true);
+            router.push(`/restaurant/${id}/tables`);
+        } else {
+            LocalStorageHelper.store(KEY_CHANGE_ORDER_TYPE, true);
+            router.push(`/restaurant/${id}/confirm-address`);
+        }
+    }
+
+    const getNetTotal = () => {
+        const netTotal = cartStorage.saleDetails.reduce((a, b) => {
+            return a + (b.retailprice * b.quantity) + (b.variationName ? b.variations.find(p => p.name == b.variationName).retailprice : 0)
+                + (b.selectedModifiers.length > 0 ? b.selectedModifiers.reduce((x, y) => { return x + y.price }, 0) : 0)
+        }, 0).toFixed(2);
+
+        return netTotal;
+    }
+
 
     return <div className="order-checkout">
         <LoadingBar color='#F07D00' ref={ref} />
@@ -291,7 +334,7 @@ const Checkout = () => {
                             <div className="card-body">
                                 <div className="single-data">
                                     <h3>Net Total</h3>
-                                    <h3>{saleItems.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h3>
+                                    <h3>{getNetTotal()}</h3>
                                 </div>
                                 <div className="single-data">
                                     <h4>Total items</h4>
@@ -299,7 +342,11 @@ const Checkout = () => {
                                 </div>
                                 <div className="single-data">
                                     <h4>Tip</h4>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#tipModal">{cartData && cartData.tipAmount ? cartData.tipAmount : 'Add'}</a>
+                                    <Link href={`/restaurant/${id}/tip`}>
+                                        <a>
+                                            {cartData && cartData.tipAmount ? (cartData.tipAmount).toFixed(2) : 'Add'}
+                                        </a>
+                                    </Link>
                                 </div>
                                 {
                                     taxes.map((taxItem, i) => {
@@ -319,10 +366,24 @@ const Checkout = () => {
                 </div>
                 <div className="section">
                     <div className='mt-2'>
-                        <div className="total-item">
+                        <div className="section d-flex justify-content-center">
+                            <div className="options mt-1">
+                                <div className="btn-group" role="group">
+                                    <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="1" name="btnRadioOrderType" id="TakeAway" checked={cartData.onlineOrderType == 1} />
+                                    <label className="btn btn-outline-primary" htmlFor="TakeAway">Take Away</label>
+
+                                    <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="3" name="btnRadioOrderType" id="DineIn" checked={cartData.onlineOrderType == 3} />
+                                    <label className="btn btn-outline-primary" htmlFor="DineIn">Dine In</label>
+
+                                    <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="2" name="btnRadioOrderType" id="Delivery" checked={cartData.onlineOrderType == 2} />
+                                    <label className="btn btn-outline-primary myDeliveryButton" htmlFor="Delivery">Delivery</label>
+                                </div>
+                            </div>
+                        </div>
+                        {/* <div className="total-item">
                             <h4>Order Type</h4>
                             <h4 className='fw-normal'>{cartData && cartData.onlineOrderTypeName}</h4>
-                        </div>
+                        </div> */}
                         {
                             cartData.onlineOrderType == 3 && cartData.tableId != 0 && <>
                                 <div className="total-item">
@@ -348,7 +409,7 @@ const Checkout = () => {
                         }
                     </div>
                 </div>
-                <div className="section mt-4">
+                <div className="section mt-0">
                     <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => payNow(e)}>Pay Now</button>
                 </div>
             </> : <>

@@ -60,6 +60,7 @@ const Restaurant = ({ restaurantdata }) => {
                 discount: 0,
                 discountAmount: 0,
                 tipAmount: 0,
+                tipType: 'amount',
                 salePayments: [{
                     paymentMethodId: 0,
                     paymentTypeId: 0,
@@ -203,7 +204,7 @@ const Restaurant = ({ restaurantdata }) => {
                         <div className="card card-border">
                             <Link href={`/restaurant/${id}/item-detail/${item.itemid}`}>
                                 <a>
-                                    <Image src={item.detailimageurl} width={300} height={150} layout="responsive" className="card-img-top" alt={item.name} />
+                                    <Image src={item.detailimageurl} width={150} height={150} layout="responsive" className="card-img-top" alt={item.name} />
                                     <div className="card-body">
                                         <div className="card-text">
                                             <div>

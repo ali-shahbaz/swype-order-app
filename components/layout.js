@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { apiSettings } from '../configs/api-settings';
 import { GetRestaurantData } from '../services/restaurant-service';
 import { LocalStorageHelper } from '../helpers/local-storage-helper';
-import { KEY_CART, KEY_RESTAURANT_DATA, KEY_LAST_VISITED_ITEM } from '../constants';
+import { KEY_CART, KEY_RESTAURANT_DATA, KEY_LAST_VISITED_ITEM, KEY_CHANGE_ORDER_TYPE } from '../constants';
 import useLocalStorage from '../hooks/useLocalStorage';
 
 
@@ -98,8 +98,13 @@ function Layout({ props = {}, children }) {
             }, 100);
         }
 
+        const pages = ['DeliveryAddressEdit', 'ConfirmAddress', 'Tables'];
+        if (pages.indexOf(props.name) < 0) {
+            LocalStorageHelper.store(KEY_CHANGE_ORDER_TYPE, false);
+        }
 
-    }, [asPath, id, push, sidebar]);
+
+    }, [asPath, id, props.name, push, sidebar]);
 
     function SidebarClickedEvent(event) {
         setSidebarClickedCount(++sidebarclickedcount);

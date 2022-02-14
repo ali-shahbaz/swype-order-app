@@ -168,7 +168,7 @@ const Menu = ({ restaurantdata }) => {
             {
                 restaurantdata.quickKeyCategoryList.map((item, i) => {
                     return <div id={item.categoryID} key={item.categoryID} className="sell-single-list mt-1">
-                        <div className="section-title ms-2">{item.name}</div>
+                        <div className="section-title ms-2">{i != 0 ? item.name : ''}</div>
                         <ul className="listview separate-list image-listview inset no-line">
                             {
                                 restaurantdata.quickProducts.filter(p => p.categoryid == item.categoryID).map((product, index) => {
@@ -180,13 +180,15 @@ const Menu = ({ restaurantdata }) => {
                                                 </a>
                                             </Link>
                                             <div className="in">
-                                                <div>
-                                                    <h4>
-                                                        <Link href={`/restaurant/${id}/item-detail/${product.itemid}`}>
-                                                            <a>{product.name}</a>
-                                                        </Link>
-                                                    </h4>
-                                                    <p>{product.description}</p>
+                                                <div className='item-details'>
+                                                    <div>
+                                                        <h4>
+                                                            <Link href={`/restaurant/${id}/item-detail/${product.itemid}`}>
+                                                                <a>{product.name}</a>
+                                                            </Link>
+                                                        </h4>
+                                                        <p>{product.description}</p>
+                                                    </div>
                                                     <div className="item-price-qnt">
                                                         <h5>{product.salesprice.toFixed(2)}</h5>
                                                         <div className="qnt-incre-decre">
