@@ -50,6 +50,10 @@ const Login = () => {
     return <div className="section">
         <Header title="Login"></Header>
         <LoadingBar color='#F07D00' ref={ref} />
+        {nav && <p>We wish to notify
+            you, when your order is
+            ready. Please confirm
+            your number below.</p>}
         <div className="card card-border mt-2">
             <div className="card-body">
                 <form>
@@ -68,13 +72,16 @@ const Login = () => {
         <div className="mt-4">
             <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => singin(e)}>{`Let's go`}</button>
         </div>
+        {nav && <div className="mt-0">
+            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => singin(e)}>{`Skip this step`}</button>
+        </div>}
     </div>
 }
 
 Login.defaultProps = {
     name: 'Login',
-    title: 'Login',
-    showBack: false,
+    title: 'Add Your Number',
+    showBack: true,
     showCart: false
 }
 
