@@ -34,20 +34,19 @@ const Checkout = ({ restaurantdata }) => {
     const [cartCount, setCartCount] = useRecoilState(cartState);
 
     const payNow = (event) => {
+
+        const cart = LocalStorageHelper.load(cartKey);
+        if (cart.onlineOrderType == 3 && !cart.tableName && restaurantdata.quickTables.length != 0) {
+            LocalStorageHelper.store(KEY_CHANGE_ORDER_TYPE, true);
+            router.push(`/restaurant/${id}/tables`);
+            return;
+        } else if (cart.onlineOrderType == 2 && Object.entries(cart.DeliveryAddress).length == 0) {
+            LocalStorageHelper.store(KEY_CHANGE_ORDER_TYPE, true);
+            router.push(`/restaurant/${id}/confirm-address`);
+            return;
+        }
+
         if (loggedInUser) {
-            const cart = LocalStorageHelper.load(cartKey);
-
-            if (cart.onlineOrderType == 3 && !cart.tableName && restaurantdata.quickTables.length != 0) {
-                LocalStorageHelper.store(KEY_CHANGE_ORDER_TYPE, true);
-                router.push(`/restaurant/${id}/tables`);
-                return;
-            } else if (cart.onlineOrderType == 2 && Object.entries(cart.DeliveryAddress).length == 0) {
-                LocalStorageHelper.store(KEY_CHANGE_ORDER_TYPE, true);
-                router.push(`/restaurant/${id}/confirm-address`);
-                return;
-            }
-
-
             event.target.disabled = true;
             ref.current.continuousStart();
 
