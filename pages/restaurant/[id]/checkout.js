@@ -91,7 +91,7 @@ const Checkout = ({ restaurantdata }) => {
                 }
             })
         } else {
-            router.push('/user/login')
+            router.push('/user/login?nav=checkout')
         }
     }
 
@@ -103,7 +103,8 @@ const Checkout = ({ restaurantdata }) => {
 
     const getGroupByTaxes = useCallback(() => {
         const taxArr = [];
-        cartStorage.saleDetails.reduce((prev, curr) => {
+        const cart = LocalStorageHelper.load(cartKey);
+        cart.saleDetails.reduce((prev, curr) => {
             const index = taxArr.findIndex(p => p.tax == curr.tax);
             // if (curr.tax != 0) {
             if (index < 0) {
@@ -115,7 +116,8 @@ const Checkout = ({ restaurantdata }) => {
         }, {});
 
         setTaxes(taxArr);
-    }, [cartStorage])
+
+    }, [cartKey])
 
     useEffect(() => {
         if (cartStorage) {
@@ -132,10 +134,10 @@ const Checkout = ({ restaurantdata }) => {
                 }
             });
 
-            getGroupByTaxes();
             setTipAmount(cartStorage.tipAmount);
             setSaleItems(newCart);
             setCartData(cartStorage);
+            getGroupByTaxes();
         }
 
     }, [cartStorage, getGroupByTaxes]);
@@ -148,8 +150,12 @@ const Checkout = ({ restaurantdata }) => {
             if (cartStorage) {
                 const saleDetails = cartData.saleDetails.filter(p => p.itemid != itemId);
                 cartStorage = { ...cartStorage, ...{ saleDetails } };
+                if (cartStorage.saleDetails.length == 0) {
+                    cartStorage.tipAmount = 0;
+                }
                 LocalStorageHelper.store(cartKey, cartStorage);
                 setCartData(cartStorage);
+                getGroupByTaxes();
                 setTimeout(() => {
                     setCartCount(cartStorage.saleDetails.reduce((prev, curr) => { return prev + curr.quantity }, 0));
                 }, 0);
@@ -257,15 +263,6 @@ const Checkout = ({ restaurantdata }) => {
         }
     }
 
-    const getNetTotal = () => {
-        const netTotal = cartStorage.saleDetails.reduce((a, b) => {
-            return a + (b.retailprice * b.quantity) + (b.variationName ? b.variations.find(p => p.name == b.variationName).retailprice : 0)
-                + (b.selectedModifiers.length > 0 ? b.selectedModifiers.reduce((x, y) => { return x + y.price }, 0) : 0)
-        }, 0).toFixed(2);
-
-        return netTotal;
-    }
-
 
     return <div className="order-checkout">
         <LoadingBar color='#F07D00' ref={ref} />
@@ -334,7 +331,10 @@ const Checkout = ({ restaurantdata }) => {
                             <div className="card-body">
                                 <div className="single-data">
                                     <h3>Net Total</h3>
-                                    <h3>{getNetTotal()}</h3>
+                                    <h3>{cartData.saleDetails.reduce((a, b) => {
+                                        return a + (b.retailprice * b.quantity) + (b.variationName ? b.variations.find(p => p.name == b.variationName).retailprice : 0)
+                                            + (b.selectedModifiers.length > 0 ? b.selectedModifiers.reduce((x, y) => { return x + y.price }, 0) : 0)
+                                    }, 0).toFixed(2)}</h3>
                                 </div>
                                 <div className="single-data">
                                     <h4>Total items</h4>
@@ -369,13 +369,13 @@ const Checkout = ({ restaurantdata }) => {
                         <div className="section d-flex justify-content-center">
                             <div className="options mt-1">
                                 <div className="btn-group" role="group">
-                                    <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="1" name="btnRadioOrderType" id="TakeAway" checked={cartData.onlineOrderType == 1} />
+                                    <input type="radio" className="btn-check" onClick={(e) => orderTypeChange(e)} onChange={(e) => orderTypeChange(e)} value="1" name="btnRadioOrderType" id="TakeAway" checked={cartData.onlineOrderType == 1} />
                                     <label className="btn btn-outline-primary" htmlFor="TakeAway">Take Away</label>
 
-                                    <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="3" name="btnRadioOrderType" id="DineIn" checked={cartData.onlineOrderType == 3} />
+                                    <input type="radio" className="btn-check" onClick={(e) => orderTypeChange(e)} onChange={(e) => orderTypeChange(e)} value="3" name="btnRadioOrderType" id="DineIn" checked={cartData.onlineOrderType == 3} />
                                     <label className="btn btn-outline-primary" htmlFor="DineIn">Dine In</label>
 
-                                    <input type="radio" className="btn-check" onChange={(e) => orderTypeChange(e)} value="2" name="btnRadioOrderType" id="Delivery" checked={cartData.onlineOrderType == 2} />
+                                    <input type="radio" className="btn-check" onClick={(e) => orderTypeChange(e)} onChange={(e) => orderTypeChange(e)} value="2" name="btnRadioOrderType" id="Delivery" checked={cartData.onlineOrderType == 2} />
                                     <label className="btn btn-outline-primary myDeliveryButton" htmlFor="Delivery">Delivery</label>
                                 </div>
                             </div>

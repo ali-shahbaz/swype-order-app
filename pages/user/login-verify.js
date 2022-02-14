@@ -87,7 +87,7 @@ const LoginVerify = () => {
         </div>
 
         <div className="mt-4">
-            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => verifyBySMS(e)}>Verify</button>
+            <button className="btn btn-primary btn-shadow btn-lg btn-block mt-2" onClick={(e) => verifyBySMS(e)}>Next</button>
         </div>
 
     </div>
@@ -95,7 +95,7 @@ const LoginVerify = () => {
 
 LoginVerify.defaultProps = {
     name: 'LoginVerify',
-    title: 'SMS',
+    title: 'Veify',
     showBack: true,
     showCart: false
 }

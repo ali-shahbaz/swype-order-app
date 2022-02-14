@@ -88,8 +88,9 @@ function Sidebar({ props, restaurantdata, sidebarclickedcount }) {
     }, [locale, loggedIn, loggedInUser, loggedInUserKey, props, router.events, sidebarclickedcount, storedData])
 
     const logout = () => {
-        localStorage.removeItem(KEY_LOGGED_IN_USER);
+        LocalStorageHelper.remove(KEY_LOGGED_IN_USER);
         setIsUserLoggedIn(false);
+        setUserData({});
     }
 
     const changeDarkMode = (event) => {
@@ -266,7 +267,7 @@ function Sidebar({ props, restaurantdata, sidebarclickedcount }) {
                         </li>
                     </ul>
                     <div className="section log-out-btn mt-3">
-                        {isUserLoggedIn ? (<button className="btn bg-primary btn-shadow btn-lg" onClick={logout}>Logout</button>) :
+                        {isUserLoggedIn ? (<button className="btn bg-primary btn-shadow btn-lg" onClick={() => logout()}>Logout</button>) :
                             <Link href="/user/login">
                                 <a className="btn bg-primary btn-shadow btn-lg">Login</a>
                             </Link>

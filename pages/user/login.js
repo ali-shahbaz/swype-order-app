@@ -14,13 +14,14 @@ import { LocalStorageHelper } from '../../helpers/local-storage-helper';
 const Login = () => {
     const [number, setNumber] = useState(null);
     const router = useRouter();
+    const { nav } = router.query;
     const ref = useRef(null);
 
     const singin = (event) => {
         if (number && number.isValid) {
             event.target.disabled = true;
             ref.current.continuousStart();
-            
+
             LoginUser(JSON.stringify(number))
                 .then(data => {
                     event.target.disabled = false;
@@ -31,7 +32,7 @@ const Login = () => {
                     } else {
                         ref.current.complete();
                     }
-                    
+
                 });
         } else {
             toast.error("Phone number is not valid");
@@ -56,7 +57,7 @@ const Login = () => {
                         <div className="input-wrapper">
                             <label className="label" htmlFor="phone">Mobile</label>
                             <IntlTelInput onPhoneNumberChange={changeHandler}
-                            fieldName="phone" preferredCountries={['us', 'gb', 'es','se']} 
+                                fieldName="phone" preferredCountries={['us', 'gb', 'es', 'se']}
                             />
                         </div>
                     </div>
