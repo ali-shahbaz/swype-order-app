@@ -78,7 +78,7 @@ const Tip = () => {
             <div className="col-4">
                 <div className="single-cash-payment">
                     <p>Amount</p>
-                    <h2>{cartStorage.saleDetails.reduce((a, b) => { return a + b.total }, 0).toFixed(2)}</h2>
+                    <h2>{cartStorage.saleDetails.reduce((a, b) => { return a + ( b.total * b.quantity) }, 0).toFixed(2)}</h2>
                 </div>
             </div>
             <div className="col-4">
@@ -90,7 +90,7 @@ const Tip = () => {
             <div className="col-4">
                 <div className="single-cash-payment">
                     <p>Total</p>
-                    <h2>{(cartStorage.saleDetails.reduce((a, b) => { return a + b.total }, 0) + (cartStorage.tipAmount || 0)).toFixed(2)}</h2>
+                    <h2>{(cartStorage.saleDetails.reduce((a, b) => { return a + ( b.total * b.quantity) }, 0) + (cartStorage.tipAmount || 0)).toFixed(2)}</h2>
                 </div>
             </div>
         </div>
