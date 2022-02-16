@@ -131,10 +131,14 @@ const Restaurant = ({ restaurantdata }) => {
         router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
     }
 
+    const getBackground = () => {
+        return `background: url('${restaurantdata.welcomePageVM.imageURL}')`
+    }
+
     if (!restaurantdata) return <></>
     const content = <div id="appCapsule" className="pt-0">
         <Header title={restaurantdata.welcomePageVM.header}></Header>
-        <div className="section full welcome-cover">
+        <div className="section full welcome-cover" style={{ background: `linear-gradient(180deg,#000000b2,#00000000),url(${restaurantdata.welcomePageVM.imageURL}) no-repeat 50%/cover` }}>
         </div>
         <div className="section full welcome-section">
             <div className="wide-block py-2">
