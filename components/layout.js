@@ -75,14 +75,6 @@ function Layout({ props = {}, children }) {
                 });
             } else {
                 restData.current = LocalStorageHelper.load(KEY_RESTAURANT_DATA);
-                // setTimeout(() => {
-                //     GetRestaurantData(data.id).then(response => {
-                //         if (response.status == 1) {
-                //             localStorage.setItem('init_data', JSON.stringify(response.payload.data));
-                //         }
-
-                //     });
-                // }, 1000);
             }
         }
 

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Header from '../../components/head';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -9,6 +9,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import { LocalStorageHelper } from '../../helpers/local-storage-helper';
 import { KEY_CART, KEY_LOGGED_IN_USER, KEY_SELECTED_MENU, KEY_SELECTED_ORDER_TYPE } from '../../constants';
+import { GetRestaurantData } from '../../services/restaurant-service';
 
 const Restaurant = ({ restaurantdata }) => {
     const [offers, setOffers] = useState([]);
@@ -110,6 +111,21 @@ const Restaurant = ({ restaurantdata }) => {
 
     }, [locale, restaurantdata, selectedMenuTabKey, selectedOrderType, selectedOrderTypeKey, selectedTabIndex, setStartOrderUrl, startWithOrderType]);
 
+
+    useLayoutEffect(() => {
+        if (id) {
+            setTimeout(() => {
+                GetRestaurantData(id).then(response => {
+                    if (response.status == 1) {
+                        localStorage.setItem('init_data', JSON.stringify(response.payload.data));
+                    }
+
+                });
+            }, 1000);
+        }
+
+    }, [id])
+
     const setOffersData = (data) => {
         const offers = data.welcomePageVM.todaySpecials.map((value, index) => {
             const product = data.quickProducts.find(p => p.itemid == value.itemId);
@@ -129,10 +145,6 @@ const Restaurant = ({ restaurantdata }) => {
 
     const changeLanguage = (lngCode) => {
         router.push(`/restaurant/${id}`, `/restaurant/${id}`, { locale: lngCode });
-    }
-
-    const getBackground = () => {
-        return `background: url('${restaurantdata.welcomePageVM.imageURL}')`
     }
 
     if (!restaurantdata) return <></>
@@ -182,7 +194,7 @@ const Restaurant = ({ restaurantdata }) => {
                 </div>
             </div>
         </div>
-        <h3 className="section card-title mt-3">Special Offers!</h3>
+        {offers.length > 0 && <h3 className="section card-title mt-3">Special Offers!</h3>}
 
         <Splide options={{
             perPage: 2,
