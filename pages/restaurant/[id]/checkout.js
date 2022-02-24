@@ -117,16 +117,30 @@ const Checkout = ({ restaurantdata }) => {
     const getGroupByTaxes = useCallback(() => {
         const taxArr = [];
         const cart = LocalStorageHelper.load(cartKey);
-        cart.saleDetails.reduce((prev, curr) => {
-            const index = taxArr.findIndex(p => p.tax == curr.tax);
-            // if (curr.tax != 0) {
-            if (index < 0) {
-                taxArr.push({ tax: curr.tax, taxAmount: curr.quantity * curr.taxAmount })
-            } else {
-                taxArr[index].taxAmount += (curr.quantity * curr.taxAmount);
+        cart.saleDetails.filter(p => p.taxamountdetails.length > 0).map((value, index) => {
+            for (let i = 0; i < value.taxamountdetails.length; i++) {
+                const curr = value.taxamountdetails[i];
+                const index = taxArr.findIndex(p => p.tax == curr.tax);
+                // if (curr.tax != 0) {
+                if (index < 0) {
+                    taxArr.push({ tax: curr.tax, taxAmount: value.quantity * curr.taxAmount, name: curr.name })
+                } else {
+                    taxArr[index].taxAmount += (curr.quantity * curr.taxAmount);
+                }
+                // }
             }
-            // }
-        }, {});
+        })
+
+        // cart.saleDetails.reduce((prev, curr) => {
+        //     const index = taxArr.findIndex(p => p.tax == curr.tax);
+        //     // if (curr.tax != 0) {
+        //     if (index < 0) {
+        //         taxArr.push({ tax: curr.tax, taxAmount: curr.quantity * curr.taxAmount })
+        //     } else {
+        //         taxArr[index].taxAmount += (curr.quantity * curr.taxAmount);
+        //     }
+        //     // }
+        // }, {});
 
         setTaxes(taxArr);
 
@@ -364,7 +378,8 @@ const Checkout = ({ restaurantdata }) => {
                                 {
                                     taxes.map((taxItem, i) => {
                                         return <div key={i} className="single-data">
-                                            <h4>Tax #{i + 1} ({taxItem.tax}%)</h4>
+                                            <h4>{taxItem.name}</h4>
+                                            {/* <h4>Tax #{i + 1} ({taxItem.tax}%)</h4> */}
                                             <p>{(taxItem.taxAmount).toFixed(2)}</p>
                                         </div>
                                     })

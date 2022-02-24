@@ -32,7 +32,8 @@ export const getItemForCart = (item) => {
         modifiers: item.modifiers,
         selectedModifiers: [],
         variations: item.variations,
-        extras : 0
+        extras : 0,
+        taxamountdetails: item.taxamountdetails
     }
 
     return itemObj;
