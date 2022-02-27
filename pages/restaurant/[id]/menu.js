@@ -172,6 +172,14 @@ const Menu = ({ restaurantdata }) => {
                         <ul className="listview separate-list image-listview inset no-line">
                             {
                                 restaurantdata.quickProducts.filter(p => p.categoryid == item.categoryID).map((product, index) => {
+
+                                    let inputStyle = 
+                                    {
+                                        width: '1ch'
+                                    }
+                                    if(getQuantity(product.itemid) > 9)
+                                        inputStyle.width = '2ch';
+
                                     return <li key={product.itemid} className="items-card card card-border">
                                         <div className="item">
                                             <Link href={`/restaurant/${id}/item-detail/${product.itemid}`}>
@@ -195,12 +203,13 @@ const Menu = ({ restaurantdata }) => {
                                                             {getQuantity(product.itemid) > 0 && <>
                                                                 <div className="qnt-incre-decre-bg"></div>
                                                                 <div></div>
-                                                                <div className="hide-incre-decre" onClick={(event) => decreaseQty(event, product.itemid)}>
+                                                                <div className="hide-incre-decre aaa" onClick={(event) => decreaseQty(event, product.itemid)}>
                                                                     <RemoveCircle cssClasses="ion-icon" />
                                                                 </div>
-                                                                <input type="text" value={getQuantity(product.itemid)} onChange={() => { }} />
+                                                                <input type="text" value={getQuantity(product.itemid)} onChange={() => { }}  style={ inputStyle }  />
                                                             </>
-                                                            }
+                                                            } 
+
                                                             <div className="show-incre-decre" onClick={(event) => increaseQty(event, product.itemid)}>
                                                                 <AddCircle cssClasses="ion-icon" />
                                                             </div>

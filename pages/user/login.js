@@ -12,7 +12,6 @@ import { LocalStorageHelper } from '../../helpers/local-storage-helper';
 import { PlaceOrder } from '../../services/restaurant-service';
 import { loadStripe } from '@stripe/stripe-js';
 
-
 const Login = () => {
     const [number, setNumber] = useState(null);
     const router = useRouter();
@@ -23,7 +22,9 @@ const Login = () => {
         if (number && number.isValid) {
             event.target.disabled = true;
             ref.current.continuousStart();
-
+            
+            number.MobileNumber = number.MobileNumber.replace(new RegExp(' ', 'g'), ''); //remove all spaces in number
+            setNumber(number);
             LoginUser(JSON.stringify(number))
                 .then(data => {
                     event.target.disabled = false;
@@ -99,7 +100,12 @@ const Login = () => {
                             toast.error(result.error.message);
                         });
                     });
-                } else {
+                } 
+                else if (response.payload.paymentProvider == 'none')
+                {
+                    window.location.assign(response.payload.successURL);
+                }
+                else {
                     event.target.disabled = false;
                     ref.current.complete();
                 }

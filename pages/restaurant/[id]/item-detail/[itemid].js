@@ -176,6 +176,13 @@ const ItemDetail = ({ restaurantdata }) => {
     }
 
     if (!restaurantdata || !itemState || orderItemsState.length == 0 || !cartStorage) return <></>
+    let inputStyle = 
+    {
+        width: '1ch'
+    }
+    let qty = orderItemsState.reduce((prev, curr) => { return prev + curr.quantity }, 0);
+    if(qty > 9)
+        inputStyle.width = '2ch';
     return <>
         <Header title={itemState.name}></Header>
         <div className="order-item-img">
@@ -191,10 +198,10 @@ const ItemDetail = ({ restaurantdata }) => {
                 <div className="qnt-incre-decre qnt-mt-3">
                     <div className="qnt-incre-decre-bg"></div>
                     <div></div>
-                    <div onClick={() => removeAnotherItem(orderItemsState.length - 1)} className="hide-incre-decre">
+                    <div onClick={() => removeAnotherItem(orderItemsState.length - 1)} className="hide-incre-decre ccc">
                         <RemoveCircle cssClasses="ion-icon" />
                     </div>
-                    <input type="text" value={orderItemsState.reduce((prev, curr) => { return prev + curr.quantity }, 0)} onChange={() => { }} />
+                    <input type="text" value={orderItemsState.reduce((prev, curr) => { return prev + curr.quantity }, 0)} onChange={() => { }} style={inputStyle} />
                     <div onClick={() => addAnotherItem()} className="show-incre-decre">
                         <AddCircle cssClasses="ion-icon" />
                     </div>
