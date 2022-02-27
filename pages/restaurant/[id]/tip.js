@@ -15,16 +15,40 @@ const Tip = () => {
     const [tip, setTip] = useState(0);
     const [tipType, setTipType] = useState(null);
     const btnVal = useRef(0);
+    const tipRef = useRef(0);
 
     useEffect(() => {
         if (cartStorage) {
             setTip(cartStorage.tipAmount);
             setTipType(cartStorage.tipType);
+
+            if (tipRef && tipRef.current) {
+                tipRef.current.addEventListener('click', (e) => {
+                    const input = document.getElementsByClassName('tip-textbox');
+                    const tipLabel = document.getElementById('tipLabel');
+                    if (input.length > 0) {
+                        input[0].style.display = 'block';
+                        input[0].value = tip;
+                        tipLabel.style.display = 'none';
+                    }
+                })
+
+                tipRef.current.removeEventListener('click', () => { });
+            }
+
         }
 
-    }, [cartStorage]);
+    }, [cartStorage, tip]);
 
     const setTipValue = (val) => {
+
+        const input = document.getElementsByClassName('tip-textbox');
+        const tipLabel = document.getElementById('tipLabel');
+        if (input.length > 0) {
+            input[0].style.display = 'none';
+            tipLabel.style.display = 'block';
+        }
+
         setTip(val);
         btnVal.current = val;
         cartStorage.tipAmount = val;
@@ -36,20 +60,19 @@ const Tip = () => {
         const val = event.target.value.toLowerCase();
         cartStorage.tipType = val;
         setTipType(val);
-        setTipAmount();
+        setTipAmount(true);
 
     }
 
-    const setTipAmount = () => {
-        if (cartStorage.tipType == 'percentage') {
+    const setTipAmount = (isEditTip = false) => {
+        if (cartStorage.tipType == 'percentage' && !isEditTip) {
             const total = cartStorage.saleDetails.reduce((a, b) => { return a + b.total }, 0);
             const tipAmount = total / 100 * btnVal.current;
-            setTip(btnVal.current);
+            setTip(tipAmount);
             cartStorage.tipAmount = tipAmount;
         } else {
             setTip(btnVal.current);
             cartStorage.tipAmount = btnVal.current;
-
         }
 
         LocalStorageHelper.store(cartKey, cartStorage);
@@ -61,14 +84,11 @@ const Tip = () => {
     }
 
     const editTip = (event) => {
-        if(event.target.innerText){
-            let val = parseFloat(event.target.innerText);
-            setTip(val);
-            btnVal.current = val;
-            setTipAmount();
-        }
-        
-        
+        let val = parseFloat(event.target.value || 0);
+        setTip(val);
+        btnVal.current = val;
+        setTipAmount(true);
+
     }
 
     if (!cartStorage) return <></>
@@ -78,19 +98,22 @@ const Tip = () => {
             <div className="col-4">
                 <div className="single-cash-payment">
                     <p>Amount</p>
-                    <h2>{cartStorage.saleDetails.reduce((a, b) => { return a + ( b.total * b.quantity) }, 0).toFixed(2)}</h2>
+                    <h2>{cartStorage.saleDetails.reduce((a, b) => { return a + (b.total * b.quantity) }, 0).toFixed(2)}</h2>
                 </div>
             </div>
             <div className="col-4">
                 <div className="single-cash-payment">
                     <p>Tip</p>
-                    <h2 contentEditable={true} suppressContentEditableWarning={true} onKeyPress={(e) => preventAlphas(e)} onKeyUp={(e) => editTip(e)}>{tip.toFixed(2)}</h2>
+                    <h2 ref={tipRef}>
+                        <input style={{ display: 'none' }} className="tip-textbox" type="text" onKeyPress={(e) => preventAlphas(e)} onChange={(e) => editTip(e)} />
+                        <span id="tipLabel">{tip.toFixed(2)}</span>
+                    </h2>
                 </div>
             </div>
             <div className="col-4">
                 <div className="single-cash-payment">
                     <p>Total</p>
-                    <h2>{(cartStorage.saleDetails.reduce((a, b) => { return a + ( b.total * b.quantity) }, 0) + (cartStorage.tipAmount || 0)).toFixed(2)}</h2>
+                    <h2>{(cartStorage.saleDetails.reduce((a, b) => { return a + (b.total * b.quantity) }, 0) + (cartStorage.tipAmount || 0)).toFixed(2)}</h2>
                 </div>
             </div>
         </div>

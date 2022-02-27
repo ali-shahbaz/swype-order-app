@@ -7490,7 +7490,7 @@ textarea,
   position: relative;
 }
 
-.order-item .section-title{
+.order-item .section-title {
   font-size: 24px;
   font-weight: 700;
 }
@@ -7793,7 +7793,7 @@ textarea,
 
 .amount-btn {
   -ms-flex-wrap: nowrap;
-      flex-wrap: nowrap;
+  flex-wrap: nowrap;
 }
 
 .amount-btn button {
@@ -7807,8 +7807,8 @@ textarea,
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: center !important;
-      -ms-flex-pack: center !important;
-          justify-content: center !important;
+  -ms-flex-pack: center !important;
+  justify-content: center !important;
   gap: 10px;
 }
 
@@ -9668,4 +9668,13 @@ label.uploader {
 
 label.uploader input[type="file"] {
   display: none;
+}
+
+.tip-textbox {
+  width: 120px;
+  padding: 0px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-weight: bold;
 }

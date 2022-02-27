@@ -95,7 +95,7 @@ const LoginVerify = () => {
 
 LoginVerify.defaultProps = {
     name: 'LoginVerify',
-    title: 'Veify',
+    title: 'Verify',
     showBack: true,
     showCart: false
 }
