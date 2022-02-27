@@ -92,7 +92,12 @@ const Checkout = ({ restaurantdata }) => {
                                 toast.error(result.error.message);
                             });
                         });
-                    } else {
+                    } 
+                    else if (response.payload.paymentProvider == 'none')
+                    {
+                        window.location.assign(response.payload.successURL);
+                    }
+                    else {
                         event.target.disabled = false;
                         ref.current.complete();
                     }
@@ -296,6 +301,13 @@ const Checkout = ({ restaurantdata }) => {
         <Header title="Checkout"></Header>
         <ul className="listview separate-list image-listview inset no-line">
             {saleItems.map((item, i) => {
+                let inputStyle = 
+                {
+                    width: '1ch'
+                }
+                if(item.quantity > 9)
+                    inputStyle.width = '2ch';
+
                 return <li key={i} className="items-card card card-border">
                     <div className="item">
                         {item.detailimageurl &&
@@ -318,10 +330,11 @@ const Checkout = ({ restaurantdata }) => {
                                     <div className="qnt-incre-decre">
                                         <div className="qnt-incre-decre-bg"></div>
                                         <div className="delete-checkout-modal"></div>
-                                        <div className="hide-incre-decre" onClick={() => removeItemQty(item.itemid)}>
+                                        <div className="hide-incre-decre bbb" onClick={() => removeItemQty(item.itemid)}>
                                             <RemoveCircle cssClasses="ion-icon" />
                                         </div>
-                                        <input type="text" value={item.quantity} onChange={() => { }} />
+                                        <input type="text" value={item.quantity} onChange={() => { }} style={inputStyle}/>
+
                                         <div className="show-incre-decre" onClick={() => addItemQty(item.itemid)}>
                                             <AddCircle cssClasses="ion-icon" />
                                         </div>

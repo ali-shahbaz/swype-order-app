@@ -67,7 +67,7 @@ export default function Home({ data }) {
                 <a>
                   <div className="card item-card card-border p-0 restaurant-card">
                     <div>
-                      <Image src={item.companyLogoUrl} height={300} width={400} layout="responsive" priority className="card-img-top" alt="image" />
+                      <Image src={item.companyLogoUrl ? item.companyLogoUrl : '/images/blank.png'} height={300} width={400} layout="responsive" priority className="card-img-top" alt="image" />
                     </div>
                     <h4  className="card-title">{item.companyName}</h4>
                     { 

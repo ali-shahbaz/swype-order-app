@@ -11,8 +11,7 @@ const Header = ({ title, children }) => {
         <meta name="description" content="Finapp HTML Mobile Template" />
         <meta name="keywords"
             content="bootstrap, wallet, banking, fintech mobile template, cordova, phonegap, mobile, html, responsive" />
-        <link rel="icon" type="image/png" href="/images/favicon.png" sizes="32x32" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/images/icon/192x192.png" />
+        <link rel="icon" type="image/png" href="/images/favicon.ico" sizes="32x32" />
         {children}
     </Head>
 }
