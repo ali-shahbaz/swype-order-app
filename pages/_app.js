@@ -9,9 +9,11 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { appWithTranslation } from 'next-i18next';
 import Router from 'next/router';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 const MyApp = ({ Component, pageProps }) => {
   const [loading, setLoading] = useState(false);
+  const isDarkMode = useLocalStorage('dark-mode');
   //let [SidebarObj, setSidebarObj] = useState(null);
   let sidebarObj = 0;
   useEffect(() => {
@@ -34,8 +36,13 @@ const MyApp = ({ Component, pageProps }) => {
         <Component {...pageProps} />
       ) : (
         <div id="loader">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/loading-icon.png" alt="icon" className="loading-icon" />
+          {isDarkMode ?
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src="/images/loading-dark-icon.png" alt="icon" className="loading-icon" /> :
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src="/images/loading-icon.png" alt="icon" className="loading-icon" />}
+          { }
+
         </div>
       )}
       <Sidebar props={Component.defaultProps} abc={++sidebarObj} />

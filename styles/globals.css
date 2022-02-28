@@ -1328,6 +1328,10 @@ blockquote.blockquote .blockquote-footer {
   border-radius: 0 !important;
 }
 
+body.dark-mode #loader {
+  background: #000000;
+}
+
 #loader {
   position: fixed;
   left: 0;
