@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import IntlTelInput from 'react-intl-tel-input';
 import 'react-intl-tel-input/dist/main.css';
 import { LoginUser } from '../../services/user-service';
@@ -18,11 +18,23 @@ const Login = () => {
     const { nav } = router.query;
     const ref = useRef(null);
 
+    useLayoutEffect(() => {
+        if (document) {
+            const element = document.getElementById('phoneNumber');
+            if (element) {
+                element.addEventListener('keypress', (event) => {
+                    let x = event.charCode || event.keyCode;
+                    if (isNaN(String.fromCharCode(event.which)) && x != 46 || x === 32 || x === 13 || (x === 46 && event.currentTarget.innerText.includes('.'))) event.preventDefault();
+                })
+            }
+        }
+    }, [])
+
     const singin = (event) => {
         if (number && number.isValid) {
             event.target.disabled = true;
             ref.current.continuousStart();
-            
+
             number.MobileNumber = number.MobileNumber.replace(new RegExp(' ', 'g'), ''); //remove all spaces in number
             setNumber(number);
             LoginUser(JSON.stringify(number))
@@ -100,9 +112,8 @@ const Login = () => {
                             toast.error(result.error.message);
                         });
                     });
-                } 
-                else if (response.payload.paymentProvider == 'none')
-                {
+                }
+                else if (response.payload.paymentProvider == 'none') {
                     window.location.assign(response.payload.successURL);
                 }
                 else {
@@ -131,7 +142,7 @@ const Login = () => {
                     <div className="form-group flag-mbl-input basic">
                         <div className="input-wrapper">
                             <label className="label" htmlFor="phone">Mobile</label>
-                            <IntlTelInput onPhoneNumberChange={changeHandler}
+                            <IntlTelInput fieldId="phoneNumber" onPhoneNumberChange={changeHandler}
                                 fieldName="phone" preferredCountries={['us', 'gb', 'es', 'se']}
                             />
                         </div>
