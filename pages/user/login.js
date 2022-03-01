@@ -39,7 +39,7 @@ const Login = () => {
             event.target.disabled = true;
             ref.current.continuousStart();
 
-            number.MobileNumber = number.MobileNumber.replace(new RegExp(' ', 'g'), ''); //remove all spaces in number
+            number.MobileNumber = number.MobileNumber.replace(new RegExp(' ', 'g'), '').replace(new RegExp('-', 'g'), ''); //remove all spaces in number
             setNumber(number);
             LoginUser(JSON.stringify(number))
                 .then(data => {
