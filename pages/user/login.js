@@ -22,9 +22,13 @@ const Login = () => {
         if (document) {
             const element = document.getElementById('phoneNumber');
             if (element) {
-                element.addEventListener('keypress', (event) => {
-                    let x = event.charCode || event.keyCode;
-                    if (isNaN(String.fromCharCode(event.which)) && x != 46 || x === 32 || x === 13 || (x === 46 && event.currentTarget.innerText.includes('.'))) event.preventDefault();
+                element.addEventListener('keypress', (evt) => {
+                    evt = (evt) ? evt : window.event;
+                    var charCode = (evt.which) ? evt.which : evt.keyCode;
+                    if (charCode != 43 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                        evt.preventDefault();
+                    }
+                    return true;
                 })
             }
         }
